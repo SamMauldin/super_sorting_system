@@ -19,18 +19,14 @@ pub struct Stats {
 }
 
 pub fn calculate_stats(state: &State) -> Stats {
-    let inventories_in_mem = state.inventories.iter_contents().count();
+    let inventories_in_mem = state.inventories.iter_inventories().count();
 
-    let total_slots = state
-        .inventories
-        .iter_contents()
-        .map(|(_key, inv)| inv.slots.len())
-        .sum::<usize>();
+    let total_slots = state.inventories.iter_slots().count();
     let free_slots = state
         .inventories
-        .iter_contents()
-        .map(|(_key, inv)| inv.slots.iter().filter(|slot| slot.is_none()).count())
-        .sum::<usize>();
+        .iter_slots()
+        .filter(|(_, _, slot)| slot.is_none())
+        .count();
 
     let current_holds = state.holds.iter().count();
 

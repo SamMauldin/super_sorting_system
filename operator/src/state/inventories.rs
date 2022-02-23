@@ -1,6 +1,6 @@
 use std::collections::{hash_map::Iter, HashMap};
 
-use crate::types::{Inventory, Vec3};
+use crate::types::{Inventory, Item, Vec3};
 
 pub struct InventoryState {
     inventory_map: HashMap<Vec3, Inventory>,
@@ -23,7 +23,16 @@ impl InventoryState {
         self.inventory_map.get(location)
     }
 
-    pub fn iter_contents(&self) -> Iter<Vec3, Inventory> {
+    pub fn iter_inventories(&self) -> Iter<Vec3, Inventory> {
         self.inventory_map.iter()
+    }
+
+    pub fn iter_slots(&self) -> impl Iterator<Item = (Vec3, usize, &Option<Item>)> {
+        self.iter_inventories().flat_map(|(&loc, inv)| {
+            inv.slots
+                .iter()
+                .enumerate()
+                .map(move |(slot, item)| (loc, slot, item))
+        })
     }
 }

@@ -24,7 +24,7 @@ async fn inventory_contents(state: StateData) -> impl Responder {
 
     let contents: Vec<InventoryWithLoc> = state
         .inventories
-        .iter_contents()
+        .iter_inventories()
         .map(|(loc, inv)| InventoryWithLoc {
             slots: inv.slots.clone(),
             loc: *loc,

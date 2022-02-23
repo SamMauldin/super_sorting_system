@@ -1,3 +1,5 @@
+use std::ops::DerefMut;
+
 use actix_web::{get, guard, post, web, HttpResponse, Responder};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -123,23 +125,17 @@ enum FreeHoldResponse {
 
 #[post("/hold/free")]
 async fn free_hold(_agent: Agent, state: StateData) -> impl Responder {
-    let mut state = state.lock().unwrap();
+    let mut state_lock = state.lock().unwrap();
+    let state = state_lock.deref_mut();
 
-    for (&loc, inv) in state.inventories.iter_contents() {
-        for (slot, _item) in inv
-            .slots
-            .iter()
-            .enumerate()
-            .filter(|(_slot, item)| item.is_none())
-        {
-            if state.holds.existing_hold(loc, slot as u32).is_some() {
-                continue;
-            }
-
-            let hold = state.holds.create(loc, slot as u32).unwrap();
-
-            return HttpResponse::Ok().json(FreeHoldResponse::HoldAcquired { hold: hold.clone() });
+    for (loc, slot, item) in state.inventories.iter_slots() {
+        if item.is_some() || state.holds.existing_hold(loc, slot as u32).is_some() {
+            continue;
         }
+
+        let hold = state.holds.create(loc, slot as u32).unwrap();
+
+        return HttpResponse::Ok().json(FreeHoldResponse::HoldAcquired { hold: hold.clone() });
     }
 
     HttpResponse::NotFound().json(FreeHoldResponse::HoldUnavailable)

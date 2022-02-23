@@ -49,42 +49,40 @@ impl Service for DefraggerService {
 
         let mut partial_items: HashMap<&str, (Vec3, usize, &Item)> = HashMap::new();
 
-        for (loc, inv) in state.inventories.iter_contents() {
-            for (slot, item) in inv.slots.iter().enumerate() {
-                if let Some(item) = item {
-                    if item.count < item.stack_size {
-                        if state.holds.existing_hold(*loc, slot as u32).is_some() {
-                            continue;
-                        }
+        for (loc, slot, item) in state.inventories.iter_slots() {
+            if let Some(item) = item {
+                if item.count < item.stack_size {
+                    if state.holds.existing_hold(loc, slot as u32).is_some() {
+                        continue;
+                    }
 
-                        if let Some((pair_loc, pair_slot, pair_item)) =
-                            partial_items.get(item.stackable_hash.as_str())
-                        {
-                            let remaining_space = pair_item.stack_size - pair_item.count;
-                            let items_to_move = min(item.count, remaining_space);
+                    if let Some((pair_loc, pair_slot, pair_item)) =
+                        partial_items.get(item.stackable_hash.as_str())
+                    {
+                        let remaining_space = pair_item.stack_size - pair_item.count;
+                        let items_to_move = min(item.count, remaining_space);
 
-                            let hold_id = state.holds.create(*loc, slot as u32).unwrap().id;
-                            let pair_hold_id =
-                                state.holds.create(*pair_loc, *pair_slot as u32).unwrap().id;
+                        let hold_id = state.holds.create(loc, slot as u32).unwrap().id;
+                        let pair_hold_id =
+                            state.holds.create(*pair_loc, *pair_slot as u32).unwrap().id;
 
-                            let queued_op_id = state
-                                .operations
-                                .queue_operation(
-                                    OperationPriority::Background,
-                                    OperationKind::MoveItems {
-                                        source_hold: hold_id,
-                                        destination_hold: pair_hold_id,
-                                        count: items_to_move,
-                                    },
-                                )
-                                .id;
+                        let queued_op_id = state
+                            .operations
+                            .queue_operation(
+                                OperationPriority::Background,
+                                OperationKind::MoveItems {
+                                    source_hold: hold_id,
+                                    destination_hold: pair_hold_id,
+                                    count: items_to_move,
+                                },
+                            )
+                            .id;
 
-                            self.outstanding_operation = Some(queued_op_id);
+                        self.outstanding_operation = Some(queued_op_id);
 
-                            return;
-                        } else {
-                            partial_items.insert(item.stackable_hash.as_str(), (*loc, slot, item));
-                        }
+                        return;
+                    } else {
+                        partial_items.insert(item.stackable_hash.as_str(), (loc, slot, item));
                     }
                 }
             }
