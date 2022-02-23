@@ -1,9 +1,9 @@
-use actix_web::{delete, get, guard, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    config::{Config, ConfigData},
+    config::ConfigData,
     state::{
         holds::{Hold, HoldError},
         operations::{Operation, OperationKind, OperationPriority},
@@ -159,19 +159,9 @@ async fn get_operation(state: StateData, op_id: web::Path<Uuid>) -> impl Respond
     }
 }
 
-pub fn configure(app: &mut web::ServiceConfig, config: &Config) {
-    let api_keys = config.auth.automation_api_keys.clone();
-
+pub fn configure(app: &mut web::ServiceConfig) {
     app.service(
         web::scope("/automation")
-            .guard(guard::fn_guard(move |req| {
-                req.headers()
-                    .get("X-Api-Key")
-                    .and_then(|header| header.to_str().ok())
-                    .and_then(|header| Uuid::parse_str(header).ok())
-                    .map(|header| api_keys.contains(&header))
-                    .unwrap_or(false)
-            }))
             .service(inventory_contents)
             .service(pathfinding_config)
             .service(holds_index)

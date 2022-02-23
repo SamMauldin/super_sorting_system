@@ -19,10 +19,7 @@ pub struct ComplexConfig {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AuthConfig {
-    pub agent_api_keys: Vec<Uuid>,
-    pub admin_api_keys: Vec<Uuid>,
-    pub automation_api_keys: Vec<Uuid>,
-    pub data_api_keys: Vec<Uuid>,
+    pub api_keys: Vec<Uuid>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

@@ -12,8 +12,9 @@ mod types;
 use std::{sync::Mutex, thread, time::Duration};
 
 use actix_cors::Cors;
-use actix_web::{middleware, web, App, HttpServer};
+use actix_web::{guard, middleware, web, App, HttpServer};
 use thiserror::Error;
+use uuid::Uuid;
 
 use crate::{
     pathfinding::{verify_pathfinding_config, PathfindingError},
@@ -72,16 +73,29 @@ async fn main() -> Result<(), StartupError> {
     let app_state = state.clone();
 
     HttpServer::new(move || {
+        let app_config_guard = app_config.clone();
+
         App::new()
             .app_data(app_config.clone())
             .app_data(app_state.clone())
             .wrap(middleware::Logger::default())
             .wrap(middleware::NormalizePath::trim())
             .wrap(Cors::permissive())
-            .configure(|serv_config| api::agent_service::configure(serv_config, &app_config))
-            .configure(|serv_config| api::admin_service::configure(serv_config, &app_config))
-            .configure(|serv_config| api::automation_service::configure(serv_config, &app_config))
-            .configure(|serv_config| api::data_service::configure(serv_config, &app_config))
+            .service(
+                web::scope("")
+                    .guard(guard::fn_guard(move |req| {
+                        req.headers()
+                            .get("X-Api-Key")
+                            .and_then(|header| header.to_str().ok())
+                            .and_then(|header| Uuid::parse_str(header).ok())
+                            .map(|header| app_config_guard.auth.api_keys.contains(&header))
+                            .unwrap_or(false)
+                    }))
+                    .configure(api::agent_service::configure)
+                    .configure(api::admin_service::configure)
+                    .configure(api::automation_service::configure)
+                    .configure(api::data_service::configure),
+            )
     })
     .bind((config.host.as_str(), config.port))
     .map_err(StartupError::CreateServerError)?

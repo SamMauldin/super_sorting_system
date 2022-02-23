@@ -1,6 +1,6 @@
 use std::ops::DerefMut;
 
-use actix_web::{get, guard, post, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -248,19 +248,9 @@ async fn pathfinding(
     }
 }
 
-pub fn configure(app: &mut web::ServiceConfig, config: &Config) {
-    let api_keys = config.auth.agent_api_keys.clone();
-
+pub fn configure(app: &mut web::ServiceConfig) {
     app.service(
         web::scope("/agent")
-            .guard(guard::fn_guard(move |req| {
-                req.headers()
-                    .get("X-Api-Key")
-                    .and_then(|header| header.to_str().ok())
-                    .and_then(|header| Uuid::parse_str(header).ok())
-                    .map(|header| api_keys.contains(&header))
-                    .unwrap_or(false)
-            }))
             .service(register_agent)
             .service(heartbeat)
             .service(alert)
