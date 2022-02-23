@@ -47,7 +47,7 @@ impl Service for DefraggerService {
             }
         }
 
-        let mut partial_items: HashMap<u64, (Vec3, usize, &Item)> = HashMap::new();
+        let mut partial_items: HashMap<&str, (Vec3, usize, &Item)> = HashMap::new();
 
         for (loc, inv) in state.inventories.iter_contents() {
             for (slot, item) in inv.slots.iter().enumerate() {
@@ -58,7 +58,7 @@ impl Service for DefraggerService {
                         }
 
                         if let Some((pair_loc, pair_slot, pair_item)) =
-                            partial_items.get(&item.stackable_hash)
+                            partial_items.get(item.stackable_hash.as_str())
                         {
                             let remaining_space = pair_item.stack_size - pair_item.count;
                             let items_to_move = min(item.count, remaining_space);
@@ -83,7 +83,7 @@ impl Service for DefraggerService {
 
                             return;
                         } else {
-                            partial_items.insert(item.stackable_hash, (*loc, slot, item));
+                            partial_items.insert(item.stackable_hash.as_str(), (*loc, slot, item));
                         }
                     }
                 }

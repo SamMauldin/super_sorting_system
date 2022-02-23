@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
@@ -63,7 +63,7 @@ impl UnhashedItem {
         }
     }
 
-    fn stackable_hash(&self) -> u64 {
+    fn stackable_hash(&self) -> String {
         let mut s = DefaultHasher::new();
 
         self.item_id.hash(&mut s);
@@ -71,7 +71,7 @@ impl UnhashedItem {
         let serialized_nbt = serde_json::to_string(&self.nbt).unwrap();
         serialized_nbt.hash(&mut s);
 
-        s.finish()
+        s.finish().to_string()
     }
 }
 
@@ -82,16 +82,7 @@ pub struct Item {
     pub metadata: u32,
     pub nbt: Value,
     pub stack_size: u32,
-    // Serialize as string because JS can't represent u64s :(
-    #[serde(serialize_with = "u64_as_string")]
-    pub stackable_hash: u64,
-}
-
-fn u64_as_string<S>(x: &u64, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_str(x.to_string().as_str())
+    pub stackable_hash: String,
 }
 
 impl Display for Item {
