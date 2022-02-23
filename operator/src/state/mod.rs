@@ -10,6 +10,7 @@ pub mod alerts;
 pub mod holds;
 pub mod inventories;
 pub mod operations;
+pub mod sign_config;
 
 pub struct State {
     pub inventories: InventoryState,

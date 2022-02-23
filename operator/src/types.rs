@@ -4,6 +4,7 @@ use serde_json::Value;
 use std::cmp::{max, min};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
+use std::ops::Add;
 use std::{fmt::Display, hash::Hasher};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -20,6 +21,18 @@ impl Vec3 {
         let z_diff = (other.z - self.z) as i64;
 
         ((x_diff.pow(2) + y_diff.pow(2) + z_diff.pow(2)) as f64).sqrt()
+    }
+}
+
+impl Add for Vec3 {
+    type Output = Self;
+
+    fn add(self, b: Vec3) -> Self {
+        Vec3 {
+            x: self.x + b.x,
+            y: self.y + b.y,
+            z: self.z + b.z,
+        }
     }
 }
 
