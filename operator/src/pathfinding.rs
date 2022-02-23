@@ -1,10 +1,11 @@
-use std::cmp::{max, min};
-
 use pathfinding::directed::bfs::bfs;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::{config::Config, types::Vec3};
+use crate::{
+    config::Config,
+    types::{Vec2, Vec3},
+};
 
 #[derive(Error, Debug, Serialize)]
 pub enum PathfindingError {
@@ -31,16 +32,7 @@ fn is_in_complex(dim: &str, loc: Vec3, config: &Config) -> bool {
 
     let (b1, b2) = config.complex.bounds;
 
-    let min_x = min(b1.x, b2.x) - 1;
-    let max_x = max(b1.x, b2.x) + 1;
-    let min_z = min(b1.z, b2.z) - 1;
-    let max_z = max(b1.z, b2.z) + 1;
-
-    if min_x > loc.x || max_x < loc.x || min_z > loc.z || max_z < loc.z {
-        return false;
-    }
-
-    true
+    Vec2::from(loc).contained_by(b1, b2)
 }
 
 // Is a inbetween b and c?

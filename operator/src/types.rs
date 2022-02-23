@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::cmp::{max, min};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::{fmt::Display, hash::Hasher};
@@ -37,6 +38,30 @@ pub struct Vec2 {
 impl Display for Vec2 {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         fmt.write_fmt(format_args!("({}, {})", self.x, self.z))
+    }
+}
+
+impl From<Vec3> for Vec2 {
+    fn from(vec3: Vec3) -> Self {
+        Vec2 {
+            x: vec3.x,
+            z: vec3.z,
+        }
+    }
+}
+
+impl Vec2 {
+    pub fn contained_by(&self, a: Vec2, b: Vec2) -> bool {
+        let min_x = min(a.x, b.x) - 1;
+        let max_x = max(a.x, b.x) + 1;
+        let min_z = min(a.z, b.z) - 1;
+        let max_z = max(a.z, b.z) + 1;
+
+        if min_x > self.x || max_x < self.x || min_z > self.z || max_z < self.z {
+            return false;
+        }
+
+        true
     }
 }
 
