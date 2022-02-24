@@ -65,12 +65,12 @@ const main = async () => {
 
   await sendVisibleSignData(bot, agent);
 
+  let atHome = false;
+
   while (true) {
     await clearInventory(bot, agent);
 
     const { data: operationResponse } = await pollOperation(agent);
-
-    let atHome = false;
 
     if (operationResponse.type === "OperationAvailable") {
       atHome = false;
