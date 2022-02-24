@@ -17,7 +17,7 @@ import {
   scanInventory,
   importInventory,
 } from "./operations";
-import { navigateTo } from "./operations/procedures";
+import { navigateTo, sendVisibleSignData } from "./operations/procedures";
 import { clearInventory, sleep } from "./utils";
 
 const main = async () => {
@@ -60,6 +60,8 @@ const main = async () => {
 
   const { x, y, z } = bot.player.entity.position;
   console.log(`Dimension: ${bot.game.dimension}, Location: (${x}, ${y}, ${z})`);
+
+  await sendVisibleSignData(bot, agent);
 
   while (true) {
     await clearInventory(bot, agent, complex);

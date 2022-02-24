@@ -13,9 +13,10 @@ use crate::{
         alerts::{Alert, AlertSource},
         holds::Hold,
         operations::{Operation, OperationError, OperationStatus},
+        sign_config::Sign,
         StateData,
     },
-    types::{Inventory, UnhashedItem, Vec3},
+    types::{Inventory, UnhashedItem, Vec2, Vec3},
 };
 
 #[derive(Serialize)]
@@ -248,6 +249,41 @@ async fn pathfinding(
     }
 }
 
+#[derive(Deserialize)]
+pub struct ScanRegion {
+    signs: Vec<Sign>,
+    bounds: (Vec2, Vec2),
+    dimension: String,
+}
+
+#[derive(Deserialize)]
+pub struct SignScanDataRequest {
+    scan_regions: Vec<ScanRegion>,
+}
+
+#[post("/sign_scan_data")]
+async fn sign_scan_data(
+    _agent: Agent,
+    state: StateData,
+    req: web::Json<SignScanDataRequest>,
+) -> impl Responder {
+    let mut state = state.lock().unwrap();
+
+    for scan_region in req.into_inner().scan_regions.into_iter() {
+        state.sign_config.clear_area(
+            &scan_region.dimension,
+            scan_region.bounds.0,
+            scan_region.bounds.1,
+        );
+
+        for sign in scan_region.signs.into_iter() {
+            state.sign_config.add_sign(sign);
+        }
+    }
+
+    HttpResponse::Ok()
+}
+
 pub fn configure(app: &mut web::ServiceConfig) {
     app.service(
         web::scope("/agent")
@@ -259,6 +295,7 @@ pub fn configure(app: &mut web::ServiceConfig) {
             .service(free_hold)
             .service(operation_complete)
             .service(inventory_scanned)
-            .service(pathfinding),
+            .service(pathfinding)
+            .service(sign_scan_data),
     );
 }

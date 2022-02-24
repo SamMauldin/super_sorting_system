@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Agent, Operation, Vec3, ComplexInfo, Item, Hold } from "./types";
+import { Agent, Operation, Vec3, ComplexInfo, Item, Hold, Vec2 } from "./types";
 
 const BASE_URL = `${process.env.AGENT_ENDPOINT!}/agent`;
 const API_KEY = process.env.AGENT_API_KEY!;
@@ -120,4 +120,26 @@ export const findPath = async (
     {
       headers: agentHeader(agent),
     }
+  );
+
+export type Sign = {
+  lines: string[];
+  location: Vec3;
+  dimension: string;
+};
+
+export type ScanRegion = {
+  signs: Sign[];
+  bounds: [Vec2, Vec2];
+  dimension: string;
+};
+
+export const sendSignScanData = (
+  agent: Agent,
+  scanRegions: ScanRegion[]
+): Promise<AxiosResponse<string>> =>
+  axios.post(
+    endpoint("sign_scan_data"),
+    { scan_regions: scanRegions },
+    { headers: agentHeader(agent) }
   );

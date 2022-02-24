@@ -1,6 +1,6 @@
 use self::{
     agents::AgentState, alerts::AlertState, holds::HoldState, inventories::InventoryState,
-    operations::OperationState,
+    operations::OperationState, sign_config::SignConfigState,
 };
 use actix_web::web;
 use std::sync::Mutex;
@@ -18,6 +18,7 @@ pub struct State {
     pub agents: AgentState,
     pub alerts: AlertState,
     pub holds: HoldState,
+    pub sign_config: SignConfigState,
 }
 
 impl Default for State {
@@ -28,6 +29,7 @@ impl Default for State {
             agents: Default::default(),
             alerts: Default::default(),
             holds: Default::default(),
+            sign_config: Default::default(),
         }
     }
 }
