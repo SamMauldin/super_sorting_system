@@ -6,6 +6,7 @@ import mineflayer from "mineflayer";
 import { setTimeout } from "timers/promises";
 
 import {
+  getSignConfig,
   heartbeat,
   operationComplete,
   pollOperation,
@@ -69,7 +70,10 @@ const main = async () => {
 
     const { data: operationResponse } = await pollOperation(agent);
 
+    let atHome = false;
+
     if (operationResponse.type === "OperationAvailable") {
+      atHome = false;
       const { operation } = operationResponse;
 
       if (operation.kind.type === "ScanInventory") {
@@ -89,12 +93,25 @@ const main = async () => {
       console.log(`Completed ${operation.kind.type} Operation`);
       await operationComplete(agent, operation);
     } else {
-      // await navigateTo(
-      //   { ...complex.bounds[0], y: complex.y_level + 1 },
-      //   complex.dimension,
-      //   bot,
-      //   agent
-      // );
+      if (!atHome) {
+        const {
+          data: { complexes },
+        } = await getSignConfig();
+        const complex = Object.values(complexes)[0];
+
+        if (complex) {
+          await navigateTo(
+            {
+              dim: complex.dimension,
+              vec3: { ...complex.bounds[0], y: complex.y_level + 1 },
+            },
+            bot,
+            agent
+          );
+        }
+
+        atHome = true;
+      }
       await sleep(1000);
     }
   }

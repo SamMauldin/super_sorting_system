@@ -1,4 +1,4 @@
-import { Item, Loc, Vec3 } from "./types";
+import { Dimension, Item, Loc, Vec2, Vec3 } from "./types";
 
 export type InventoryWithLoc = {
   slots: Array<Item | null>;
@@ -15,8 +15,16 @@ export type PathfindingNode = {
   dropoff?: Vec3;
 };
 
+export type StorageComplex = {
+  dimension: Dimension;
+  y_level: number;
+  bounds: [Vec2, Vec2];
+  name: string;
+};
+
 export type CompiledSignConfig = {
   nodes: { [name: string]: PathfindingNode };
+  complexes: { [name: string]: StorageComplex };
 };
 
 export type Hold = {
