@@ -7,13 +7,12 @@ use std::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::types::{Vec2, Vec3};
+use crate::types::{Dimension, Location, Vec2, Vec3};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Sign {
     pub lines: [String; 4],
-    pub location: Vec3,
-    pub dimension: String,
+    pub location: Location,
 }
 
 // Sign Syntax
@@ -74,7 +73,7 @@ pub struct Sign {
 #[derive(Debug)]
 pub enum ParsedSign {
     PathfindingNode {
-        effective_location: (Vec3, String),
+        effective_location: Location,
         name: String,
     },
     PathfindingConnection {
@@ -82,7 +81,7 @@ pub enum ParsedSign {
         node_b_name: String,
     },
     StorageComplex {
-        dimension: String,
+        dimension: Dimension,
         y_level: i32,
         bounds: (Vec2, Vec2),
         name: String,
@@ -144,7 +143,10 @@ impl TryFrom<&Sign> for ParsedSign {
             Vec3 { x: 0, y: 0, z: 0 }
         };
 
-        let effective_location = (loc_offset + s.location, s.dimension.clone());
+        let effective_location = Location {
+            vec3: loc_offset + s.location.vec3,
+            dim: s.location.dim,
+        };
 
         match s.lines[1].as_str() {
             "path node" => {
@@ -178,11 +180,11 @@ impl TryFrom<&Sign> for ParsedSign {
 
                 Ok(ParsedSign::StorageComplex {
                     name,
-                    dimension: effective_location.1,
-                    y_level: effective_location.0.y,
+                    dimension: effective_location.dim,
+                    y_level: effective_location.vec3.y,
                     bounds: (
-                        effective_location.0.into(),
-                        (effective_location.0 + second_offset).into(),
+                        effective_location.vec3.into(),
+                        (effective_location.vec3 + second_offset).into(),
                     ),
                 })
             }
@@ -191,25 +193,28 @@ impl TryFrom<&Sign> for ParsedSign {
     }
 }
 
+#[derive(Serialize)]
 pub struct PathfindingNode {
-    location: (Vec3, String),
-    name: String,
-    connections: Vec<String>,
+    pub location: Location,
+    pub name: String,
+    pub connections: Vec<String>,
 }
 
+#[derive(Serialize)]
 pub struct StorageComplex {
-    dimension: String,
-    y_level: i32,
-    bounds: (Vec2, Vec2),
-    name: String,
+    pub dimension: Dimension,
+    pub y_level: i32,
+    pub bounds: (Vec2, Vec2),
+    pub name: String,
 }
 
+#[derive(Serialize)]
 pub struct CompiledSignConfig {
-    nodes: HashMap<String, PathfindingNode>,
-    complexes: HashMap<String, StorageComplex>,
+    pub nodes: HashMap<String, PathfindingNode>,
+    pub complexes: HashMap<String, StorageComplex>,
 
-    sign_parse_errors: Vec<SignParseError>,
-    validation_errors: Vec<SignConfigValidationError>,
+    pub sign_parse_errors: Vec<SignParseError>,
+    pub validation_errors: Vec<SignConfigValidationError>,
 }
 
 pub struct SignConfigState {
@@ -227,9 +232,10 @@ impl Default for SignConfigState {
 }
 
 impl SignConfigState {
-    pub fn clear_area(&mut self, dimension: &str, start: Vec2, end: Vec2) {
+    pub fn clear_area(&mut self, dimension: Dimension, start: Vec2, end: Vec2) {
         self.signs.drain_filter(|sign| {
-            sign.dimension == dimension && Vec2::from(sign.location).contained_by(start, end)
+            sign.location.dim == dimension
+                && Vec2::from(sign.location.vec3).contained_by(start, end)
         });
 
         self.set_dirty();
@@ -267,7 +273,7 @@ impl SignConfigState {
                         name.clone(),
                         PathfindingNode {
                             name: name.clone(),
-                            location: effective_location.clone(),
+                            location: *effective_location,
                             connections: Vec::new(),
                         },
                     );
@@ -290,14 +296,14 @@ impl SignConfigState {
                         name.clone(),
                         PathfindingNode {
                             name: name.clone(),
-                            location: (
-                                Vec3 {
+                            location: Location {
+                                vec3: Vec3 {
                                     x: bounds.0.x,
                                     z: bounds.0.z,
                                     y: y_level + 1,
                                 },
-                                dimension.clone(),
-                            ),
+                                dim: *dimension,
+                            },
                             connections: Vec::new(),
                         },
                     );
@@ -341,7 +347,7 @@ impl SignConfigState {
                 let node_a = node_a.unwrap();
                 let node_b = node_b.unwrap();
 
-                if node_a.location.1 != node_b.location.1 {
+                if node_a.location.dim != node_b.location.dim {
                     validation_errors.push(SignConfigValidationError::InterdimentionalConnection {
                         name_a: node_a_name.clone(),
                         name_b: node_b_name.clone(),
@@ -371,7 +377,7 @@ impl SignConfigState {
                     name.clone(),
                     StorageComplex {
                         name: name.clone(),
-                        dimension: dimension.clone(),
+                        dimension: *dimension,
                         y_level: *y_level,
                         bounds: *bounds,
                     },

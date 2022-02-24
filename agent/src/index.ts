@@ -16,13 +16,14 @@ import {
   moveItems,
   scanInventory,
   importInventory,
+  scanSigns,
 } from "./operations";
 import { navigateTo, sendVisibleSignData } from "./operations/procedures";
 import { clearInventory, sleep } from "./utils";
 
 const main = async () => {
   const {
-    data: { agent, complex },
+    data: { agent },
   } = await registerAgent();
 
   console.log(`Registered agent ${agent.id}`);
@@ -64,7 +65,7 @@ const main = async () => {
   await sendVisibleSignData(bot, agent);
 
   while (true) {
-    await clearInventory(bot, agent, complex);
+    await clearInventory(bot, agent);
 
     const { data: operationResponse } = await pollOperation(agent);
 
@@ -72,13 +73,15 @@ const main = async () => {
       const { operation } = operationResponse;
 
       if (operation.kind.type === "ScanInventory") {
-        await scanInventory(operation.kind, bot, agent, complex);
+        await scanInventory(operation.kind, bot, agent);
       } else if (operation.kind.type === "MoveItems") {
-        await moveItems(operation.kind, bot, agent, complex);
+        await moveItems(operation.kind, bot, agent);
       } else if (operation.kind.type === "DropItems") {
-        await dropItems(operation.kind, bot, agent, complex);
+        await dropItems(operation.kind, bot, agent);
       } else if (operation.kind.type === "ImportInventory") {
-        await importInventory(operation.kind, bot, agent, complex);
+        await importInventory(operation.kind, bot, agent);
+      } else if (operation.kind.type === "ScanSigns") {
+        await scanSigns(operation.kind, bot, agent);
       } else {
         throw new Error("Unknown operation kind dispatched!");
       }
@@ -86,12 +89,12 @@ const main = async () => {
       console.log(`Completed ${operation.kind.type} Operation`);
       await operationComplete(agent, operation);
     } else {
-      await navigateTo(
-        { ...complex.bounds[0], y: complex.y_level + 1 },
-        complex.dimension,
-        bot,
-        agent
-      );
+      // await navigateTo(
+      //   { ...complex.bounds[0], y: complex.y_level + 1 },
+      //   complex.dimension,
+      //   bot,
+      //   agent
+      // );
       await sleep(1000);
     }
   }

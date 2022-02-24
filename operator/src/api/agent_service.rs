@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    config::{ComplexConfig, Config, ConfigData},
     pathfinding::PathfindingError,
     state::{
         agents::Agent,
@@ -16,25 +15,21 @@ use crate::{
         sign_config::Sign,
         StateData,
     },
-    types::{Inventory, UnhashedItem, Vec2, Vec3},
+    types::{Dimension, Inventory, Location, UnhashedItem, Vec2, Vec3},
 };
 
 #[derive(Serialize)]
 struct RegisterAgentResponse {
     agent: Agent,
-    complex: ComplexConfig,
 }
 
 #[post("/register")]
-async fn register_agent(state: StateData, config: ConfigData) -> impl Responder {
+async fn register_agent(state: StateData) -> impl Responder {
     let mut state = state.lock().unwrap();
 
     let agent = state.agents.register().clone();
 
-    HttpResponse::Ok().json(RegisterAgentResponse {
-        agent,
-        complex: config.complex.clone(),
-    })
+    HttpResponse::Ok().json(RegisterAgentResponse { agent })
 }
 
 #[post("/heartbeat")]
@@ -183,7 +178,7 @@ async fn operation_complete(
 
 #[derive(Deserialize)]
 pub struct InventoryScannedRequest {
-    location: Vec3,
+    location: Location,
     slots: Vec<Option<UnhashedItem>>,
 }
 
@@ -216,10 +211,8 @@ async fn inventory_scanned(
 
 #[derive(Deserialize, Debug)]
 pub struct PathfindingRequest {
-    start_vec: Vec3,
-    start_dim: String,
-    end_vec: Vec3,
-    end_dim: String,
+    start_loc: Location,
+    end_loc: Location,
 }
 
 #[derive(Serialize)]
@@ -233,15 +226,11 @@ enum PathfindingResponse {
 async fn pathfinding(
     _agent: Agent,
     req: web::Json<PathfindingRequest>,
-    config: web::Data<Config>,
+    state: StateData,
 ) -> impl Responder {
-    let path = crate::pathfinding::find_path(
-        req.start_vec,
-        &req.start_dim,
-        req.end_vec,
-        &req.end_dim,
-        &config,
-    );
+    let state = state.lock().unwrap();
+
+    let path = crate::pathfinding::find_path(req.start_loc, req.end_loc, &state);
 
     match path {
         Ok(path) => HttpResponse::Ok().json(PathfindingResponse::PathFound { path }),
@@ -253,7 +242,7 @@ async fn pathfinding(
 pub struct ScanRegion {
     signs: Vec<Sign>,
     bounds: (Vec2, Vec2),
-    dimension: String,
+    dimension: Dimension,
 }
 
 #[derive(Deserialize)]
@@ -271,7 +260,7 @@ async fn sign_scan_data(
 
     for scan_region in req.into_inner().scan_regions.into_iter() {
         state.sign_config.clear_area(
-            &scan_region.dimension,
+            scan_region.dimension,
             scan_region.bounds.0,
             scan_region.bounds.1,
         );

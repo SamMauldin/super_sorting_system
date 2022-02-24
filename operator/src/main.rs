@@ -18,10 +18,10 @@ use thiserror::Error;
 use uuid::Uuid;
 
 use crate::{
-    pathfinding::{verify_pathfinding_config, PathfindingError},
     services::{
         agent_expiration::AgentExpirationService, defragger::DefraggerService,
-        hold_expiration::HoldExpirationService, scanner::ScannerService, service::Service,
+        hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
+        node_scanner::NodeScannerService, service::Service,
     },
     state::StateData,
 };
@@ -32,8 +32,6 @@ enum StartupError {
     FigmentError(figment::Error),
     #[error(transparent)]
     CreateServerError(std::io::Error),
-    #[error(transparent)]
-    PathfindingConfigError(PathfindingError),
 }
 
 #[actix_web::main]
@@ -42,8 +40,6 @@ async fn main() -> Result<(), StartupError> {
     info!("Hello from Super Sorting System's Operator");
 
     let config = web::Data::new(config::read_config().map_err(StartupError::FigmentError)?);
-
-    verify_pathfinding_config(&config).map_err(|err| StartupError::PathfindingConfigError(err))?;
 
     let state: StateData = web::Data::new(Mutex::new(Default::default()));
 
@@ -54,19 +50,21 @@ async fn main() -> Result<(), StartupError> {
         let state = bg_state.clone();
         let config = bg_config.clone();
 
-        let mut scanner_service = ScannerService::new(&config);
+        let mut inventory_scanner_service = InventoryScannerService::new(&config);
         let mut agent_expiration_service = AgentExpirationService::new(&config);
         let mut defragger_service = DefraggerService::new(&config);
         let mut hold_expiration_service = HoldExpirationService::new(&config);
+        let mut node_scanner_service = NodeScannerService::new(&config);
 
         loop {
             thread::sleep(Duration::from_millis(1000));
             let mut state = state.lock().unwrap();
 
-            scanner_service.tick(&mut state);
+            inventory_scanner_service.tick(&mut state);
             agent_expiration_service.tick(&mut state);
             defragger_service.tick(&mut state);
             hold_expiration_service.tick(&mut state);
+            node_scanner_service.tick(&mut state);
         }
     });
 

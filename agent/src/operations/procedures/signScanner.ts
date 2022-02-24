@@ -1,5 +1,5 @@
 import { Bot } from "mineflayer";
-import { Agent, Vec3 } from "../../types";
+import { Agent, stringToDim, Vec3 } from "../../types";
 import vec3 from "vec3";
 import { ScanRegion, sendSignScanData, Sign } from "../../controllerApi";
 
@@ -58,8 +58,10 @@ const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
 
           signs.push({
             lines: signBlock.signText?.split("\n"),
-            dimension: bot.game.dimension,
-            location: { x: chunkPos.x + x, y, z: chunkPos.z + z },
+            location: {
+              vec3: { x: chunkPos.x + x, y, z: chunkPos.z + z },
+              dim: stringToDim(bot.game.dimension),
+            },
           });
         }
       }
@@ -72,6 +74,6 @@ const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
       { x: chunkPos.x, z: chunkPos.z },
       { x: chunkPos.x + 15, z: chunkPos.z + 15 },
     ],
-    dimension: bot.game.dimension,
+    dimension: stringToDim(bot.game.dimension),
   };
 };

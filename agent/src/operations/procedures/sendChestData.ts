@@ -1,11 +1,11 @@
 import { Chest } from "mineflayer";
 import { Window } from "prismarine-windows";
 import { inventoryScanned } from "../../controllerApi";
-import { Agent, Item, Vec3 } from "../../types";
+import { Agent, Item, Location } from "../../types";
 
 export const sendChestData = async (
   chest: Chest & Window,
-  location: Vec3,
+  location: Location,
   agent: Agent
 ) => {
   const items: Array<Item | null> = chest.slots

@@ -5,16 +5,12 @@ import {
   sendChestData,
   transferItems,
 } from "./operations/procedures";
-import { Agent, ComplexInfo } from "./types";
+import { Agent } from "./types";
 
 export const sleep = (delay: number) =>
   new Promise((resolve) => setTimeout(resolve, delay));
 
-export const clearInventory = async (
-  bot: Bot,
-  agent: Agent,
-  complex: ComplexInfo
-) => {
+export const clearInventory = async (bot: Bot, agent: Agent) => {
   // Verify inventory empty
   for (const [invSlot, contents] of bot.inventory.slots.entries()) {
     if (!contents) continue;
@@ -29,7 +25,7 @@ export const clearInventory = async (
       hold: { location, slot },
     } = data;
 
-    const chest = await openChestAt(location, complex.dimension, bot, agent);
+    const chest = await openChestAt(location, bot, agent);
 
     await transferItems(
       bot,

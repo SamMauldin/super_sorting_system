@@ -1,4 +1,4 @@
-use crate::types::Vec3;
+use crate::types::{Location, Vec3};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use uuid::Uuid;
@@ -31,7 +31,10 @@ pub struct Operation {
 #[serde(tag = "type")]
 pub enum OperationKind {
     ScanInventory {
-        location: Vec3,
+        location: Location,
+    },
+    ScanSigns {
+        location: Location,
     },
     MoveItems {
         source_hold: Uuid,
@@ -39,13 +42,13 @@ pub enum OperationKind {
         count: u32,
     },
     DropItems {
-        drop_from: Vec3,
+        drop_from: Location,
         aim_towards: Vec3,
         source_holds: Vec<Uuid>,
     },
     ImportInventory {
         chest_location: Vec3,
-        node_location: Vec3,
+        node_location: Location,
         destination_holds: Vec<Uuid>,
     },
 }
@@ -125,7 +128,7 @@ impl OperationState {
 impl Operation {
     pub fn holds(&self) -> Vec<Uuid> {
         match &self.kind {
-            OperationKind::ScanInventory { .. } => vec![],
+            OperationKind::ScanInventory { .. } | OperationKind::ScanSigns { .. } => vec![],
             OperationKind::MoveItems {
                 source_hold,
                 destination_hold,

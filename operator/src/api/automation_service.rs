@@ -3,19 +3,18 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    config::ConfigData,
     state::{
         holds::{Hold, HoldError},
         operations::{Operation, OperationKind, OperationPriority},
         StateData,
     },
-    types::{Item, Vec3},
+    types::{Item, Location},
 };
 
 #[derive(Serialize)]
 struct InventoryWithLoc {
     pub slots: Vec<Option<Item>>,
-    pub loc: Vec3,
+    pub loc: Location,
 }
 
 #[get("/inventory_contents")]
@@ -34,9 +33,12 @@ async fn inventory_contents(state: StateData) -> impl Responder {
     HttpResponse::Ok().json(contents)
 }
 
-#[get("/pathfinding_config")]
-async fn pathfinding_config(config: ConfigData) -> impl Responder {
-    HttpResponse::Ok().json(&config.pathfinding)
+#[get("/sign_config")]
+async fn pathfinding_config(state: StateData) -> impl Responder {
+    let state = state.lock().unwrap();
+    let sign_config = state.sign_config.get_config();
+
+    HttpResponse::Ok().json(sign_config.as_ref())
 }
 
 #[derive(Serialize)]
@@ -54,7 +56,7 @@ async fn holds_index(state: StateData) -> impl Responder {
 
 #[derive(Deserialize)]
 struct CreateHoldRequest {
-    location: Vec3,
+    location: Location,
     slot: u32,
 }
 

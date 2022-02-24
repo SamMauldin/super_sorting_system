@@ -7,7 +7,7 @@ use crate::{
     config::Config,
     state::operations::{OperationKind, OperationPriority, OperationStatus},
     state::State,
-    types::{Item, Vec3},
+    types::{Item, Location},
 };
 
 pub struct DefraggerService {
@@ -47,7 +47,7 @@ impl Service for DefraggerService {
             }
         }
 
-        let mut partial_items: HashMap<&str, (Vec3, usize, &Item)> = HashMap::new();
+        let mut partial_items: HashMap<&str, (Location, usize, &Item)> = HashMap::new();
 
         for (loc, slot, item) in state.inventories.iter_slots() {
             if let Some(item) = item {

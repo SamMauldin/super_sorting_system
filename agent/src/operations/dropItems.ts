@@ -3,13 +3,7 @@ import { Window } from "prismarine-windows";
 import vec3 from "vec3";
 
 import { getHold } from "../controllerApi";
-import {
-  Agent,
-  ComplexInfo,
-  DropItemsOperationKind,
-  Vec3,
-  vecEq,
-} from "../types";
+import { Agent, DropItemsOperationKind, Location, locEq } from "../types";
 import {
   dropSlot,
   navigateTo,
@@ -21,10 +15,9 @@ import {
 export const dropItems = async (
   operationKind: DropItemsOperationKind,
   bot: Bot,
-  agent: Agent,
-  complex: ComplexInfo
+  agent: Agent
 ) => {
-  let lastChest: { location: Vec3; chest: Chest & Window } | null = null;
+  let lastChest: { location: Location; chest: Chest & Window } | null = null;
 
   for (const [inv_slot, hold_id] of operationKind.source_holds.entries()) {
     const {
@@ -33,15 +26,14 @@ export const dropItems = async (
       },
     } = await getHold(hold_id, agent);
 
-    if (lastChest && !vecEq(sourceLocation, lastChest.location)) {
+    if (lastChest && !locEq(sourceLocation, lastChest.location)) {
       await sendChestData(lastChest.chest, lastChest.location, agent);
       lastChest.chest.close();
       lastChest = null;
     }
 
     const chest: Chest & Window =
-      lastChest?.chest ||
-      (await openChestAt(sourceLocation, complex.dimension, bot, agent));
+      lastChest?.chest || (await openChestAt(sourceLocation, bot, agent));
 
     await transferItems(
       bot,
@@ -60,7 +52,7 @@ export const dropItems = async (
     lastChest.chest.close();
   }
 
-  await navigateTo(operationKind.drop_from, complex.dimension, bot, agent);
+  await navigateTo(operationKind.drop_from, bot, agent);
 
   await bot.lookAt(vec3(operationKind.aim_towards));
 

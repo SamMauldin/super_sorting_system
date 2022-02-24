@@ -4,7 +4,7 @@ import { findPath } from "../../controllerApi";
 import { once } from "events";
 import { setTimeout } from "timers/promises";
 
-import { Agent, Vec3, vecEq } from "../../types";
+import { Agent, Vec3, vecEq, Location, stringToDim } from "../../types";
 
 const floorVec3 = (input: Vec3) => ({
   x: Math.floor(input.x),
@@ -59,26 +59,23 @@ async function flyTo(bot: Bot, destination: depVec3) {
 }
 
 export const navigateTo = async (
-  destinationLoc: Vec3,
-  destinationDim: string,
+  destinationLoc: Location,
   bot: Bot,
   agent: Agent
 ): Promise<void> => {
   const { x, y, z } = bot.player.entity.position;
-  const { dimension } = bot.game;
+  const dim = stringToDim(bot.game.dimension);
 
   if (
-    destinationDim === dimension &&
-    vecEq(floorVec3({ x, y, z }), floorVec3(destinationLoc))
+    destinationLoc.dim === dim &&
+    vecEq(floorVec3({ x, y, z }), floorVec3(destinationLoc.vec3))
   )
     return;
 
   const { data: pathResp } = await findPath(
     agent,
-    floorVec3({ x, y, z }),
-    dimension,
-    floorVec3(destinationLoc),
-    destinationDim
+    { vec3: floorVec3({ x, y, z }), dim },
+    destinationLoc
   );
 
   if (pathResp.type === "Error") throw new Error("Pathfinding request failed!");

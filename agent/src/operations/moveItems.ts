@@ -1,15 +1,14 @@
 import { Bot } from "mineflayer";
 
 import { getHold } from "../controllerApi";
-import { Agent, ComplexInfo, MoveItemsOperationKind } from "../types";
+import { Agent, MoveItemsOperationKind } from "../types";
 import { sendChestData, transferItems } from "./procedures";
 import { openChestAt } from "./procedures/openChestAt";
 
 export const moveItems = async (
   operationKind: MoveItemsOperationKind,
   bot: Bot,
-  agent: Agent,
-  complex: ComplexInfo
+  agent: Agent
 ) => {
   const {
     data: {
@@ -22,12 +21,7 @@ export const moveItems = async (
     },
   } = await getHold(operationKind.destination_hold, agent);
 
-  const sourceChest = await openChestAt(
-    sourceLocation,
-    complex.dimension,
-    bot,
-    agent
-  );
+  const sourceChest = await openChestAt(sourceLocation, bot, agent);
 
   await transferItems(
     bot,
@@ -42,12 +36,7 @@ export const moveItems = async (
 
   sourceChest.close();
 
-  const destChest = await openChestAt(
-    destinationLocation,
-    complex.dimension,
-    bot,
-    agent
-  );
+  const destChest = await openChestAt(destinationLocation, bot, agent);
 
   await transferItems(
     bot,

@@ -1,9 +1,9 @@
 use std::collections::{hash_map::Iter, HashMap};
 
-use crate::types::{Inventory, Item, Vec3};
+use crate::types::{Inventory, Item, Location};
 
 pub struct InventoryState {
-    inventory_map: HashMap<Vec3, Inventory>,
+    inventory_map: HashMap<Location, Inventory>,
 }
 
 impl Default for InventoryState {
@@ -15,19 +15,19 @@ impl Default for InventoryState {
 }
 
 impl InventoryState {
-    pub fn set_inventory_at(&mut self, location: Vec3, inventory: Inventory) {
+    pub fn set_inventory_at(&mut self, location: Location, inventory: Inventory) {
         self.inventory_map.insert(location, inventory);
     }
 
-    pub fn inventory_contents_at(&self, location: &Vec3) -> Option<&Inventory> {
+    pub fn inventory_contents_at(&self, location: &Location) -> Option<&Inventory> {
         self.inventory_map.get(location)
     }
 
-    pub fn iter_inventories(&self) -> Iter<Vec3, Inventory> {
+    pub fn iter_inventories(&self) -> Iter<Location, Inventory> {
         self.inventory_map.iter()
     }
 
-    pub fn iter_slots(&self) -> impl Iterator<Item = (Vec3, usize, &Option<Item>)> {
+    pub fn iter_slots(&self) -> impl Iterator<Item = (Location, usize, &Option<Item>)> {
         self.iter_inventories().flat_map(|(&loc, inv)| {
             inv.slots
                 .iter()

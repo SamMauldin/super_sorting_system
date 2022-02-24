@@ -14,6 +14,19 @@ pub struct Vec3 {
     pub z: i32,
 }
 
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub enum Dimension {
+    TheNether,
+    Overworld,
+    TheEnd,
+}
+
+#[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub struct Location {
+    pub vec3: Vec3,
+    pub dim: Dimension,
+}
+
 impl Vec3 {
     pub fn dist(&self, other: Vec3) -> f64 {
         let x_diff = (other.x - self.x) as i64;

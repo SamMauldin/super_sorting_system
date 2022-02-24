@@ -1,5 +1,14 @@
 import axios, { AxiosResponse } from "axios";
-import { Agent, Operation, Vec3, ComplexInfo, Item, Hold, Vec2 } from "./types";
+import {
+  Agent,
+  Operation,
+  Vec3,
+  Item,
+  Hold,
+  Vec2,
+  Dimension,
+  Location,
+} from "./types";
 
 const BASE_URL = `${process.env.AGENT_ENDPOINT!}/agent`;
 const API_KEY = process.env.AGENT_API_KEY!;
@@ -16,7 +25,6 @@ const agentHeader = (agent: Agent) => ({
 export const registerAgent = async (): Promise<
   AxiosResponse<{
     agent: Agent;
-    complex: ComplexInfo;
   }>
 > => axios.post(endpoint("register"), undefined, { headers: authHeader });
 
@@ -61,7 +69,7 @@ export const operationComplete = async (
 
 export const inventoryScanned = async (
   slots: Array<Item | null>,
-  inventoryLocation: Vec3,
+  inventoryLocation: Location,
   agent: Agent
 ): Promise<AxiosResponse<string>> =>
   axios.post(
@@ -104,18 +112,14 @@ type PathfindingResponse =
 
 export const findPath = async (
   agent: Agent,
-  startVec: Vec3,
-  startDim: String,
-  endVec: Vec3,
-  endDim: String
+  startLoc: Location,
+  endLoc: Location
 ): Promise<AxiosResponse<PathfindingResponse>> =>
   axios.post(
     endpoint("pathfinding"),
     {
-      start_vec: startVec,
-      start_dim: startDim,
-      end_vec: endVec,
-      end_dim: endDim,
+      start_loc: startLoc,
+      end_loc: endLoc,
     },
     {
       headers: agentHeader(agent),
@@ -124,14 +128,13 @@ export const findPath = async (
 
 export type Sign = {
   lines: string[];
-  location: Vec3;
-  dimension: string;
+  location: Location;
 };
 
 export type ScanRegion = {
   signs: Sign[];
   bounds: [Vec2, Vec2];
-  dimension: string;
+  dimension: Dimension;
 };
 
 export const sendSignScanData = (

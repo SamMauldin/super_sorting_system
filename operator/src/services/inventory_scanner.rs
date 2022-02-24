@@ -9,47 +9,62 @@ use crate::{
         operations::{OperationKind, OperationPriority, OperationStatus},
         State,
     },
-    types::Vec3,
+    types::{Location, Vec3},
 };
 
 use super::service::Service;
 
 struct TrackedInventory {
-    location: Vec3,
+    location: Location,
     current_scan_operation_id: Option<Uuid>,
 }
 
-pub struct ScannerService {
+pub struct InventoryScannerService {
     tracked_inventories: Vec<TrackedInventory>,
 }
 
-impl Service for ScannerService {
-    fn new(config: &Config) -> Self {
-        let mut tracked_inventories = Vec::new();
-
-        let bounds = config.complex.bounds;
-        let y = config.complex.y_level;
-
-        let x1 = bounds.0.x;
-        let x2 = bounds.1.x;
-        let z1 = bounds.0.z;
-        let z2 = bounds.1.z;
-
-        for x in min(x1, x2)..=max(x1, x2) {
-            for z in min(z1, z2)..=max(z1, z2) {
-                tracked_inventories.push(TrackedInventory {
-                    location: Vec3 { x, y, z },
-                    current_scan_operation_id: None,
-                })
-            }
-        }
-
-        ScannerService {
-            tracked_inventories,
+impl Service for InventoryScannerService {
+    fn new(_config: &Config) -> Self {
+        InventoryScannerService {
+            tracked_inventories: Default::default(),
         }
     }
 
     fn tick(&mut self, state: &mut State) {
+        let sign_config = state.sign_config.get_config();
+
+        for (_name, complex) in sign_config.complexes.iter() {
+            let bounds = complex.bounds;
+            let y = complex.y_level;
+
+            let x1 = bounds.0.x;
+            let x2 = bounds.1.x;
+            let z1 = bounds.0.z;
+            let z2 = bounds.1.z;
+
+            for x in min(x1, x2)..=max(x1, x2) {
+                for z in min(z1, z2)..=max(z1, z2) {
+                    if self.tracked_inventories.iter().any(|inv| {
+                        inv.location
+                            == Location {
+                                vec3: Vec3 { x, y, z },
+                                dim: complex.dimension,
+                            }
+                    }) {
+                        continue;
+                    }
+
+                    self.tracked_inventories.push(TrackedInventory {
+                        location: Location {
+                            vec3: crate::types::Vec3 { x, y, z },
+                            dim: complex.dimension,
+                        },
+                        current_scan_operation_id: None,
+                    })
+                }
+            }
+        }
+
         for inventory in self.tracked_inventories.iter_mut() {
             if let Some(op_id) = inventory.current_scan_operation_id {
                 let op = state.operations.get(op_id);

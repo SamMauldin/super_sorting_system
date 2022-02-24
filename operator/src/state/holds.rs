@@ -1,4 +1,4 @@
-use crate::types::Vec3;
+use crate::types::Location;
 use chrono::{DateTime, Duration, Utc};
 use serde::Serialize;
 use std::collections::HashMap;
@@ -8,7 +8,7 @@ use uuid::Uuid;
 #[derive(Serialize, Clone)]
 pub struct Hold {
     pub id: Uuid,
-    pub location: Vec3,
+    pub location: Location,
     pub slot: u32,
     pub valid_until: DateTime<Utc>,
 }
@@ -44,14 +44,14 @@ impl HoldState {
         self.holds.remove(&id)
     }
 
-    pub fn existing_hold(&self, location: Vec3, slot: u32) -> Option<&Hold> {
+    pub fn existing_hold(&self, location: Location, slot: u32) -> Option<&Hold> {
         self.holds
             .iter()
             .find(|(_id, hold)| hold.location == location && hold.slot == slot)
             .map(|(_id, hold)| hold)
     }
 
-    pub fn create(&mut self, location: Vec3, slot: u32) -> Result<&Hold, HoldError> {
+    pub fn create(&mut self, location: Location, slot: u32) -> Result<&Hold, HoldError> {
         let id = Uuid::new_v4();
 
         let existing_hold = self.existing_hold(location, slot);
