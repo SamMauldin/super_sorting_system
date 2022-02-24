@@ -30,7 +30,7 @@ fn is_in_complex(loc: Location, sign_config: &CompiledSignConfig) -> Option<Stri
 
         let (b1, b2) = complex.bounds;
 
-        if Vec2::from(loc.vec3).contained_by(b1, b2) {
+        if Vec2::from(loc.vec3).contained_by(b1, b2, 1) {
             return Some(name.clone());
         }
     }

@@ -235,7 +235,7 @@ impl SignConfigState {
     pub fn clear_area(&mut self, dimension: Dimension, start: Vec2, end: Vec2) {
         self.signs.drain_filter(|sign| {
             sign.location.dim == dimension
-                && Vec2::from(sign.location.vec3).contained_by(start, end)
+                && Vec2::from(sign.location.vec3).contained_by(start, end, 0)
         });
 
         self.set_dirty();

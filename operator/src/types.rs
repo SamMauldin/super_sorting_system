@@ -77,11 +77,11 @@ impl From<Vec3> for Vec2 {
 }
 
 impl Vec2 {
-    pub fn contained_by(&self, a: Vec2, b: Vec2) -> bool {
-        let min_x = min(a.x, b.x) - 1;
-        let max_x = max(a.x, b.x) + 1;
-        let min_z = min(a.z, b.z) - 1;
-        let max_z = max(a.z, b.z) + 1;
+    pub fn contained_by(&self, a: Vec2, b: Vec2, margin: i32) -> bool {
+        let min_x = min(a.x, b.x) - margin;
+        let max_x = max(a.x, b.x) + margin;
+        let min_z = min(a.z, b.z) - margin;
+        let max_z = max(a.z, b.z) + margin;
 
         if min_x > self.x || max_x < self.x || min_z > self.z || max_z < self.z {
             return false;
