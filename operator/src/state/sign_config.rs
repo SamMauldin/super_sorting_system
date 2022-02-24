@@ -44,6 +44,40 @@ pub struct Sign {
 // (4th line empty)
 
 /*
+ * Pickup Chest Signs
+ * These signs indicate that a given location is a container that items can be picked up from
+ * This container must be accessible from the given pathfinding node
+ * Only one of these is permitted for a given pathfinding node
+ */
+
+// Line 2: Sign type "pickup"
+// Line 3: Pathfinding Node Name
+// Line 4: Unused
+
+// Example
+// SSS 0,-4,0
+// pickup chest
+// Hallway A
+// (4th line empty)
+
+/*
+ * Drop-off Location Signs
+ * These signs indicate that a given location is an point where items should be dropped
+ * This point will be where the agent looks at while dropping items from the pathfinding node
+ * Only one of these is permitted for a given pathfinding node
+ */
+
+// Line 2: Sign type "drop-off"
+// Line 3: Pathfinding Node Name
+// Line 4: Unused
+
+// Example
+// SSS 0,-4,0
+// drop-off
+// Hallway A
+// (4th line empty)
+
+/*
  * Pathfinding Connection Signs
  * These signs indiciate that two pathfinding nodes have a clear path in between one another
  */
@@ -79,6 +113,14 @@ pub enum ParsedSign {
     PathfindingConnection {
         node_a_name: String,
         node_b_name: String,
+    },
+    PickupChest {
+        effective_location: Vec3,
+        node_name: String,
+    },
+    DropOffLocation {
+        effective_location: Vec3,
+        node_name: String,
     },
     StorageComplex {
         dimension: Dimension,
@@ -174,6 +216,22 @@ impl TryFrom<&Sign> for ParsedSign {
                     node_b_name: name_b,
                 })
             }
+            "pickup" => {
+                let node_name = s.lines[2].clone();
+
+                Ok(ParsedSign::PickupChest {
+                    node_name,
+                    effective_location: effective_location.vec3,
+                })
+            }
+            "drop-off" => {
+                let node_name = s.lines[2].clone();
+
+                Ok(ParsedSign::DropOffLocation {
+                    node_name,
+                    effective_location: effective_location.vec3,
+                })
+            }
             "storage complex" => {
                 let name = s.lines[3].clone();
                 let second_offset = parse_offset(s.lines[2].as_str())?;
@@ -198,6 +256,8 @@ pub struct PathfindingNode {
     pub location: Location,
     pub name: String,
     pub connections: Vec<String>,
+    pub pickup: Option<Vec3>,
+    pub dropoff: Option<Vec3>,
 }
 
 #[derive(Serialize)]
@@ -275,6 +335,8 @@ impl SignConfigState {
                             name: name.clone(),
                             location: *effective_location,
                             connections: Vec::new(),
+                            pickup: None,
+                            dropoff: None,
                         },
                     );
 
@@ -305,6 +367,8 @@ impl SignConfigState {
                                 dim: *dimension,
                             },
                             connections: Vec::new(),
+                            pickup: None,
+                            dropoff: None,
                         },
                     );
 
@@ -320,13 +384,12 @@ impl SignConfigState {
             };
         });
 
-        // Add all connections
-        parsed_signs.iter().for_each(|sign| {
-            if let ParsedSign::PathfindingConnection {
+        // Add all connections, pickups, and drop-offs
+        parsed_signs.iter().for_each(|sign| match sign {
+            ParsedSign::PathfindingConnection {
                 node_a_name,
                 node_b_name,
-            } = sign
-            {
+            } => {
                 let node_a = nodes.get(node_a_name);
                 let node_b = nodes.get(node_b_name);
 
@@ -361,6 +424,37 @@ impl SignConfigState {
                 let node_b = nodes.get_mut(node_b_name).unwrap();
                 node_b.connections.push(node_a_name.clone());
             }
+            ParsedSign::DropOffLocation {
+                node_name,
+                effective_location,
+            } => {
+                let node = nodes.get_mut(node_name);
+
+                if node.is_none() {
+                    validation_errors.push(SignConfigValidationError::UnknownNode {
+                        name: node_name.clone(),
+                    });
+                    return;
+                }
+
+                node.unwrap().dropoff = Some(*effective_location)
+            }
+            ParsedSign::PickupChest {
+                node_name,
+                effective_location,
+            } => {
+                let node = nodes.get_mut(node_name);
+
+                if node.is_none() {
+                    validation_errors.push(SignConfigValidationError::UnknownNode {
+                        name: node_name.clone(),
+                    });
+                    return;
+                }
+
+                node.unwrap().pickup = Some(*effective_location)
+            }
+            _ => {}
         });
 
         let mut complexes = HashMap::new();
