@@ -5,9 +5,9 @@ import {
   OperationKind,
   Operation,
   OperationPriority,
-  PathfindingNode,
+  CompiledSignConfig,
 } from "./automation_types";
-import { Vec3 } from "./types";
+import { Loc } from "./types";
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL!;
 const API_KEY = process.env.REACT_APP_API_KEY!;
@@ -19,9 +19,8 @@ export const getInventoryContents = (): Promise<
   AxiosResponse<InventoriesWithLoc>
 > => axios.get(endpoint("inventory_contents"), { headers });
 
-export const getPathfindingConfig = (): Promise<
-  AxiosResponse<{ nodes: { [node_id: string]: PathfindingNode } }>
-> => axios.get(endpoint("pathfinding_config"), { headers });
+export const getSignConfig = (): Promise<AxiosResponse<CompiledSignConfig>> =>
+  axios.get(endpoint("sign_config"), { headers });
 
 export const getHolds = (): Promise<AxiosResponse<{ holds: Hold[] }>> =>
   axios.get(endpoint("holds"), { headers });
@@ -36,7 +35,7 @@ type CreateHoldResponse =
     };
 
 export const createHold = (
-  location: Vec3,
+  location: Loc,
   slot: number
 ): Promise<AxiosResponse<CreateHoldResponse>> =>
   axios.post(endpoint("holds"), { location, slot }, { headers });

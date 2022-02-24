@@ -8,7 +8,7 @@ import {
   ExtendedItem,
   executeOperation,
 } from "../helpers";
-import { getPathfindingConfig } from "./automation";
+import { getSignConfig } from "./automation";
 
 export const deliverItems = async (
   destinationLoc: string,
@@ -19,11 +19,11 @@ export const deliverItems = async (
 ): Promise<void> => {
   const {
     data: { nodes },
-  } = await getPathfindingConfig();
+  } = await getSignConfig();
   const destNode = nodes[destinationLoc];
 
   assert(destNode, "Destination location does not exist");
-  assert(destNode.portal, "Destination does not have portal");
+  assert(destNode.dropoff, "Destination does not have a drop-off location");
 
   const slotsToDeliver: string[] = [];
   let tempHold: string | null = null;
@@ -118,7 +118,7 @@ export const deliverItems = async (
         type: "DropItems",
         source_holds: slotsToDeliver,
         drop_from: destNode.location,
-        aim_towards: destNode.portal!.location,
+        aim_towards: destNode.dropoff,
       },
       "UserInteractive"
     );

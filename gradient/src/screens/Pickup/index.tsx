@@ -1,7 +1,7 @@
 import { KeyboardEvent, useEffect } from "react";
 import styled from "styled-components";
 import { useMutation, useQuery } from "react-query";
-import { getPathfindingConfig } from "../../api/automation";
+import { getSignConfig } from "../../api/automation";
 import { SplashScreen } from "../SplashScreen";
 import { pickupItems } from "../../api/pickup";
 import { pathfindingNode } from "../../store";
@@ -18,7 +18,7 @@ import { useRecoilState } from "recoil";
 export const Pickup = () => {
   const { isLoading, isError, data } = useQuery(
     "pathfinding_config",
-    getPathfindingConfig
+    getSignConfig
   );
 
   const [pickupLoc, setPickupLoc] = useRecoilState(pathfindingNode);
@@ -29,6 +29,7 @@ export const Pickup = () => {
     if (!data.data.nodes[pickupLoc]) {
       setPickupLoc(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pickupLoc, data]);
 
   const { mutate, status, error, reset } = useMutation(
@@ -86,11 +87,11 @@ export const Pickup = () => {
         autoFocus
       >
         <option value="">-- Please select a pickup location --</option>
-        {Object.entries(data.data.nodes)
-          .filter(([_node_id, node]) => Boolean(node.chest))
-          .map(([node_id, node]) => (
-            <option key={node_id} value={node_id}>
-              {node.pretty_name || node_id}
+        {Object.values(data.data.nodes)
+          .filter((node) => Boolean(node.pickup))
+          .map((node) => (
+            <option key={node.name} value={node.name}>
+              {node.name}
             </option>
           ))}
       </select>

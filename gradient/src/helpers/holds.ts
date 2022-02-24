@@ -5,18 +5,18 @@ import {
   removeHold,
   renewHold,
 } from "../api/automation";
-import { Item, Vec3, vecEq } from "../api/types";
+import { Item, Loc, locEq } from "../api/types";
 import { searchFor, stackMatches } from ".";
 
 const verifySlot = async (
-  loc: Vec3,
+  loc: Loc,
   slot: number,
   contents: Item | null,
   ignoreCount?: boolean
 ): Promise<boolean> => {
   const { data: inventories } = await getInventoryContents();
 
-  const invAtLoc = inventories.find(({ loc: invLoc }) => vecEq(loc, invLoc));
+  const invAtLoc = inventories.find(({ loc: invLoc }) => locEq(loc, invLoc));
   if (!invAtLoc) return false;
   assert(invAtLoc, "Inventory not found at given location!");
 
@@ -26,7 +26,7 @@ const verifySlot = async (
 };
 
 export const acquireHoldVerified = async (
-  loc: Vec3,
+  loc: Loc,
   slot: number,
   contents: Item | null,
   ignoreCount?: boolean

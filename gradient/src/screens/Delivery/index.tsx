@@ -3,7 +3,7 @@ import { ItemSelector } from "../../common";
 import { ExtendedItem } from "../../helpers";
 import styled from "styled-components";
 import { useMutation, useQuery } from "react-query";
-import { getPathfindingConfig } from "../../api/automation";
+import { getSignConfig } from "../../api/automation";
 import { SplashScreen } from "../SplashScreen";
 import { deliverItems } from "../../api/delivery";
 import { useRecoilState } from "recoil";
@@ -28,7 +28,7 @@ export const Delivery = () => {
 
   const { isLoading, isError, data } = useQuery(
     "pathfinding_config",
-    getPathfindingConfig
+    getSignConfig
   );
 
   const [deliveryLoc, setDeliveryLoc] = useRecoilState(pathfindingNode);
@@ -39,6 +39,7 @@ export const Delivery = () => {
     if (!data.data.nodes[deliveryLoc]) {
       setDeliveryLoc(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deliveryLoc, data]);
 
   const { mutate, status, error, reset } = useMutation(
@@ -124,11 +125,11 @@ export const Delivery = () => {
             autoFocus
           >
             <option value="">-- Please select a delivery location --</option>
-            {Object.entries(data.data.nodes)
-              .filter(([_node_id, node]) => Boolean(node.portal))
-              .map(([node_id, node]) => (
-                <option key={node_id} value={node_id}>
-                  {node.pretty_name || node_id}
+            {Object.values(data.data.nodes)
+              .filter((node) => Boolean(node.dropoff))
+              .map((node) => (
+                <option key={node.name} value={node.name}>
+                  {node.name}
                 </option>
               ))}
           </select>

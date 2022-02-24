@@ -1,25 +1,27 @@
-import { Item, Vec3 } from "./types";
+import { Item, Loc, Vec3 } from "./types";
 
 export type InventoryWithLoc = {
   slots: Array<Item | null>;
-  loc: Vec3;
+  loc: Loc;
 };
 
 export type InventoriesWithLoc = Array<InventoryWithLoc>;
 
-export type PathfindingPortal = { location: Vec3; connects_to?: string };
 export type PathfindingNode = {
-  pretty_name?: string;
-  dimension: string;
-  location: Vec3;
+  location: Loc;
+  name: string;
   connections: string[];
-  portal?: PathfindingPortal;
-  chest?: Vec3;
+  pickup?: Vec3;
+  dropoff?: Vec3;
+};
+
+export type CompiledSignConfig = {
+  nodes: { [name: string]: PathfindingNode };
 };
 
 export type Hold = {
   id: string;
-  location: Vec3;
+  location: Loc;
   slot: number;
   valid_until: string;
 };
@@ -34,7 +36,12 @@ export type OperationStatus = "Pending" | "InProgress" | "Complete" | "Aborted";
 
 export type ScanInventoryOperationKind = {
   type: "ScanInventory";
-  location: Vec3;
+  location: Loc;
+};
+
+export type ScanSignsOperationKind = {
+  type: "ScanSigns";
+  location: Loc;
 };
 
 export type MoveItemsOperationKind = {
@@ -46,7 +53,7 @@ export type MoveItemsOperationKind = {
 
 export type DropItemsOperationKind = {
   type: "DropItems";
-  drop_from: Vec3;
+  drop_from: Loc;
   aim_towards: Vec3;
   source_holds: string[];
 };
@@ -54,12 +61,13 @@ export type DropItemsOperationKind = {
 export type ImportInventoryOperationKind = {
   type: "ImportInventory";
   chest_location: Vec3;
-  node_location: Vec3;
+  node_location: Loc;
   destination_holds: string[];
 };
 
 export type OperationKind =
   | ScanInventoryOperationKind
+  | ScanSignsOperationKind
   | MoveItemsOperationKind
   | DropItemsOperationKind
   | ImportInventoryOperationKind;
