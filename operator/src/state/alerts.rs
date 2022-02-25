@@ -35,6 +35,8 @@ impl AlertState {
             timestamp: Utc::now(),
         });
 
+        warn!("{:?}", self.alerts.last().unwrap());
+
         self.alerts.last().unwrap()
     }
 }
