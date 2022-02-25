@@ -54,7 +54,7 @@ export const ItemSelector = ({ submit }: Props) => {
 
     for (const [hashCode, count] of Object.entries(selectedItems)) {
       if (count === 0 || count === undefined) continue;
-      const matchedItem = items.find(
+      const matchedItem = itemList.find(
         (item) => item.stackable_hash === hashCode
       );
 
