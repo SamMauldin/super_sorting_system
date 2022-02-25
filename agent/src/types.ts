@@ -86,10 +86,12 @@ export type OperationKind =
   | DropItemsOperationKind
   | ImportInventoryOperationKind;
 
+export type OperationStatus = "Pending" | "InProgress" | "Complete" | "Aborted";
+
 export type Operation = {
   id: string;
   priority: string;
-  status: string;
+  status: OperationStatus;
   kind: OperationKind;
 };
 

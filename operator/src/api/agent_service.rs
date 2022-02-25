@@ -140,6 +140,7 @@ async fn free_hold(_agent: Agent, state: StateData) -> impl Responder {
 #[derive(Deserialize)]
 struct OperationCompleteRequest {
     operation_id: Uuid,
+    final_status: OperationStatus,
 }
 
 #[derive(Serialize)]
@@ -162,16 +163,29 @@ async fn operation_complete(
             .body("Given operation does not match currently executing operation (if any)");
     }
 
+    if !(operation_data.final_status == OperationStatus::Complete
+        || operation_data.final_status == OperationStatus::Aborted)
+    {
+        return HttpResponse::BadRequest().body("Invalid final operation status given");
+    }
+
     state.agents.set_operation(agent.id, None).unwrap();
 
     let res = state
         .operations
-        .set_operation_status(operation_data.operation_id, OperationStatus::Complete);
+        .set_operation_status(operation_data.operation_id, operation_data.final_status);
 
     match res {
-        Ok(op) => HttpResponse::Ok().json(OperationCompleteResponse::OperationCompleted {
-            operation: op.clone(),
-        }),
+        Ok(op) => {
+            let op = op.clone();
+
+            state.alerts.add_alert(
+                AlertSource::Agent(agent.id),
+                format!("Operation {} failed", op.id),
+            );
+
+            HttpResponse::Ok().json(OperationCompleteResponse::OperationCompleted { operation: op })
+        }
         Err(error) => HttpResponse::BadRequest().json(OperationCompleteResponse::Error(error)),
     }
 }

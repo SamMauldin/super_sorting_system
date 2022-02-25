@@ -76,22 +76,28 @@ const main = async () => {
       atHome = false;
       const { operation } = operationResponse;
 
-      if (operation.kind.type === "ScanInventory") {
-        await scanInventory(operation.kind, bot, agent);
-      } else if (operation.kind.type === "MoveItems") {
-        await moveItems(operation.kind, bot, agent);
-      } else if (operation.kind.type === "DropItems") {
-        await dropItems(operation.kind, bot, agent);
-      } else if (operation.kind.type === "ImportInventory") {
-        await importInventory(operation.kind, bot, agent);
-      } else if (operation.kind.type === "ScanSigns") {
-        await scanSigns(operation.kind, bot, agent);
-      } else {
-        throw new Error("Unknown operation kind dispatched!");
-      }
+      try {
+        if (operation.kind.type === "ScanInventory") {
+          await scanInventory(operation.kind, bot, agent);
+        } else if (operation.kind.type === "MoveItems") {
+          await moveItems(operation.kind, bot, agent);
+        } else if (operation.kind.type === "DropItems") {
+          await dropItems(operation.kind, bot, agent);
+        } else if (operation.kind.type === "ImportInventory") {
+          await importInventory(operation.kind, bot, agent);
+        } else if (operation.kind.type === "ScanSigns") {
+          await scanSigns(operation.kind, bot, agent);
+        } else {
+          throw new Error("Unknown operation kind dispatched!");
+        }
 
-      console.log(`Completed ${operation.kind.type} Operation`);
-      await operationComplete(agent, operation);
+        console.log(`Completed ${operation.kind.type} Operation`);
+        await operationComplete(agent, operation, "Complete");
+      } catch (e) {
+        console.error(e);
+        console.log("Error while attempting operation!");
+        await operationComplete(agent, operation, "Aborted");
+      }
     } else {
       if (!atHome) {
         const {

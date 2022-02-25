@@ -8,6 +8,7 @@ import {
   Vec2,
   Dimension,
   Location,
+  OperationStatus,
 } from "./types";
 
 const BASE_URL = process.env.AGENT_ENDPOINT!;
@@ -62,11 +63,12 @@ export const pollOperation = async (
 
 export const operationComplete = async (
   agent: Agent,
-  operation: Operation
+  operation: Operation,
+  finalStatus: OperationStatus
 ): Promise<AxiosResponse<string>> =>
   axios.post(
     agentEndpoint("operation_complete"),
-    { operation_id: operation.id },
+    { operation_id: operation.id, final_status: finalStatus },
     { headers: agentHeader(agent) }
   );
 

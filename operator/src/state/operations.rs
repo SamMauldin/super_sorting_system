@@ -11,7 +11,7 @@ pub enum OperationPriority {
     LowPriority = 3,
 }
 
-#[derive(Serialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum OperationStatus {
     Pending,
     InProgress,
