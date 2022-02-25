@@ -179,10 +179,12 @@ async fn operation_complete(
         Ok(op) => {
             let op = op.clone();
 
-            state.alerts.add_alert(
-                AlertSource::Agent(agent.id),
-                format!("Operation {} failed", op.id),
-            );
+            if operation_data.final_status == OperationStatus::Aborted {
+                state.alerts.add_alert(
+                    AlertSource::Agent(agent.id),
+                    format!("Operation {} failed", op.id),
+                );
+            }
 
             HttpResponse::Ok().json(OperationCompleteResponse::OperationCompleted { operation: op })
         }
