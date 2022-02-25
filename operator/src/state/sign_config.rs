@@ -131,6 +131,7 @@ pub enum ParsedSign {
 }
 
 #[derive(Error, Debug, Serialize)]
+#[serde(tag = "type")]
 pub enum SignParseError {
     #[error("Sign marker not found, this is probably not a SSS config sign")]
     NoMarker,
@@ -143,6 +144,7 @@ pub enum SignParseError {
 }
 
 #[derive(Error, Debug, Serialize)]
+#[serde(tag = "type")]
 pub enum SignConfigValidationError {
     #[error("Duplicate pathfinding node with name {name}")]
     DuplicatePathfindingNode { name: String },

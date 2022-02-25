@@ -16,10 +16,7 @@ import { useRecoilState } from "recoil";
  */
 
 export const Pickup = () => {
-  const { isLoading, isError, data } = useQuery(
-    "pathfinding_config",
-    getSignConfig
-  );
+  const { isLoading, isError, data } = useQuery("sign_config", getSignConfig);
 
   const [pickupLoc, setPickupLoc] = useRecoilState(pathfindingNode);
 

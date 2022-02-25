@@ -7,6 +7,7 @@ export const Help = () => (
     <ul>
       <li>Alt + D: Open Delivery page</li>
       <li>Alt + P: Open Pickup page</li>
+      <li>Alt + C: Open Config page</li>
       <li>Alt + S: Open Stats page</li>
       <li>Alt + H: Open Help page</li>
       <li>These keys also work with Ctrl instead of Alt</li>

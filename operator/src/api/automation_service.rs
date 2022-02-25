@@ -34,7 +34,7 @@ async fn inventory_contents(state: StateData) -> impl Responder {
 }
 
 #[get("/sign_config")]
-async fn pathfinding_config(state: StateData) -> impl Responder {
+async fn sign_config(state: StateData) -> impl Responder {
     let state = state.lock().unwrap();
     let sign_config = state.sign_config.get_config();
 
@@ -165,7 +165,7 @@ pub fn configure(app: &mut web::ServiceConfig) {
     app.service(
         web::scope("/automation")
             .service(inventory_contents)
-            .service(pathfinding_config)
+            .service(sign_config)
             .service(holds_index)
             .service(holds_create)
             .service(remove_hold)

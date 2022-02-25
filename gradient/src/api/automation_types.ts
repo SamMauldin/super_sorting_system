@@ -22,9 +22,31 @@ export type StorageComplex = {
   name: string;
 };
 
+type SignParseError = {
+  type: "NoMarker" | "OffsetParseFailed" | "UnknownSignType" | "NameEmpty";
+};
+
+type SignValidationError =
+  | {
+      type: "DuplicatePathfindingNode";
+      name: string;
+    }
+  | {
+      type: "UnknownNode";
+      name: string;
+    }
+  | {
+      type: "InterdimentionalConnection";
+      name_a: string;
+      name_b: string;
+    };
+
 export type CompiledSignConfig = {
   nodes: { [name: string]: PathfindingNode };
   complexes: { [name: string]: StorageComplex };
+
+  sign_parse_errors: SignParseError[];
+  validation_errors: SignValidationError[];
 };
 
 export type Hold = {

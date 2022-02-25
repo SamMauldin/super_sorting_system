@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { Delivery, Pickup, Stats, Help } from "./screens";
+import { Delivery, Pickup, Config, Stats, Help } from "./screens";
 import shulker from "./assets/shulker.png";
 
 export const App = () => {
   const [currentLocation, setCurrentLocation] = useState<
-    "delivery" | "pickup" | "stats" | "help"
+    "delivery" | "pickup" | "config" | "stats" | "help"
   >("delivery");
 
   useEffect(() => {
@@ -18,6 +18,9 @@ export const App = () => {
         ev.preventDefault();
       } else if (ev.key === "p") {
         setCurrentLocation("pickup");
+        ev.preventDefault();
+      } else if (ev.key === "c") {
+        setCurrentLocation("config");
         ev.preventDefault();
       } else if (ev.key === "s") {
         setCurrentLocation("stats");
@@ -51,6 +54,12 @@ export const App = () => {
           Pickup
         </Button>
         <Button
+          disabled={currentLocation === "config"}
+          onClick={() => setCurrentLocation("config")}
+        >
+          Config
+        </Button>
+        <Button
           disabled={currentLocation === "stats"}
           onClick={() => setCurrentLocation("stats")}
         >
@@ -65,6 +74,7 @@ export const App = () => {
       </TitleBar>
       {currentLocation === "delivery" && <Delivery />}
       {currentLocation === "pickup" && <Pickup />}
+      {currentLocation === "config" && <Config />}
       {currentLocation === "stats" && <Stats />}
       {currentLocation === "help" && <Help />}
     </Container>

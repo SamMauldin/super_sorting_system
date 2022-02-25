@@ -26,10 +26,7 @@ export const Delivery = () => {
     | null
   >(null);
 
-  const { isLoading, isError, data } = useQuery(
-    "pathfinding_config",
-    getSignConfig
-  );
+  const { isLoading, isError, data } = useQuery("sign_config", getSignConfig);
 
   const [deliveryLoc, setDeliveryLoc] = useRecoilState(pathfindingNode);
 
