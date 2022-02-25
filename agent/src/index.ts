@@ -76,6 +76,8 @@ const main = async () => {
       atHome = false;
       const { operation } = operationResponse;
 
+      console.log(`Starting ${operation.kind.type} operation`);
+
       try {
         if (operation.kind.type === "ScanInventory") {
           await scanInventory(operation.kind, bot, agent);
