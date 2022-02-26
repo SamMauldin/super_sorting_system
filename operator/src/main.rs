@@ -83,7 +83,8 @@ async fn main() -> Result<(), StartupError> {
             .service(
                 web::scope("")
                     .guard(guard::fn_guard(move |req| {
-                        req.headers()
+                        req.head()
+                            .headers()
                             .get("X-Api-Key")
                             .and_then(|header| header.to_str().ok())
                             .and_then(|header| Uuid::parse_str(header).ok())
