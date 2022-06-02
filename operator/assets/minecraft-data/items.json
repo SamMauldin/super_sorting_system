@@ -1594,7 +1594,10 @@
     "displayName": "Carved Pumpkin",
     "name": "carved_pumpkin",
     "stackSize": 64,
-    "enchantCategories": ["wearable", "vanishable"]
+    "enchantCategories": [
+      "wearable",
+      "vanishable"
+    ]
   },
   {
     "id": 267,
@@ -4002,7 +4005,10 @@
     "name": "carrot_on_a_stick",
     "stackSize": 1,
     "maxDurability": 25,
-    "enchantCategories": ["breakable", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable"
+    ]
   },
   {
     "id": 668,
@@ -4010,7 +4016,10 @@
     "name": "warped_fungus_on_a_stick",
     "stackSize": 64,
     "maxDurability": 100,
-    "enchantCategories": ["breakable", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable"
+    ]
   },
   {
     "id": 669,
@@ -4018,8 +4027,14 @@
     "name": "elytra",
     "stackSize": 1,
     "maxDurability": 432,
-    "enchantCategories": ["breakable", "wearable", "vanishable"],
-    "repairWith": ["phantom_membrane"]
+    "enchantCategories": [
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "phantom_membrane"
+    ]
   },
   {
     "id": 670,
@@ -4082,7 +4097,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["scute"]
+    "repairWith": [
+      "scute"
+    ]
   },
   {
     "id": 679,
@@ -4096,7 +4113,10 @@
     "name": "flint_and_steel",
     "stackSize": 1,
     "maxDurability": 64,
-    "enchantCategories": ["breakable", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable"
+    ]
   },
   {
     "id": 681,
@@ -4110,7 +4130,11 @@
     "name": "bow",
     "stackSize": 1,
     "maxDurability": 384,
-    "enchantCategories": ["breakable", "bow", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "bow",
+      "vanishable"
+    ]
   },
   {
     "id": 683,
@@ -4214,7 +4238,11 @@
     "name": "wooden_sword",
     "stackSize": 1,
     "maxDurability": 59,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -4232,7 +4260,11 @@
     "name": "wooden_shovel",
     "stackSize": 1,
     "maxDurability": 59,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -4250,7 +4282,11 @@
     "name": "wooden_pickaxe",
     "stackSize": 1,
     "maxDurability": 59,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -4268,7 +4304,11 @@
     "name": "wooden_axe",
     "stackSize": 1,
     "maxDurability": 59,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -4286,7 +4326,11 @@
     "name": "wooden_hoe",
     "stackSize": 1,
     "maxDurability": 59,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -4304,8 +4348,15 @@
     "name": "stone_sword",
     "stackSize": 1,
     "maxDurability": 131,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
-    "repairWith": ["cobblestone", "blackstone"]
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "cobblestone",
+      "blackstone"
+    ]
   },
   {
     "id": 705,
@@ -4313,8 +4364,15 @@
     "name": "stone_shovel",
     "stackSize": 1,
     "maxDurability": 131,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["cobblestone", "blackstone"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "cobblestone",
+      "blackstone"
+    ]
   },
   {
     "id": 706,
@@ -4322,8 +4380,15 @@
     "name": "stone_pickaxe",
     "stackSize": 1,
     "maxDurability": 131,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["cobblestone", "blackstone"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "cobblestone",
+      "blackstone"
+    ]
   },
   {
     "id": 707,
@@ -4331,8 +4396,15 @@
     "name": "stone_axe",
     "stackSize": 1,
     "maxDurability": 131,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["cobblestone", "blackstone"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "cobblestone",
+      "blackstone"
+    ]
   },
   {
     "id": 708,
@@ -4340,8 +4412,15 @@
     "name": "stone_hoe",
     "stackSize": 1,
     "maxDurability": 131,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["cobblestone", "blackstone"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "cobblestone",
+      "blackstone"
+    ]
   },
   {
     "id": 709,
@@ -4349,8 +4428,14 @@
     "name": "golden_sword",
     "stackSize": 1,
     "maxDurability": 32,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 710,
@@ -4358,8 +4443,14 @@
     "name": "golden_shovel",
     "stackSize": 1,
     "maxDurability": 32,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 711,
@@ -4367,8 +4458,14 @@
     "name": "golden_pickaxe",
     "stackSize": 1,
     "maxDurability": 32,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 712,
@@ -4376,8 +4473,14 @@
     "name": "golden_axe",
     "stackSize": 1,
     "maxDurability": 32,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 713,
@@ -4385,8 +4488,14 @@
     "name": "golden_hoe",
     "stackSize": 1,
     "maxDurability": 32,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 714,
@@ -4394,8 +4503,14 @@
     "name": "iron_sword",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 715,
@@ -4403,8 +4518,14 @@
     "name": "iron_shovel",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 716,
@@ -4412,8 +4533,14 @@
     "name": "iron_pickaxe",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 717,
@@ -4421,8 +4548,14 @@
     "name": "iron_axe",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 718,
@@ -4430,8 +4563,14 @@
     "name": "iron_hoe",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 719,
@@ -4439,8 +4578,14 @@
     "name": "diamond_sword",
     "stackSize": 1,
     "maxDurability": 1561,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 720,
@@ -4448,8 +4593,14 @@
     "name": "diamond_shovel",
     "stackSize": 1,
     "maxDurability": 1561,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 721,
@@ -4457,8 +4608,14 @@
     "name": "diamond_pickaxe",
     "stackSize": 1,
     "maxDurability": 1561,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 722,
@@ -4466,8 +4623,14 @@
     "name": "diamond_axe",
     "stackSize": 1,
     "maxDurability": 1561,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 723,
@@ -4475,8 +4638,14 @@
     "name": "diamond_hoe",
     "stackSize": 1,
     "maxDurability": 1561,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 724,
@@ -4484,8 +4653,14 @@
     "name": "netherite_sword",
     "stackSize": 1,
     "maxDurability": 2031,
-    "enchantCategories": ["weapon", "breakable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "weapon",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 725,
@@ -4493,8 +4668,14 @@
     "name": "netherite_shovel",
     "stackSize": 1,
     "maxDurability": 2031,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 726,
@@ -4502,8 +4683,14 @@
     "name": "netherite_pickaxe",
     "stackSize": 1,
     "maxDurability": 2031,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 727,
@@ -4511,8 +4698,14 @@
     "name": "netherite_axe",
     "stackSize": 1,
     "maxDurability": 2031,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 728,
@@ -4520,8 +4713,14 @@
     "name": "netherite_hoe",
     "stackSize": 1,
     "maxDurability": 2031,
-    "enchantCategories": ["digger", "breakable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "digger",
+      "breakable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 729,
@@ -4590,7 +4789,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["leather"]
+    "repairWith": [
+      "leather"
+    ]
   },
   {
     "id": 739,
@@ -4605,7 +4806,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["leather"]
+    "repairWith": [
+      "leather"
+    ]
   },
   {
     "id": 740,
@@ -4613,8 +4816,15 @@
     "name": "leather_leggings",
     "stackSize": 1,
     "maxDurability": 75,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["leather"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "leather"
+    ]
   },
   {
     "id": 741,
@@ -4629,7 +4839,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["leather"]
+    "repairWith": [
+      "leather"
+    ]
   },
   {
     "id": 742,
@@ -4644,7 +4856,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 743,
@@ -4659,7 +4873,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 744,
@@ -4667,8 +4883,15 @@
     "name": "chainmail_leggings",
     "stackSize": 1,
     "maxDurability": 225,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 745,
@@ -4683,7 +4906,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 746,
@@ -4698,7 +4923,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 747,
@@ -4713,7 +4940,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 748,
@@ -4721,8 +4950,15 @@
     "name": "iron_leggings",
     "stackSize": 1,
     "maxDurability": 225,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["iron_ingot"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 749,
@@ -4737,7 +4973,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["iron_ingot"]
+    "repairWith": [
+      "iron_ingot"
+    ]
   },
   {
     "id": 750,
@@ -4752,7 +4990,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["diamond"]
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 751,
@@ -4767,7 +5007,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["diamond"]
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 752,
@@ -4775,8 +5017,15 @@
     "name": "diamond_leggings",
     "stackSize": 1,
     "maxDurability": 495,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["diamond"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 753,
@@ -4791,7 +5040,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["diamond"]
+    "repairWith": [
+      "diamond"
+    ]
   },
   {
     "id": 754,
@@ -4806,7 +5057,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["gold_ingot"]
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 755,
@@ -4821,7 +5074,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["gold_ingot"]
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 756,
@@ -4829,8 +5084,15 @@
     "name": "golden_leggings",
     "stackSize": 1,
     "maxDurability": 105,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["gold_ingot"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 757,
@@ -4845,7 +5107,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["gold_ingot"]
+    "repairWith": [
+      "gold_ingot"
+    ]
   },
   {
     "id": 758,
@@ -4860,7 +5124,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["netherite_ingot"]
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 759,
@@ -4875,7 +5141,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["netherite_ingot"]
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 760,
@@ -4883,8 +5151,15 @@
     "name": "netherite_leggings",
     "stackSize": 1,
     "maxDurability": 555,
-    "enchantCategories": ["armor", "breakable", "wearable", "vanishable"],
-    "repairWith": ["netherite_ingot"]
+    "enchantCategories": [
+      "armor",
+      "breakable",
+      "wearable",
+      "vanishable"
+    ],
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 761,
@@ -4899,7 +5174,9 @@
       "wearable",
       "vanishable"
     ],
-    "repairWith": ["netherite_ingot"]
+    "repairWith": [
+      "netherite_ingot"
+    ]
   },
   {
     "id": 762,
@@ -5117,7 +5394,11 @@
     "name": "fishing_rod",
     "stackSize": 1,
     "maxDurability": 64,
-    "enchantCategories": ["breakable", "fishing_rod", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "fishing_rod",
+      "vanishable"
+    ]
   },
   {
     "id": 798,
@@ -5425,7 +5706,10 @@
     "name": "shears",
     "stackSize": 1,
     "maxDurability": 238,
-    "enchantCategories": ["breakable", "vanishable"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable"
+    ]
   },
   {
     "id": 849,
@@ -6068,28 +6352,40 @@
     "displayName": "Player Head",
     "name": "player_head",
     "stackSize": 64,
-    "enchantCategories": ["wearable", "vanishable"]
+    "enchantCategories": [
+      "wearable",
+      "vanishable"
+    ]
   },
   {
     "id": 956,
     "displayName": "Zombie Head",
     "name": "zombie_head",
     "stackSize": 64,
-    "enchantCategories": ["wearable", "vanishable"]
+    "enchantCategories": [
+      "wearable",
+      "vanishable"
+    ]
   },
   {
     "id": 957,
     "displayName": "Creeper Head",
     "name": "creeper_head",
     "stackSize": 64,
-    "enchantCategories": ["wearable", "vanishable"]
+    "enchantCategories": [
+      "wearable",
+      "vanishable"
+    ]
   },
   {
     "id": 958,
     "displayName": "Dragon Head",
     "name": "dragon_head",
     "stackSize": 64,
-    "enchantCategories": ["wearable", "vanishable"]
+    "enchantCategories": [
+      "wearable",
+      "vanishable"
+    ]
   },
   {
     "id": 959,
@@ -6397,7 +6693,10 @@
     "name": "shield",
     "stackSize": 1,
     "maxDurability": 336,
-    "enchantCategories": ["breakable", "vanishable"],
+    "enchantCategories": [
+      "breakable",
+      "vanishable"
+    ],
     "repairWith": [
       "oak_planks",
       "spruce_planks",
@@ -6514,441 +6813,455 @@
   {
     "id": 1027,
     "displayName": "Music Disc",
-    "name": "music_disc_pigstep",
+    "name": "music_disc_otherside",
     "stackSize": 1
   },
   {
     "id": 1028,
+    "displayName": "Music Disc",
+    "name": "music_disc_pigstep",
+    "stackSize": 1
+  },
+  {
+    "id": 1029,
     "displayName": "Trident",
     "name": "trident",
     "stackSize": 1,
     "maxDurability": 250,
-    "enchantCategories": ["breakable", "vanishable", "trident"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable",
+      "trident"
+    ]
   },
   {
-    "id": 1029,
+    "id": 1030,
     "displayName": "Phantom Membrane",
     "name": "phantom_membrane",
     "stackSize": 64
   },
   {
-    "id": 1030,
+    "id": 1031,
     "displayName": "Nautilus Shell",
     "name": "nautilus_shell",
     "stackSize": 64
   },
   {
-    "id": 1031,
+    "id": 1032,
     "displayName": "Heart of the Sea",
     "name": "heart_of_the_sea",
     "stackSize": 64
   },
   {
-    "id": 1032,
+    "id": 1033,
     "displayName": "Crossbow",
     "name": "crossbow",
     "stackSize": 1,
     "maxDurability": 326,
-    "enchantCategories": ["breakable", "vanishable", "crossbow"]
+    "enchantCategories": [
+      "breakable",
+      "vanishable",
+      "crossbow"
+    ]
   },
   {
-    "id": 1033,
+    "id": 1034,
     "displayName": "Suspicious Stew",
     "name": "suspicious_stew",
     "stackSize": 1
   },
   {
-    "id": 1034,
+    "id": 1035,
     "displayName": "Loom",
     "name": "loom",
     "stackSize": 64
   },
   {
-    "id": 1035,
+    "id": 1036,
     "displayName": "Banner Pattern",
     "name": "flower_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1036,
+    "id": 1037,
     "displayName": "Banner Pattern",
     "name": "creeper_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1037,
+    "id": 1038,
     "displayName": "Banner Pattern",
     "name": "skull_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1038,
+    "id": 1039,
     "displayName": "Banner Pattern",
     "name": "mojang_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1039,
+    "id": 1040,
     "displayName": "Banner Pattern",
     "name": "globe_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1040,
+    "id": 1041,
     "displayName": "Banner Pattern",
     "name": "piglin_banner_pattern",
     "stackSize": 1
   },
   {
-    "id": 1041,
+    "id": 1042,
     "displayName": "Composter",
     "name": "composter",
     "stackSize": 64
   },
   {
-    "id": 1042,
+    "id": 1043,
     "displayName": "Barrel",
     "name": "barrel",
     "stackSize": 64
   },
   {
-    "id": 1043,
+    "id": 1044,
     "displayName": "Smoker",
     "name": "smoker",
     "stackSize": 64
   },
   {
-    "id": 1044,
+    "id": 1045,
     "displayName": "Blast Furnace",
     "name": "blast_furnace",
     "stackSize": 64
   },
   {
-    "id": 1045,
+    "id": 1046,
     "displayName": "Cartography Table",
     "name": "cartography_table",
     "stackSize": 64
   },
   {
-    "id": 1046,
+    "id": 1047,
     "displayName": "Fletching Table",
     "name": "fletching_table",
     "stackSize": 64
   },
   {
-    "id": 1047,
+    "id": 1048,
     "displayName": "Grindstone",
     "name": "grindstone",
     "stackSize": 64
   },
   {
-    "id": 1048,
+    "id": 1049,
     "displayName": "Smithing Table",
     "name": "smithing_table",
     "stackSize": 64
   },
   {
-    "id": 1049,
+    "id": 1050,
     "displayName": "Stonecutter",
     "name": "stonecutter",
     "stackSize": 64
   },
   {
-    "id": 1050,
+    "id": 1051,
     "displayName": "Bell",
     "name": "bell",
     "stackSize": 64
   },
   {
-    "id": 1051,
+    "id": 1052,
     "displayName": "Lantern",
     "name": "lantern",
     "stackSize": 64
   },
   {
-    "id": 1052,
+    "id": 1053,
     "displayName": "Soul Lantern",
     "name": "soul_lantern",
     "stackSize": 64
   },
   {
-    "id": 1053,
+    "id": 1054,
     "displayName": "Sweet Berries",
     "name": "sweet_berries",
     "stackSize": 64
   },
   {
-    "id": 1054,
+    "id": 1055,
     "displayName": "Glow Berries",
     "name": "glow_berries",
     "stackSize": 64
   },
   {
-    "id": 1055,
+    "id": 1056,
     "displayName": "Campfire",
     "name": "campfire",
     "stackSize": 64
   },
   {
-    "id": 1056,
+    "id": 1057,
     "displayName": "Soul Campfire",
     "name": "soul_campfire",
     "stackSize": 64
   },
   {
-    "id": 1057,
+    "id": 1058,
     "displayName": "Shroomlight",
     "name": "shroomlight",
     "stackSize": 64
   },
   {
-    "id": 1058,
+    "id": 1059,
     "displayName": "Honeycomb",
     "name": "honeycomb",
     "stackSize": 64
   },
   {
-    "id": 1059,
+    "id": 1060,
     "displayName": "Bee Nest",
     "name": "bee_nest",
     "stackSize": 64
   },
   {
-    "id": 1060,
+    "id": 1061,
     "displayName": "Beehive",
     "name": "beehive",
     "stackSize": 64
   },
   {
-    "id": 1061,
+    "id": 1062,
     "displayName": "Honey Bottle",
     "name": "honey_bottle",
     "stackSize": 16
   },
   {
-    "id": 1062,
+    "id": 1063,
     "displayName": "Honeycomb Block",
     "name": "honeycomb_block",
     "stackSize": 64
   },
   {
-    "id": 1063,
+    "id": 1064,
     "displayName": "Lodestone",
     "name": "lodestone",
     "stackSize": 64
   },
   {
-    "id": 1064,
+    "id": 1065,
     "displayName": "Crying Obsidian",
     "name": "crying_obsidian",
     "stackSize": 64
   },
   {
-    "id": 1065,
+    "id": 1066,
     "displayName": "Blackstone",
     "name": "blackstone",
     "stackSize": 64
   },
   {
-    "id": 1066,
+    "id": 1067,
     "displayName": "Blackstone Slab",
     "name": "blackstone_slab",
     "stackSize": 64
   },
   {
-    "id": 1067,
+    "id": 1068,
     "displayName": "Blackstone Stairs",
     "name": "blackstone_stairs",
     "stackSize": 64
   },
   {
-    "id": 1068,
+    "id": 1069,
     "displayName": "Gilded Blackstone",
     "name": "gilded_blackstone",
     "stackSize": 64
   },
   {
-    "id": 1069,
+    "id": 1070,
     "displayName": "Polished Blackstone",
     "name": "polished_blackstone",
     "stackSize": 64
   },
   {
-    "id": 1070,
+    "id": 1071,
     "displayName": "Polished Blackstone Slab",
     "name": "polished_blackstone_slab",
     "stackSize": 64
   },
   {
-    "id": 1071,
+    "id": 1072,
     "displayName": "Polished Blackstone Stairs",
     "name": "polished_blackstone_stairs",
     "stackSize": 64
   },
   {
-    "id": 1072,
+    "id": 1073,
     "displayName": "Chiseled Polished Blackstone",
     "name": "chiseled_polished_blackstone",
     "stackSize": 64
   },
   {
-    "id": 1073,
+    "id": 1074,
     "displayName": "Polished Blackstone Bricks",
     "name": "polished_blackstone_bricks",
     "stackSize": 64
   },
   {
-    "id": 1074,
+    "id": 1075,
     "displayName": "Polished Blackstone Brick Slab",
     "name": "polished_blackstone_brick_slab",
     "stackSize": 64
   },
   {
-    "id": 1075,
+    "id": 1076,
     "displayName": "Polished Blackstone Brick Stairs",
     "name": "polished_blackstone_brick_stairs",
     "stackSize": 64
   },
   {
-    "id": 1076,
+    "id": 1077,
     "displayName": "Cracked Polished Blackstone Bricks",
     "name": "cracked_polished_blackstone_bricks",
     "stackSize": 64
   },
   {
-    "id": 1077,
+    "id": 1078,
     "displayName": "Respawn Anchor",
     "name": "respawn_anchor",
     "stackSize": 64
   },
   {
-    "id": 1078,
+    "id": 1079,
     "displayName": "Candle",
     "name": "candle",
     "stackSize": 64
   },
   {
-    "id": 1079,
+    "id": 1080,
     "displayName": "White Candle",
     "name": "white_candle",
     "stackSize": 64
   },
   {
-    "id": 1080,
+    "id": 1081,
     "displayName": "Orange Candle",
     "name": "orange_candle",
     "stackSize": 64
   },
   {
-    "id": 1081,
+    "id": 1082,
     "displayName": "Magenta Candle",
     "name": "magenta_candle",
     "stackSize": 64
   },
   {
-    "id": 1082,
+    "id": 1083,
     "displayName": "Light Blue Candle",
     "name": "light_blue_candle",
     "stackSize": 64
   },
   {
-    "id": 1083,
+    "id": 1084,
     "displayName": "Yellow Candle",
     "name": "yellow_candle",
     "stackSize": 64
   },
   {
-    "id": 1084,
+    "id": 1085,
     "displayName": "Lime Candle",
     "name": "lime_candle",
     "stackSize": 64
   },
   {
-    "id": 1085,
+    "id": 1086,
     "displayName": "Pink Candle",
     "name": "pink_candle",
     "stackSize": 64
   },
   {
-    "id": 1086,
+    "id": 1087,
     "displayName": "Gray Candle",
     "name": "gray_candle",
     "stackSize": 64
   },
   {
-    "id": 1087,
+    "id": 1088,
     "displayName": "Light Gray Candle",
     "name": "light_gray_candle",
     "stackSize": 64
   },
   {
-    "id": 1088,
+    "id": 1089,
     "displayName": "Cyan Candle",
     "name": "cyan_candle",
     "stackSize": 64
   },
   {
-    "id": 1089,
+    "id": 1090,
     "displayName": "Purple Candle",
     "name": "purple_candle",
     "stackSize": 64
   },
   {
-    "id": 1090,
+    "id": 1091,
     "displayName": "Blue Candle",
     "name": "blue_candle",
     "stackSize": 64
   },
   {
-    "id": 1091,
+    "id": 1092,
     "displayName": "Brown Candle",
     "name": "brown_candle",
     "stackSize": 64
   },
   {
-    "id": 1092,
+    "id": 1093,
     "displayName": "Green Candle",
     "name": "green_candle",
     "stackSize": 64
   },
   {
-    "id": 1093,
+    "id": 1094,
     "displayName": "Red Candle",
     "name": "red_candle",
     "stackSize": 64
   },
   {
-    "id": 1094,
+    "id": 1095,
     "displayName": "Black Candle",
     "name": "black_candle",
     "stackSize": 64
   },
   {
-    "id": 1095,
+    "id": 1096,
     "displayName": "Small Amethyst Bud",
     "name": "small_amethyst_bud",
     "stackSize": 64
   },
   {
-    "id": 1096,
+    "id": 1097,
     "displayName": "Medium Amethyst Bud",
     "name": "medium_amethyst_bud",
     "stackSize": 64
   },
   {
-    "id": 1097,
+    "id": 1098,
     "displayName": "Large Amethyst Bud",
     "name": "large_amethyst_bud",
     "stackSize": 64
   },
   {
-    "id": 1098,
+    "id": 1099,
     "displayName": "Amethyst Cluster",
     "name": "amethyst_cluster",
     "stackSize": 64
   },
   {
-    "id": 1099,
+    "id": 1100,
     "displayName": "Pointed Dripstone",
     "name": "pointed_dripstone",
     "stackSize": 64
