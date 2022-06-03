@@ -1,0 +1,7 @@
+# Most of the files here are generated, but there a few we want to keep around
+/*
+
+!server.properties
+!plugins/.keep
+!plugins/WorldEdit/.keep
+!plugins/WorldEdit/craftscripts/*
