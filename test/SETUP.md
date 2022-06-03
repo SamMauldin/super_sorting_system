@@ -16,6 +16,9 @@ In the `test/server` directory, run `java -jar BuildTools.jar --rev 1.18.2`.
 You will need to agree to the Minecraft EULA by copying `test/server/eula.txt.example`
 to `test/server/eula.text` and setting `eula=true` in that file.
 
+Copy `test/server/server.properties.example` to `test/server/server.properties`.
+No changes are neccesary.
+
 ## WorldEdit
 
 Download WorldEdit [here](https://dev.bukkit.org/projects/worldedit/files)
