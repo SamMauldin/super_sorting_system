@@ -1,6 +1,7 @@
 use std::env;
-use std::process::Command;
+use std::fs::{remove_dir_all, remove_file};
 use std::path::Path;
+use std::process::Command;
 
 use regex::Regex;
 
@@ -16,13 +17,21 @@ impl Server {
             .expect("unable to determine workspace directory: must be ran with cargo");
         let suite_path = Path::new(&suite_directory);
         let server_path = suite_path.parent().unwrap().join("server");
+        let playerdata_path = server_path.join("world/playerdata");
         let spigot_path = server_path.join("spigot-1.18.2.jar");
 
         println!("Starting Spigot server...");
 
+        // Best effort to clean server state
+        let _ = remove_dir_all(playerdata_path);
+        let _ = remove_file(server_path.join("world/session.lock"));
+        let _ = remove_file(server_path.join("world_nether/session.lock"));
+        let _ = remove_file(server_path.join("world_the_end/session.lock"));
+
         let mut command = Command::new("java");
 
-            command.current_dir(server_path)
+        command
+            .current_dir(server_path)
             .args(["-Xmx1G", "-Xms1G", "-jar"])
             .arg(spigot_path);
 
@@ -37,8 +46,14 @@ impl Server {
         server
     }
 
-    pub fn wait_for_regex(&self, regex: &Regex) {
-        self.process_wrapper.wait_for_regex(regex);
+    pub fn run_command(&mut self, command: &str, expect_regex: &str) -> String {
+        self.process_wrapper.send_stdin(&format!("{}\n", command));
+
+        self.wait_for_regex(&Regex::new(expect_regex).unwrap())
+    }
+
+    pub fn wait_for_regex(&self, regex: &Regex) -> String {
+        self.process_wrapper.wait_for_regex(regex)
     }
 
     pub fn stop(mut self) {
