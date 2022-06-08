@@ -1,18 +1,13 @@
 use figment::{
-    providers::{Format, Toml},
+    providers::{Format, Toml, Env},
     Figment,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct AuthConfig {
-    pub api_keys: Vec<Uuid>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
-    pub auth: AuthConfig,
+    pub api_keys: Vec<Uuid>,
     #[serde(default = "default_host")]
     pub host: String,
     #[serde(default = "default_port")]
@@ -28,5 +23,5 @@ fn default_port() -> u16 {
 }
 
 pub fn read_config() -> Result<Config, figment::Error> {
-    Figment::new().merge(Toml::file("operator.toml")).extract()
+    Figment::new().merge(Toml::file("operator.toml")).merge(Env::prefixed("OPERATOR_")).extract()
 }

@@ -71,7 +71,7 @@ async fn main() -> Result<(), StartupError> {
     let app_config = config.clone();
     let app_state = state.clone();
 
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         let app_config_guard = app_config.clone();
 
         App::new()
@@ -88,7 +88,7 @@ async fn main() -> Result<(), StartupError> {
                             .get("X-Api-Key")
                             .and_then(|header| header.to_str().ok())
                             .and_then(|header| Uuid::parse_str(header).ok())
-                            .map(|header| app_config_guard.auth.api_keys.contains(&header))
+                            .map(|header| app_config_guard.api_keys.contains(&header))
                             .unwrap_or(false)
                     }))
                     .configure(api::agent_service::configure)
@@ -98,8 +98,9 @@ async fn main() -> Result<(), StartupError> {
             )
     })
     .bind((config.host.as_str(), config.port))
-    .map_err(StartupError::CreateServerError)?
-    .run()
+    .map_err(StartupError::CreateServerError)?;
+    info!("Bound to {:?}", (config.host.as_str(), config.port));
+    server.run()
     .await
     .map_err(StartupError::CreateServerError)
 }
