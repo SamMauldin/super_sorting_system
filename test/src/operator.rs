@@ -20,8 +20,6 @@ impl Operator {
         let operator_path = suite_path
             .parent()
             .unwrap()
-            .parent()
-            .unwrap()
             .join("operator");
 
         println!("Starting operator...");

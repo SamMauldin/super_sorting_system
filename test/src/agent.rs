@@ -16,7 +16,7 @@ impl Agent {
         let suite_directory = env::var("CARGO_MANIFEST_DIR")
             .expect("unable to determine workspace directory: must be ran with cargo");
         let suite_path = Path::new(&suite_directory);
-        let agent_path = suite_path.parent().unwrap().parent().unwrap().join("agent");
+        let agent_path = suite_path.parent().unwrap().join("agent");
 
         println!("Starting agent...");
 

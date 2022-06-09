@@ -16,7 +16,7 @@ impl Server {
         let suite_directory = env::var("CARGO_MANIFEST_DIR")
             .expect("unable to determine workspace directory: must be ran with cargo");
         let suite_path = Path::new(&suite_directory);
-        let server_path = suite_path.parent().unwrap().join("server");
+        let server_path = suite_path.join("server");
         let playerdata_path = server_path.join("world/playerdata");
         let spigot_path = server_path.join("spigot-1.18.2.jar");
 
