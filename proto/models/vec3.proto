@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package super_sorting_system.models;
+
+message Vec3i {
+  required int32 x = 1;
+  required int32 y = 2;
+  required int32 z = 3;
+}

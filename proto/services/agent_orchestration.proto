@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package super_sorting_system.services;
+
+import "models/agent.proto";
+
+service AgentOrchestration {
+  rpc RegisterAgent (RegisterAgentRequest) returns (RegisterAgentResponse);
+}
+
+message RegisterAgentRequest {}
+
+message RegisterAgentResponse {
+  models.Agent agent = 1;
+}

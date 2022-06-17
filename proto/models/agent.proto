@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package super_sorting_system.models;
+
+import "google/protobuf/timestamp.proto";
+
+message Agent {
+  string id = 1;
+  google.protobuf.Timestamp last_seen_at = 2;
+  optional string current_operation_id = 3;
+}

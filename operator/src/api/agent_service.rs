@@ -5,6 +5,15 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use tonic::{transport::Server, Request, Response, Status};
+
+use services::agent_orchestration_server::{AgentOrchestration, AgentOrchestrationServer};
+
+pub mod services {
+    tonic::include_proto!("super_sorting_system.models");
+    tonic::include_proto!("super_sorting_system.services");
+}
+
 use crate::{
     pathfinding::PathfindingError,
     state::{
@@ -17,6 +26,11 @@ use crate::{
     },
     types::{Dimension, Inventory, Location, UnhashedItem, Vec2, Vec3},
 };
+
+pub struct AgentOrchestrationService {}
+
+#[tonic::async_trait]
+impl AgentOrchestration for AgentOrchestrationServer {}
 
 #[derive(Serialize)]
 struct RegisterAgentResponse {

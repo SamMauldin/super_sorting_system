@@ -1,5 +1,5 @@
 use figment::{
-    providers::{Format, Toml, Env},
+    providers::{Env, Format, Toml},
     Figment,
 };
 use serde::{Deserialize, Serialize};
@@ -23,5 +23,8 @@ fn default_port() -> u16 {
 }
 
 pub fn read_config() -> Result<Config, figment::Error> {
-    Figment::new().merge(Toml::file("operator.toml")).merge(Env::prefixed("OPERATOR_")).extract()
+    Figment::new()
+        .merge(Toml::file("operator.toml"))
+        .merge(Env::prefixed("OPERATOR_"))
+        .extract()
 }

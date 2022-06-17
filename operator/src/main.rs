@@ -100,7 +100,5 @@ async fn main() -> Result<(), StartupError> {
     .bind((config.host.as_str(), config.port))
     .map_err(StartupError::CreateServerError)?;
     info!("Bound to {:?}", (config.host.as_str(), config.port));
-    server.run()
-    .await
-    .map_err(StartupError::CreateServerError)
+    server.run().await.map_err(StartupError::CreateServerError)
 }
