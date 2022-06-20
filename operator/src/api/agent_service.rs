@@ -5,18 +5,15 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use tonic::{transport::Server, Request, Response, Status};
+use tonic::{Request, Response, Status, Code};
 
-use services::agent_orchestration_server::{AgentOrchestration, AgentOrchestrationServer};
-
-pub mod services {
-    tonic::include_proto!("super_sorting_system.models");
-    tonic::include_proto!("super_sorting_system.services");
-}
+use proto::services::agent_orchestration_server::AgentOrchestration;
+use proto::services::{RegisterAgentRequest, RegisterAgentResponse, HeartbeatRequest, HeartbeatResponse};
 
 use crate::{
     pathfinding::PathfindingError,
     state::{
+        StateArc,
         agents::Agent,
         alerts::{Alert, AlertSource},
         holds::Hold,
@@ -27,13 +24,30 @@ use crate::{
     types::{Dimension, Inventory, Location, UnhashedItem, Vec2, Vec3},
 };
 
-pub struct AgentOrchestrationService {}
+pub struct AgentOrchestrationService {
+}
 
 #[tonic::async_trait]
-impl AgentOrchestration for AgentOrchestrationServer {}
+impl AgentOrchestration for AgentOrchestrationService {
+  async fn register_agent(&self, request: Request<RegisterAgentRequest>) -> Result<Response<RegisterAgentResponse>, Status> {
+      let mut state = request.extensions().get::<StateArc>().unwrap().lock().unwrap();
+
+      let agent = state.agents.register().clone();
+
+      Ok(Response::new(RegisterAgentResponse {
+        agent: Some(agent.to_proto()),
+      }))
+  }
+
+  async fn heartbeat(&self, request: Request<HeartbeatRequest>) -> Result<Response<HeartbeatResponse>, Status> {
+      let mut state = request.extensions().get::<StateArc>().unwrap().lock().unwrap();
+
+      let agent = state.agents.get_and_mark_seen(Uuid::parse_str(&request.get_ref().agent_id).map_err(|err| Err(Status::new(Code::InvalidArgument, "")))?);
+  }
+}
 
 #[derive(Serialize)]
-struct RegisterAgentResponse {
+struct RestRegisterAgentResponse {
     agent: Agent,
 }
 
@@ -43,7 +57,7 @@ async fn register_agent(state: StateData) -> impl Responder {
 
     let agent = state.agents.register().clone();
 
-    HttpResponse::Ok().json(RegisterAgentResponse { agent })
+    HttpResponse::Ok().json(RestRegisterAgentResponse { agent })
 }
 
 #[post("/heartbeat")]

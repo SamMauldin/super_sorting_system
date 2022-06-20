@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{NaiveDateTime, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::cmp::{max, min};
@@ -6,6 +6,8 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::ops::Add;
 use std::{fmt::Display, hash::Hasher};
+
+use prost_types::Timestamp;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct Vec3 {
@@ -147,3 +149,15 @@ pub struct Inventory {
     pub slots: Vec<Option<Item>>,
     pub scanned_at: DateTime<Utc>,
 }
+
+    pub fn chrono_to_timestamp(dt: DateTime<Utc>) -> Timestamp {
+        Timestamp {
+            seconds: dt.timestamp(),
+            nanos: dt.timestamp_subsec_nanos() as i32,
+        }
+    }
+
+    pub fn timestamp_to_chrono(val: Timestamp) -> DateTime<Utc> {
+        let dt = NaiveDateTime::from_timestamp(val.seconds, val.nanos as u32);
+        DateTime::from_utc(dt, Utc)
+    }

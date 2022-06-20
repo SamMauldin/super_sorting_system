@@ -10,20 +10,28 @@ mod state;
 mod stats;
 mod types;
 
-use std::{sync::Mutex, thread, time::Duration};
+use std::{sync::{Arc, Mutex}, thread, time::Duration, net::SocketAddr};
 
 use actix_cors::Cors;
 use actix_web::{guard, middleware, web, App, HttpServer};
 use thiserror::Error;
 use uuid::Uuid;
+use futures::select;
+use futures_util::FutureExt;
+
+use tonic::transport::Server;
+
+use tower_http::add_extension::AddExtensionLayer;
+
+use proto::services::agent_orchestration_server::AgentOrchestrationServer;
 
 use crate::{
+    api::agent_service::AgentOrchestrationService,
     services::{
         agent_expiration::AgentExpirationService, defragger::DefraggerService,
         hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
         node_scanner::NodeScannerService, service::Service,
     },
-    state::StateData,
 };
 
 #[derive(Error, Debug)]
@@ -32,6 +40,8 @@ enum StartupError {
     FigmentError(figment::Error),
     #[error(transparent)]
     CreateServerError(std::io::Error),
+    #[error(transparent)]
+    CreateTonicServerError(tonic::transport::Error),
 }
 
 #[actix_web::main]
@@ -41,9 +51,10 @@ async fn main() -> Result<(), StartupError> {
 
     let config = web::Data::new(config::read_config().map_err(StartupError::FigmentError)?);
 
-    let state: StateData = web::Data::new(Mutex::new(Default::default()));
+    let state = Arc::new(Mutex::new(Default::default()));
+    let state_data = web::Data::new(state.clone());
 
-    let bg_state = state.clone();
+    let bg_state = state_data.clone();
     let bg_config = config.clone();
 
     thread::spawn(move || {
@@ -100,5 +111,15 @@ async fn main() -> Result<(), StartupError> {
     .bind((config.host.as_str(), config.port))
     .map_err(StartupError::CreateServerError)?;
     info!("Bound to {:?}", (config.host.as_str(), config.port));
-    server.run().await.map_err(StartupError::CreateServerError)
+
+    let agent_orchestration = AgentOrchestrationService {};
+
+    let tonic_server = Server::builder()
+        .layer(AddExtensionLayer::new(state))
+        .add_service(AgentOrchestrationServer::new(agent_orchestration)).serve(SocketAddr::new(config.host.parse().unwrap(), config.port + 1));
+
+    select! {
+        http_res = server.run().fuse() => http_res.map_err(StartupError::CreateServerError),
+        tonic_res = tonic_server.fuse() => tonic_res.map_err(StartupError::CreateTonicServerError)
+    }
 }

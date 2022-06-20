@@ -3,7 +3,7 @@ use self::{
     operations::OperationState, sign_config::SignConfigState,
 };
 use actix_web::web;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 pub mod agents;
 pub mod alerts;
@@ -35,3 +35,4 @@ impl Default for State {
 }
 
 pub type StateData = web::Data<Mutex<State>>;
+pub type StateArc = Arc<Mutex<State>>;

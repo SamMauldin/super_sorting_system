@@ -6,6 +6,7 @@ import "models/agent.proto";
 
 service AgentOrchestration {
   rpc RegisterAgent (RegisterAgentRequest) returns (RegisterAgentResponse);
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
 }
 
 message RegisterAgentRequest {}
@@ -13,3 +14,9 @@ message RegisterAgentRequest {}
 message RegisterAgentResponse {
   models.Agent agent = 1;
 }
+
+message HeartbeatRequest {
+  string agent_id = 1;
+}
+
+message HeartbeatResponse {}

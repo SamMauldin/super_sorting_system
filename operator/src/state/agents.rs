@@ -7,13 +7,26 @@ use serde::Serialize;
 use thiserror::Error;
 use uuid::Uuid;
 
+use proto::models::Agent as ProtoAgent;
+
 use crate::state::StateData;
+use crate::types::chrono_to_timestamp;
 
 #[derive(Serialize, Clone)]
 pub struct Agent {
     pub id: Uuid,
     pub last_seen: DateTime<Utc>,
     pub current_operation: Option<Uuid>,
+}
+
+impl Agent {
+    pub fn to_proto(&self) -> ProtoAgent {
+        ProtoAgent {
+            id: self.id.to_string(),
+            last_seen_at: Some(chrono_to_timestamp(self.last_seen)),
+            current_operation_id: self.current_operation.map(|id| id.to_string()),
+        }
+    }
 }
 
 pub struct AgentState {
