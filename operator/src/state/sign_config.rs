@@ -93,6 +93,24 @@ pub struct Sign {
 // Hallway B
 
 /*
+ * Portal Signs
+ * These signs indicate that a pathfinding node has a portal that connects to another pathfinding
+ * node. This point will be inside of the portal. Note that this only establishes
+ * a one-way connection.
+ * Only one of these is permitted for a given pathfinding node.
+ */
+
+// Line 2: Sign type "portal"
+// Line 3: Node this portal is located at
+// Line 4: Node this portal leads to
+
+// Example:
+// SSS 0,+3,0
+// portal
+// nether_node
+// overworld_node
+
+/*
  * Storage Complex Signs
  * These signs indicate an area of storage containers to be used by the network
  * This will also act as a pathfinding node of the given name
@@ -122,6 +140,11 @@ pub enum ParsedSign {
         effective_location: Vec3,
         node_name: String,
     },
+    Portal {
+        effective_location: Vec3,
+        source_node_name: String,
+        destination_node_name: String,
+    },
     StorageComplex {
         dimension: Dimension,
         y_level: i32,
@@ -150,7 +173,7 @@ pub enum SignConfigValidationError {
     DuplicatePathfindingNode { name: String },
     #[error("Referenced node {name} is unknown")]
     UnknownNode { name: String },
-    #[error("Connection between node {name_a} and {name_b} is invalid because they are in different dimensions")]
+    #[error("Connection between node {name_a} and {name_b} is invalid because they are in different dimensions. Use a portal sign to link these.")]
     InterdimentionalConnection { name_a: String, name_b: String },
 }
 
@@ -234,6 +257,16 @@ impl TryFrom<&Sign> for ParsedSign {
                     effective_location: effective_location.vec3,
                 })
             }
+            "portal" => {
+                let source_node_name = s.lines[2].clone();
+                let destination_node_name = s.lines[3].clone();
+
+                Ok(ParsedSign::Portal {
+                    effective_location: effective_location.vec3,
+                    source_node_name,
+                    destination_node_name,
+                })
+            }
             "storage complex" => {
                 let name = s.lines[3].clone();
                 let second_offset = parse_offset(s.lines[2].as_str())?;
@@ -254,12 +287,19 @@ impl TryFrom<&Sign> for ParsedSign {
 }
 
 #[derive(Serialize)]
+pub struct Portal {
+    pub vec3: Vec3,
+    pub destination_node_name: String,
+}
+
+#[derive(Serialize)]
 pub struct PathfindingNode {
     pub location: Location,
     pub name: String,
     pub connections: Vec<String>,
     pub pickup: Option<Vec3>,
     pub dropoff: Option<Vec3>,
+    pub portal: Option<Portal>,
 }
 
 #[derive(Serialize)]
@@ -339,6 +379,7 @@ impl SignConfigState {
                             connections: Vec::new(),
                             pickup: None,
                             dropoff: None,
+                            portal: None,
                         },
                     );
 
@@ -371,6 +412,7 @@ impl SignConfigState {
                             connections: Vec::new(),
                             pickup: None,
                             dropoff: None,
+                            portal: None,
                         },
                     );
 
@@ -455,6 +497,35 @@ impl SignConfigState {
                 }
 
                 node.unwrap().pickup = Some(*effective_location)
+            }
+            ParsedSign::Portal {
+                effective_location,
+                source_node_name,
+                destination_node_name,
+            } => {
+                let source_node = nodes.get(source_node_name);
+                let destination_node = nodes.get(destination_node_name);
+
+                if source_node.is_none() {
+                    validation_errors.push(SignConfigValidationError::UnknownNode {
+                        name: source_node_name.clone(),
+                    });
+                    return;
+                }
+
+                if destination_node.is_none() {
+                    validation_errors.push(SignConfigValidationError::UnknownNode {
+                        name: destination_node_name.clone(),
+                    });
+                    return;
+                }
+
+                let source_node = nodes.get_mut(source_node_name);
+
+                source_node.unwrap().portal = Some(Portal {
+                    destination_node_name: destination_node_name.clone(),
+                    vec3: *effective_location,
+                });
             }
             _ => {}
         });
