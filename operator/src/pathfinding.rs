@@ -13,8 +13,6 @@ pub enum PathfindingError {
     NoPath,
     #[error("Unknown starting location")]
     UnknownStartingLocation,
-    #[error("Cross-dimension paths currently unsupported")]
-    CrossDimensionUnsupported,
 }
 
 // Is the given point inside a complex? If so, which one?
@@ -135,7 +133,10 @@ pub fn find_path(
             }
             PfNode::Portal { source_node } => {
                 let config_node = sign_config.nodes.get(source_node).unwrap();
+                let portal = config_node.portal.as_ref().unwrap();
+                let destination_node = sign_config.nodes.get(&portal.destination_node_name);
 
+                if destination_node.is_some() {
                 vec![PfNode::Normal {
                     node: config_node
                         .portal
@@ -144,6 +145,9 @@ pub fn find_path(
                         .destination_node_name
                         .clone(),
                 }]
+                } else {
+                    vec![]
+                }
             }
         },
         |node| match &node {
@@ -165,8 +169,7 @@ pub fn find_path(
                     let portal = config_node.portal.as_ref().unwrap();
                     let destination_node = sign_config
                         .nodes
-                        .get(&portal.destination_node_name)
-                        .unwrap();
+                        .get(&portal.destination_node_name).unwrap();
 
                     PfResultNode::Portal {
                         vec: portal.vec3,

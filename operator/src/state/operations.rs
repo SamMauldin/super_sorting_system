@@ -35,6 +35,7 @@ pub enum OperationKind {
     },
     ScanSigns {
         location: Location,
+        take_portal: Option<Vec3>,
     },
     MoveItems {
         source_hold: Uuid,

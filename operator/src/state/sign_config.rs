@@ -514,10 +514,10 @@ impl SignConfigState {
                 }
 
                 if destination_node.is_none() {
+                    // Keep portal so it can be scanned, but still report validation error
                     validation_errors.push(SignConfigValidationError::UnknownNode {
                         name: destination_node_name.clone(),
                     });
-                    return;
                 }
 
                 let source_node = nodes.get_mut(source_node_name);
