@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    pathfinding::PathfindingError,
+    pathfinding::{PathfindingError, PfResultNode},
     state::{
         agents::Agent,
         alerts::{Alert, AlertSource},
@@ -15,7 +15,7 @@ use crate::{
         sign_config::Sign,
         StateData,
     },
-    types::{Dimension, Inventory, Location, UnhashedItem, Vec2, Vec3},
+    types::{Dimension, Inventory, Location, UnhashedItem, Vec2},
 };
 
 #[derive(Serialize)]
@@ -234,7 +234,7 @@ pub struct PathfindingRequest {
 #[derive(Serialize)]
 #[serde(tag = "type")]
 enum PathfindingResponse {
-    PathFound { path: Vec<Vec3> },
+    PathFound { path: Vec<PfResultNode> },
     Error(PathfindingError),
 }
 
