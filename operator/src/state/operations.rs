@@ -52,6 +52,12 @@ pub enum OperationKind {
         node_location: Location,
         destination_holds: Vec<Uuid>,
     },
+    Craft {
+        crafting_table_location: Vec3,
+        node_location: Location,
+        recipe_source_holds: Vec<Uuid>,
+        destination_holds: Vec<Uuid>,
+    }
 }
 
 pub struct OperationState {
@@ -139,6 +145,12 @@ impl Operation {
             OperationKind::ImportInventory {
                 destination_holds, ..
             } => destination_holds.clone(),
+            OperationKind::Craft { recipe_source_holds, destination_holds, .. } => {
+                let mut holds = vec![];
+                holds.extend(recipe_source_holds.iter());
+                holds.extend(destination_holds.iter());
+                holds
+            }
         }
     }
 }
