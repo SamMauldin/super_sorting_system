@@ -1,15 +1,15 @@
-import { Bot } from "mineflayer";
-import vec3, { Vec3 as depVec3 } from "vec3";
-import { findPath } from "../../controllerApi";
-import { once } from "events";
-import { setTimeout } from "timers/promises";
+import { Bot } from 'mineflayer';
+import vec3, { Vec3 as depVec3 } from 'vec3';
+import { findPath } from '../../controllerApi';
+import { once } from 'events';
+import { setTimeout } from 'timers/promises';
 
-import { Agent, Vec3, vecEq, Location, stringToDim } from "../../types";
+import { Agent, Vec3, vecEq, Location, stringToDim } from '../../types';
 
 const floorVec3 = (input: Vec3) => ({
   x: Math.floor(input.x),
   y: Math.floor(input.y),
-  z: Math.floor(input.z),
+  z: Math.floor(input.z)
 });
 
 // Largely adapted from mineflayer
@@ -47,7 +47,7 @@ async function flyTo(bot: Bot, destination: depVec3) {
     const normalizedVector = vector.scaled(1 / magnitude);
     bot.entity.position.add(normalizedVector.scaled(flyingSpeedEaseOut));
 
-    await once(bot, "move");
+    await once(bot, 'move');
 
     vector = destination.minus(bot.entity.position);
     magnitude = vecMagnitude(vector);
@@ -55,8 +55,18 @@ async function flyTo(bot: Bot, destination: depVec3) {
 
   // last step
   bot.entity.position = destination;
-  await once(bot, "move");
+  await once(bot, 'move');
 }
+
+export const takePortal = async (vec: Vec3, bot: Bot) => {
+  const startingDim = bot.game.dimension;
+
+  await flyTo(bot, vec3(vec));
+
+  while (bot.game.dimension === startingDim) {
+    await setTimeout(500);
+  }
+};
 
 export const navigateTo = async (
   destinationLoc: Location,
@@ -78,9 +88,13 @@ export const navigateTo = async (
     destinationLoc
   );
 
-  if (pathResp.type === "Error") throw new Error("Pathfinding request failed!");
+  if (pathResp.type === 'Error') throw new Error('Pathfinding request failed!');
 
   for (const node of pathResp.path) {
-    await flyTo(bot, vec3(node).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
+    if ('Vec' in node) {
+      await flyTo(bot, vec3(node.Vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
+    } else {
+      await takePortal(node.Portal.vec, bot);
+    }
   }
 };

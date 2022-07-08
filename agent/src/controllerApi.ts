@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosResponse } from "axios";
+import axios, { Axios, AxiosResponse } from 'axios';
 import {
   Agent,
   Operation,
@@ -9,7 +9,8 @@ import {
   Dimension,
   Location,
   OperationStatus,
-} from "./types";
+  PfResultNode
+} from './types';
 
 const BASE_URL = process.env.AGENT_ENDPOINT!;
 const API_KEY = process.env.AGENT_API_KEY!;
@@ -17,22 +18,22 @@ const API_KEY = process.env.AGENT_API_KEY!;
 const agentEndpoint = (name: string) => `${BASE_URL}/agent/${name}`;
 const automationEndpoint = (name: string) => `${BASE_URL}/automation/${name}`;
 
-const authHeader = { "X-Api-Key": API_KEY };
+const authHeader = { 'X-Api-Key': API_KEY };
 
 const agentHeader = (agent: Agent) => ({
-  "X-Agent-Id": agent.id,
-  ...authHeader,
+  'X-Agent-Id': agent.id,
+  ...authHeader
 });
 
 export const registerAgent = async (): Promise<
   AxiosResponse<{
     agent: Agent;
   }>
-> => axios.post(agentEndpoint("register"), undefined, { headers: authHeader });
+> => axios.post(agentEndpoint('register'), undefined, { headers: authHeader });
 
 export const heartbeat = async (agent: Agent): Promise<AxiosResponse<string>> =>
-  axios.post(agentEndpoint("heartbeat"), undefined, {
-    headers: agentHeader(agent),
+  axios.post(agentEndpoint('heartbeat'), undefined, {
+    headers: agentHeader(agent)
   });
 
 export const alert = async (
@@ -40,25 +41,25 @@ export const alert = async (
   agent: Agent
 ): Promise<AxiosResponse<string>> =>
   axios.post(
-    agentEndpoint("alert"),
+    agentEndpoint('alert'),
     { description },
     { headers: agentHeader(agent) }
   );
 
 type PollOperationResponse =
   | {
-      type: "OperationUnavailable";
+      type: 'OperationUnavailable';
     }
   | {
-      type: "OperationAvailable";
+      type: 'OperationAvailable';
       operation: Operation;
     };
 
 export const pollOperation = async (
   agent: Agent
 ): Promise<AxiosResponse<PollOperationResponse>> =>
-  axios.post(agentEndpoint("poll_operation"), undefined, {
-    headers: agentHeader(agent),
+  axios.post(agentEndpoint('poll_operation'), undefined, {
+    headers: agentHeader(agent)
   });
 
 export const operationComplete = async (
@@ -67,7 +68,7 @@ export const operationComplete = async (
   finalStatus: OperationStatus
 ): Promise<AxiosResponse<string>> =>
   axios.post(
-    agentEndpoint("operation_complete"),
+    agentEndpoint('operation_complete'),
     { operation_id: operation.id, final_status: finalStatus },
     { headers: agentHeader(agent) }
   );
@@ -78,10 +79,10 @@ export const inventoryScanned = async (
   agent: Agent
 ): Promise<AxiosResponse<string>> =>
   axios.post(
-    agentEndpoint("inventory_scanned"),
+    agentEndpoint('inventory_scanned'),
     {
       location: inventoryLocation,
-      slots,
+      slots
     },
     { headers: agentHeader(agent) }
   );
@@ -94,27 +95,27 @@ export const getHold = async (
 
 type FreeHoldResponse =
   | {
-      type: "HoldAcquired";
+      type: 'HoldAcquired';
       hold: Hold;
     }
   | {
-      type: "HoldUnavailable";
+      type: 'HoldUnavailable';
     };
 
 export const getFreeHold = async (
   agent: Agent
 ): Promise<AxiosResponse<FreeHoldResponse>> =>
-  axios.post(agentEndpoint("hold/free"), undefined, {
-    headers: agentHeader(agent),
+  axios.post(agentEndpoint('hold/free'), undefined, {
+    headers: agentHeader(agent)
   });
 
 type PathfindingResponse =
   | {
-      type: "PathFound";
-      path: Vec3[];
+      type: 'PathFound';
+      path: PfResultNode[];
     }
   | {
-      type: "Error";
+      type: 'Error';
     };
 
 export const findPath = async (
@@ -123,13 +124,13 @@ export const findPath = async (
   endLoc: Location
 ): Promise<AxiosResponse<PathfindingResponse>> =>
   axios.post(
-    agentEndpoint("pathfinding"),
+    agentEndpoint('pathfinding'),
     {
       start_loc: startLoc,
-      end_loc: endLoc,
+      end_loc: endLoc
     },
     {
-      headers: agentHeader(agent),
+      headers: agentHeader(agent)
     }
   );
 
@@ -149,7 +150,7 @@ export const sendSignScanData = (
   scanRegions: ScanRegion[]
 ): Promise<AxiosResponse<string>> =>
   axios.post(
-    agentEndpoint("sign_scan_data"),
+    agentEndpoint('sign_scan_data'),
     { scan_regions: scanRegions },
     { headers: agentHeader(agent) }
   );
@@ -175,4 +176,4 @@ export type CompiledSignConfig = {
 };
 
 export const getSignConfig = (): Promise<AxiosResponse<CompiledSignConfig>> =>
-  axios.get(automationEndpoint("sign_config"), { headers: authHeader });
+  axios.get(automationEndpoint('sign_config'), { headers: authHeader });

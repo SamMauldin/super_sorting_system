@@ -1,7 +1,7 @@
-import { Bot } from "mineflayer";
+import { Bot } from 'mineflayer';
 
-import { Agent, ScanSignsOperationKind } from "../types";
-import { navigateTo, sendVisibleSignData } from "./procedures";
+import { Agent, ScanSignsOperationKind } from '../types';
+import { navigateTo, sendVisibleSignData, takePortal } from './procedures';
 
 export const scanSigns = async (
   operationKind: ScanSignsOperationKind,
@@ -9,6 +9,10 @@ export const scanSigns = async (
   agent: Agent
 ) => {
   await navigateTo(operationKind.location, bot, agent);
+
+  if (operationKind.take_portal) {
+    await takePortal(operationKind.take_portal, bot);
+  }
 
   await sendVisibleSignData(bot, agent);
 };
