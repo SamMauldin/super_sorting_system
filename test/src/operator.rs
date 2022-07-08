@@ -17,10 +17,7 @@ impl Operator {
         let suite_directory = env::var("CARGO_MANIFEST_DIR")
             .expect("unable to determine workspace directory: must be ran with cargo");
         let suite_path = Path::new(&suite_directory);
-        let operator_path = suite_path
-            .parent()
-            .unwrap()
-            .join("operator");
+        let operator_path = suite_path.parent().unwrap().join("operator");
 
         println!("Starting operator...");
 
