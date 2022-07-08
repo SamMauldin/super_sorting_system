@@ -113,7 +113,7 @@ export const Config = () => {
             return (
               <li key={idx}>
                 Cannot connect nodes {err.name_a} and {err.name_b} because they
-                are in different dimensions
+                are in different dimensions. Use a portal sign to link these.
               </li>
             );
           } else {
