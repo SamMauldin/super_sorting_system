@@ -7,7 +7,7 @@ use crate::{
         operations::{OperationKind, OperationPriority, OperationStatus},
         State,
     },
-    types::{Vec3, Location},
+    types::{Location, Vec3},
 };
 
 use super::service::Service;
@@ -38,16 +38,21 @@ impl Service for NodeScannerService {
 
         let mut new_tracked_nodes = vec![];
         for (_name, node) in sign_config.nodes.iter() {
-            let prev_node = self.tracked_nodes.iter().find(|e_node| e_node.name == node.name);
+            let prev_node = self
+                .tracked_nodes
+                .iter()
+                .find(|e_node| e_node.name == node.name);
 
             new_tracked_nodes.push(TrackedNode {
                 name: node.name.clone(),
                 location: node.location,
                 portal_vec: node.portal.as_ref().map(|p| p.vec3),
-                current_scan_operation_id: prev_node.and_then(|node| node.current_scan_operation_id),
+                current_scan_operation_id: prev_node
+                    .and_then(|node| node.current_scan_operation_id),
                 last_scan: prev_node.and_then(|node| node.last_scan),
-                current_portal_scan_operation_id: prev_node.and_then(|node| node.current_portal_scan_operation_id),
-                last_portal_scan: prev_node.and_then(|node| node.last_portal_scan)
+                current_portal_scan_operation_id: prev_node
+                    .and_then(|node| node.current_portal_scan_operation_id),
+                last_portal_scan: prev_node.and_then(|node| node.last_portal_scan),
             })
         }
         self.tracked_nodes = new_tracked_nodes;
@@ -96,7 +101,9 @@ impl Service for NodeScannerService {
 
         // Scan node portal
         for node in self.tracked_nodes.iter_mut() {
-            if node.portal_vec.is_none() { continue }
+            if node.portal_vec.is_none() {
+                continue;
+            }
 
             if let Some(op_id) = node.current_portal_scan_operation_id {
                 let op = state.operations.get(op_id);

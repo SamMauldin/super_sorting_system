@@ -137,14 +137,14 @@ pub fn find_path(
                 let destination_node = sign_config.nodes.get(&portal.destination_node_name);
 
                 if destination_node.is_some() {
-                vec![PfNode::Normal {
-                    node: config_node
-                        .portal
-                        .as_ref()
-                        .unwrap()
-                        .destination_node_name
-                        .clone(),
-                }]
+                    vec![PfNode::Normal {
+                        node: config_node
+                            .portal
+                            .as_ref()
+                            .unwrap()
+                            .destination_node_name
+                            .clone(),
+                    }]
                 } else {
                     vec![]
                 }
@@ -169,7 +169,8 @@ pub fn find_path(
                     let portal = config_node.portal.as_ref().unwrap();
                     let destination_node = sign_config
                         .nodes
-                        .get(&portal.destination_node_name).unwrap();
+                        .get(&portal.destination_node_name)
+                        .unwrap();
 
                     PfResultNode::Portal {
                         vec: portal.vec3,
