@@ -1,16 +1,16 @@
-import { Bot, Chest } from "mineflayer";
-import { Window } from "prismarine-windows";
-import vec3 from "vec3";
+import { Bot, Chest } from 'mineflayer';
+import { Window } from 'prismarine-windows';
+import vec3 from 'vec3';
 
-import { getHold } from "../controllerApi";
-import { Agent, DropItemsOperationKind, Location, locEq } from "../types";
+import { getHold } from '../controllerApi';
+import { Agent, DropItemsOperationKind, Location, locEq } from '../types';
 import {
   dropSlot,
   navigateTo,
   openChestAt,
   sendChestData,
-  transferItems,
-} from "./procedures";
+  transferItems
+} from './procedures';
 
 export const dropItems = async (
   operationKind: DropItemsOperationKind,
@@ -22,8 +22,8 @@ export const dropItems = async (
   for (const [inv_slot, hold_id] of operationKind.source_holds.entries()) {
     const {
       data: {
-        hold: { location: sourceLocation, slot: sourceSlot },
-      },
+        hold: { location: sourceLocation, slot: sourceSlot }
+      }
     } = await getHold(hold_id, agent);
 
     if (lastChest && !locEq(sourceLocation, lastChest.location)) {
@@ -41,7 +41,7 @@ export const dropItems = async (
       sourceSlot,
       inv_slot,
       Infinity,
-      "from_chest"
+      'from_chest'
     );
 
     lastChest = { chest, location: sourceLocation };

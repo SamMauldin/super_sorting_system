@@ -1,9 +1,9 @@
-import { Bot, Chest } from "mineflayer";
-import { Window } from "prismarine-windows";
-import vec3 from "vec3";
-import { navigateTo } from ".";
+import { Bot, Chest } from 'mineflayer';
+import { Window } from 'prismarine-windows';
+import vec3 from 'vec3';
+import { navigateTo } from '.';
 
-import { Agent, Location } from "../../types";
+import { Agent, Location } from '../../types';
 
 export const openChestAt = async (
   chestLoc: Location,
@@ -17,18 +17,18 @@ export const openChestAt = async (
         ...chestLoc,
         vec3: {
           ...chestLoc.vec3,
-          y: chestLoc.vec3.y + 1,
-        },
+          y: chestLoc.vec3.y + 1
+        }
       },
       bot,
       agent
     );
 
   const chestBlock = bot.blockAt(vec3(chestLoc.vec3));
-  if (!chestBlock) throw new Error("No block at chest destination!");
+  if (!chestBlock) throw new Error('No block at chest destination!');
 
   // @ts-ignore mineflayer typing is wrong
-  const chest: Chest & Window = await bot.openChest(chestBlock);
+  const chest: Chest & Window = await bot.openBlock(chestBlock);
 
   return chest;
 };

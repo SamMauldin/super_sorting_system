@@ -1,7 +1,7 @@
-import { Bot } from "mineflayer";
-import { Agent, stringToDim, Vec3 } from "../../types";
-import vec3 from "vec3";
-import { ScanRegion, sendSignScanData, Sign } from "../../controllerApi";
+import { Bot } from 'mineflayer';
+import { Agent, stringToDim, Vec3 } from '../../types';
+import vec3 from 'vec3';
+import { ScanRegion, sendSignScanData, Sign } from '../../controllerApi';
 
 export const sendVisibleSignData = async (bot: Bot, agent: Agent) => {
   const scanRegions = await scanVisibleRegion(bot);
@@ -20,7 +20,7 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
     const chunkPos = {
       x: parseInt(chunk.chunkX) * 16,
       y: 0,
-      z: parseInt(chunk.chunkZ) * 16,
+      z: parseInt(chunk.chunkZ) * 16
     };
 
     const scanRegion = getSignsInChunk(bot, chunkPos);
@@ -33,10 +33,10 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
 };
 
 const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
-  const data = require("minecraft-data")(bot._client.version);
+  const data = require('minecraft-data')(bot._client.version);
 
   const signBlockIds: number[] = Object.values(data.blocksByName)
-    .filter((b: any) => b.name.includes("_sign"))
+    .filter((b: any) => b.name.includes('_sign'))
     .map((b: any) => b.id);
 
   const chunk = bot.world.getColumnAt(chunkPos);
@@ -57,11 +57,11 @@ const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
           if (!signBlock || !signBlock.signText) continue;
 
           signs.push({
-            lines: signBlock.signText?.split("\n"),
+            lines: signBlock.signText?.split('\n'),
             location: {
               vec3: { x: chunkPos.x + x, y, z: chunkPos.z + z },
-              dim: stringToDim(bot.game.dimension),
-            },
+              dim: stringToDim(bot.game.dimension)
+            }
           });
         }
       }
@@ -72,8 +72,8 @@ const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
     signs,
     bounds: [
       { x: chunkPos.x, z: chunkPos.z },
-      { x: chunkPos.x + 15, z: chunkPos.z + 15 },
+      { x: chunkPos.x + 15, z: chunkPos.z + 15 }
     ],
-    dimension: stringToDim(bot.game.dimension),
+    dimension: stringToDim(bot.game.dimension)
   };
 };

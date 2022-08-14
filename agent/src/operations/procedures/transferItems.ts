@@ -1,9 +1,9 @@
-import assert from "assert";
-import { Bot, Chest } from "mineflayer";
-import itemLoader from "prismarine-item";
-import { Window } from "prismarine-windows";
+import assert from 'assert';
+import { Bot, Chest } from 'mineflayer';
+import itemLoader from 'prismarine-item';
+import { Window } from 'prismarine-windows';
 
-const Item = itemLoader("1.17.1");
+const Item = itemLoader('1.17.1');
 
 export const transferItems = async (
   bot: Bot,
@@ -11,7 +11,7 @@ export const transferItems = async (
   chestSlot: number,
   inventorySlot: number,
   count: number,
-  direction: "to_chest" | "from_chest"
+  direction: 'to_chest' | 'from_chest'
 ) => {
   const invPacketSlot = inventorySlot + chest.inventoryStart;
   const invArrSlot = inventorySlot + bot.inventory.inventoryStart;
@@ -20,23 +20,23 @@ export const transferItems = async (
   const chestArrSlot = chestSlot;
 
   const updateSourceSlot =
-    direction === "to_chest"
+    direction === 'to_chest'
       ? bot.inventory.updateSlot.bind(bot.inventory)
       : chest.updateSlot.bind(chest);
   const updateDestSlot =
-    direction === "to_chest"
+    direction === 'to_chest'
       ? chest.updateSlot.bind(chest)
       : bot.inventory.updateSlot.bind(bot.inventory);
 
   // Pickup items
   const sourceItem =
-    direction === "to_chest"
+    direction === 'to_chest'
       ? bot.inventory.slots[invArrSlot]
       : chest.slots[chestArrSlot];
 
   const sourcePacketSlot =
-    direction === "to_chest" ? invPacketSlot : chestPacketSlot;
-  const sourceArrSlot = direction === "to_chest" ? invArrSlot : chestArrSlot;
+    direction === 'to_chest' ? invPacketSlot : chestPacketSlot;
+  const sourceArrSlot = direction === 'to_chest' ? invArrSlot : chestArrSlot;
 
   assert(sourceItem);
 
@@ -76,14 +76,14 @@ export const transferItems = async (
 
   // Move to destination
   const destinationItem =
-    direction === "to_chest"
+    direction === 'to_chest'
       ? chest.slots[chestArrSlot]
       : bot.inventory.slots[invArrSlot];
   const destinationItemCount = destinationItem?.count || 0;
 
   const destPacketSlot =
-    direction === "to_chest" ? chestPacketSlot : invPacketSlot;
-  const destArrSlot = direction === "to_chest" ? chestArrSlot : invArrSlot;
+    direction === 'to_chest' ? chestPacketSlot : invPacketSlot;
+  const destArrSlot = direction === 'to_chest' ? chestArrSlot : invArrSlot;
 
   await bot.clickWindow(destPacketSlot, 0, 0);
 

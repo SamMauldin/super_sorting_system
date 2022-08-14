@@ -1,7 +1,7 @@
-import { Chest } from "mineflayer";
-import { Window } from "prismarine-windows";
-import { inventoryScanned } from "../../controllerApi";
-import { Agent, Item, Location } from "../../types";
+import { Chest } from 'mineflayer';
+import { Window } from 'prismarine-windows';
+import { inventoryScanned } from '../../controllerApi';
+import { Agent, Item, Location } from '../../types';
 
 export const sendChestData = async (
   chest: Chest & Window,
@@ -18,7 +18,7 @@ export const sendChestData = async (
         count: slot.count,
         metadata: slot.metadata,
         nbt: slot.nbt,
-        stack_size: slot.stackSize,
+        stack_size: slot.stackSize
       };
     });
 

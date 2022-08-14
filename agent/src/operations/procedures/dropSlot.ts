@@ -1,5 +1,5 @@
-import assert from "assert";
-import { Bot } from "mineflayer";
+import assert from 'assert';
+import { Bot } from 'mineflayer';
 
 export const dropSlot = async (bot: Bot, inventorySlot: number) => {
   const invArrSlot = inventorySlot + bot.inventory.inventoryStart;

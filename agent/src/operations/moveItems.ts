@@ -1,9 +1,9 @@
-import { Bot } from "mineflayer";
+import { Bot } from 'mineflayer';
 
-import { getHold } from "../controllerApi";
-import { Agent, MoveItemsOperationKind } from "../types";
-import { sendChestData, transferItems } from "./procedures";
-import { openChestAt } from "./procedures/openChestAt";
+import { getHold } from '../controllerApi';
+import { Agent, MoveItemsOperationKind } from '../types';
+import { sendChestData, transferItems } from './procedures';
+import { openChestAt } from './procedures/openChestAt';
 
 export const moveItems = async (
   operationKind: MoveItemsOperationKind,
@@ -12,13 +12,13 @@ export const moveItems = async (
 ) => {
   const {
     data: {
-      hold: { location: sourceLocation, slot: sourceSlot },
-    },
+      hold: { location: sourceLocation, slot: sourceSlot }
+    }
   } = await getHold(operationKind.source_hold, agent);
   const {
     data: {
-      hold: { location: destinationLocation, slot: destinationSlot },
-    },
+      hold: { location: destinationLocation, slot: destinationSlot }
+    }
   } = await getHold(operationKind.destination_hold, agent);
 
   const sourceChest = await openChestAt(sourceLocation, bot, agent);
@@ -29,7 +29,7 @@ export const moveItems = async (
     sourceSlot,
     0,
     operationKind.count,
-    "from_chest"
+    'from_chest'
   );
 
   await sendChestData(sourceChest, sourceLocation, agent);
@@ -44,7 +44,7 @@ export const moveItems = async (
     destinationSlot,
     0,
     operationKind.count,
-    "to_chest"
+    'to_chest'
   );
 
   await sendChestData(destChest, destinationLocation, agent);

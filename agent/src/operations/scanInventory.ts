@@ -1,7 +1,7 @@
-import { Bot } from "mineflayer";
+import { Bot } from 'mineflayer';
 
-import { Agent, ScanInventoryOperationKind } from "../types";
-import { openChestAt, sendChestData } from "./procedures";
+import { Agent, ScanInventoryOperationKind } from '../types';
+import { openChestAt, sendChestData } from './procedures';
 
 export const scanInventory = async (
   operationKind: ScanInventoryOperationKind,

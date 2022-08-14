@@ -1,20 +1,20 @@
-import { Bot, Chest } from "mineflayer";
-import { Window } from "prismarine-windows";
-import { getHold } from "../controllerApi";
+import { Bot, Chest } from 'mineflayer';
+import { Window } from 'prismarine-windows';
+import { getHold } from '../controllerApi';
 
-import { Agent, ImportInventoryOperationKind, locEq, Location } from "../types";
+import { Agent, ImportInventoryOperationKind, locEq, Location } from '../types';
 import {
   navigateTo,
   openChestAt,
   sendChestData,
-  transferItems,
-} from "./procedures";
+  transferItems
+} from './procedures';
 
 export const importInventory = async (
   {
     chest_location,
     node_location,
-    destination_holds,
+    destination_holds
   }: ImportInventoryOperationKind,
   bot: Bot,
   agent: Agent
@@ -32,7 +32,7 @@ export const importInventory = async (
     .slice(0, sourceChest.inventoryStart)
     .map((item, slot) => ({
       item,
-      slot,
+      slot
     }))
     .filter(({ item }) => Boolean(item));
 
@@ -47,7 +47,7 @@ export const importInventory = async (
       slot,
       takenItemsCount,
       Infinity,
-      "from_chest"
+      'from_chest'
     );
     takenItemsCount++;
   }
@@ -59,8 +59,8 @@ export const importInventory = async (
   for (let i = 0; i < takenItemsCount; i++) {
     const {
       data: {
-        hold: { location: destinationLocation, slot: destinationSlot },
-      },
+        hold: { location: destinationLocation, slot: destinationSlot }
+      }
     } = await getHold(destination_holds[i], agent);
 
     if (lastChest && !locEq(destinationLocation, lastChest.location)) {
@@ -78,7 +78,7 @@ export const importInventory = async (
       destinationSlot,
       i,
       Infinity,
-      "to_chest"
+      'to_chest'
     );
 
     lastChest = { chest: destChest, location: destinationLocation };
