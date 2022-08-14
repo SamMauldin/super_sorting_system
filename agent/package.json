@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node --enable-source-maps ./dist/index.js",
     "build": "tsc",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@types/node": "^16.7.13",
@@ -23,6 +24,7 @@
   "dependencies": {
     "axios": "^0.24.0",
     "dotenv": "^10.0.0",
-    "mineflayer": "^4.3.0"
+    "mineflayer": "^4.3.0",
+    "patch-package": "^6.4.7"
   }
 }

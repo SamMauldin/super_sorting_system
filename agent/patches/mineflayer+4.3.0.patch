@@ -1,0 +1,32 @@
+diff --git a/node_modules/mineflayer/lib/plugins/inventory.js b/node_modules/mineflayer/lib/plugins/inventory.js
+index 76ccbb6..243e8bb 100644
+--- a/node_modules/mineflayer/lib/plugins/inventory.js
++++ b/node_modules/mineflayer/lib/plugins/inventory.js
+@@ -152,7 +152,8 @@ function inject (bot, { hideErrors }) {
+ 
+   async function activateBlock (block) {
+     // TODO: tell the server that we are not sneaking while doing this
+-    await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), false)
++    // Skip looking for performance reasons
++    // await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), false)
+     // place block message
+     if (bot.supportFeature('blockPlaceHasHeldItem')) {
+       bot._client.write('block_place', {
+diff --git a/node_modules/mineflayer/lib/plugins/physics.js b/node_modules/mineflayer/lib/plugins/physics.js
+index d38f8aa..de40c33 100644
+--- a/node_modules/mineflayer/lib/plugins/physics.js
++++ b/node_modules/mineflayer/lib/plugins/physics.js
+@@ -235,8 +235,11 @@ function inject (bot, { physicsEnabled }) {
+     const yawChange = Math.round((yaw - bot.entity.yaw) / sensitivity) * sensitivity
+     const pitchChange = Math.round((pitch - bot.entity.pitch) / sensitivity) * sensitivity
+ 
+-    bot.entity.yaw += yawChange
+-    bot.entity.pitch += pitchChange
++    if (Math.abs(deltaYaw(bot.yaw)) < 0.01) return;
++
++    // We don't care about smoothly animating the look animation, just go as fast as possible
++    bot.entity.yaw = yaw
++    bot.entity.pitch = pitch
+ 
+     if (force) {
+       lastSentYaw = yaw
