@@ -44,7 +44,7 @@ const main = async () => {
       ? Number(process.env.AGENT_MC_SERVER_PORT)
       : undefined,
     username: process.env.AGENT_USERNAME!,
-    password: process.env.AGENT_PASSWORD!,
+    auth: 'microsoft',
     version: '1.18.2'
   });
 
