@@ -36,25 +36,21 @@ impl Service for NodeScannerService {
     fn tick(&mut self, state: &mut State) {
         let sign_config = state.sign_config.get_config();
 
+        let mut new_tracked_nodes = vec![];
         for (_name, node) in sign_config.nodes.iter() {
-            if self
-                .tracked_nodes
-                .iter()
-                .any(|e_node| e_node.name == node.name)
-            {
-                continue;
-            }
+            let prev_node = self.tracked_nodes.iter().find(|e_node| e_node.name == node.name);
 
-            self.tracked_nodes.push(TrackedNode {
+            new_tracked_nodes.push(TrackedNode {
                 name: node.name.clone(),
                 location: node.location,
                 portal_vec: node.portal.as_ref().map(|p| p.vec3),
-                current_scan_operation_id: None,
-                last_scan: None,
-                current_portal_scan_operation_id: None,
-                last_portal_scan: None
+                current_scan_operation_id: prev_node.and_then(|node| node.current_scan_operation_id),
+                last_scan: prev_node.and_then(|node| node.last_scan),
+                current_portal_scan_operation_id: prev_node.and_then(|node| node.current_portal_scan_operation_id),
+                last_portal_scan: prev_node.and_then(|node| node.last_portal_scan)
             })
         }
+        self.tracked_nodes = new_tracked_nodes;
 
         // Scan node
         for node in self.tracked_nodes.iter_mut() {
@@ -139,7 +135,7 @@ impl Service for NodeScannerService {
 
             let op = state.operations.queue_operation(priority, kind);
 
-            node.current_scan_operation_id = Some(op.id);
+            node.current_portal_scan_operation_id = Some(op.id);
         }
     }
 }

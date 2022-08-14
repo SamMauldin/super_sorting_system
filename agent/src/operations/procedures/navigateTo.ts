@@ -61,11 +61,13 @@ async function flyTo(bot: Bot, destination: depVec3) {
 export const takePortal = async (vec: Vec3, bot: Bot) => {
   const startingDim = bot.game.dimension;
 
-  await flyTo(bot, vec3(vec));
+  await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
 
   while (bot.game.dimension === startingDim) {
     await setTimeout(500);
   }
+
+  await setTimeout(5000);
 };
 
 export const navigateTo = async (
