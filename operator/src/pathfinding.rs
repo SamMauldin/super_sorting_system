@@ -61,15 +61,23 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
         return Some(name.to_owned());
     }
 
-    // In between two nodes, first selected
+    // In between two nodes, select closest
     let in_between_node_res = sign_config
         .nodes
         .iter()
-        .find_map(|(_name, node)| {
-            node.connections.iter().find(|other_name| {
-                let other_node = sign_config.nodes.get(*other_name).unwrap();
+        .find_map(|(node_name, node)| {
+            node.connections.iter().find_map(|other_name| {
+                let other_node = sign_config.nodes.get(other_name).unwrap();
 
-                is_in_between(start_loc.vec3, node.location.vec3, other_node.location.vec3)
+                if is_in_between(start_loc.vec3, node.location.vec3, other_node.location.vec3) {
+                    if start_loc.vec3.dist(node.location.vec3) < start_loc.vec3.dist(other_node.location.vec3) {
+                        Some(node_name)
+                    } else {
+                        Some(other_name)
+                    }
+                } else {
+                    None
+                }
             })
         })
         .map(|node| node.to_owned());
@@ -101,6 +109,7 @@ pub fn find_path(
 
     let starting_node = find_aligned_node(start_loc, &sign_config)
         .ok_or(PathfindingError::UnknownStartingLocation)?;
+    let starting_config_node = sign_config.nodes.get(&starting_node).unwrap();
     let ending_node = find_aligned_node(end_loc, &sign_config)
         .ok_or(PathfindingError::UnknownStartingLocation)?;
 
@@ -181,6 +190,7 @@ pub fn find_path(
             .collect::<Vec<PfResultNode>>()
     })
     .map(|mut path| {
+        path.insert(0, PfResultNode::Vec(starting_config_node.location.vec3));
         path.push(PfResultNode::Vec(end_loc.vec3));
 
         path
