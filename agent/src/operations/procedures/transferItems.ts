@@ -3,7 +3,7 @@ import { Bot, Chest } from 'mineflayer';
 import itemLoader from 'prismarine-item';
 import { Window } from 'prismarine-windows';
 
-const Item = itemLoader('1.17.1');
+const Item = itemLoader('1.18.2');
 
 export const transferItems = async (
   bot: Bot,

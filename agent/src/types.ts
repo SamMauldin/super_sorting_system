@@ -91,12 +91,21 @@ export type ImportInventoryOperationKind = {
   destination_holds: string[];
 };
 
+export type CraftOperationKind = {
+  type: 'Craft';
+  crafting_table_location: Vec3;
+  node_location: Location;
+  recipe_source_holds: Array<string | null>;
+  destination_holds: Array<string>;
+};
+
 export type OperationKind =
   | ScanInventoryOperationKind
   | ScanSignsOperationKind
   | MoveItemsOperationKind
   | DropItemsOperationKind
-  | ImportInventoryOperationKind;
+  | ImportInventoryOperationKind
+  | CraftOperationKind;
 
 export type OperationStatus = 'Pending' | 'InProgress' | 'Complete' | 'Aborted';
 
