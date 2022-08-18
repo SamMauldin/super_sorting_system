@@ -42,7 +42,7 @@ fn is_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
 
     let actual_dist = a.dist(b) + a.dist(c);
 
-    actual_dist - 5_f64 <= target_dist
+    actual_dist - 1_f64 <= target_dist
 }
 
 fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> Option<String> {
@@ -61,6 +61,23 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
         return Some(name.to_owned());
     }
 
+    // Portal within 3 blocks
+    let nearby_portal = sign_config
+        .nodes
+        .iter()
+        .filter(|(_name, node)| node.location.dim == start_loc.dim)
+        .find(|(_name, node)| {
+            if let Some(portal) = &node.portal {
+                portal.vec3.dist(start_loc.vec3) < 3_f64
+            } else {
+                false
+            }
+        });
+
+    if let Some((name, _node)) = nearby_portal {
+        return Some(name.to_owned());
+    }
+
     // In between two nodes, select closest
     let in_between_node_res = sign_config
         .nodes
@@ -70,7 +87,9 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
                 let other_node = sign_config.nodes.get(other_name).unwrap();
 
                 if is_in_between(start_loc.vec3, node.location.vec3, other_node.location.vec3) {
-                    if start_loc.vec3.dist(node.location.vec3) < start_loc.vec3.dist(other_node.location.vec3) {
+                    if start_loc.vec3.dist(node.location.vec3)
+                        < start_loc.vec3.dist(other_node.location.vec3)
+                    {
                         Some(node_name)
                     } else {
                         Some(other_name)
