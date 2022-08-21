@@ -6,6 +6,9 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::ops::Add;
 use std::{fmt::Display, hash::Hasher};
+use thiserror::Error;
+
+use crate::state::{holds::Hold, State};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct Vec3 {
@@ -139,6 +142,108 @@ pub struct Item {
 impl Display for Item {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         fmt.write_fmt(format_args!("{} x{}", self.item_id, self.count))
+    }
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub enum ItemMatchCriteria {
+    StackableHash { stackable_hash: String },
+}
+
+impl ItemMatchCriteria {
+    pub fn matches_item(&self, item: &Item) -> bool {
+        match self {
+            Self::StackableHash { stackable_hash } => &item.stackable_hash == stackable_hash,
+        }
+    }
+}
+
+#[derive(Error, Debug, Serialize)]
+pub enum HoldMatchError {
+    #[error("The slot at the requested position was already held")]
+    AlreadyHeld,
+    #[error("No match was found for the requested criteria")]
+    NoMatch,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub enum HoldRequestFilter {
+    EmptySlot,
+    ItemMatch {
+        match_criteria: ItemMatchCriteria,
+        total: u64,
+    },
+    SlotLocation {
+        location: Location,
+        slot: u32,
+    },
+}
+
+impl HoldRequestFilter {
+    pub fn attempt_match(&self, state: &mut State) -> Result<Vec<Hold>, HoldMatchError> {
+        match self {
+            Self::EmptySlot => {
+                for (loc, slot, item) in state.inventories.iter_slots() {
+                    if item.is_some() || state.holds.existing_hold(loc, slot as u32).is_some() {
+                        continue;
+                    }
+
+                    let hold = state.holds.create(loc, slot as u32).unwrap().clone();
+
+                    return Ok(vec![hold]);
+                }
+
+                return Err(HoldMatchError::NoMatch);
+            }
+            Self::ItemMatch {
+                match_criteria,
+                total,
+            } => {
+                let mut total_remaining = *total;
+                let mut holds = vec![];
+
+                let mut matching_items = state
+                    .inventories
+                    .iter_slots()
+                    .filter(|(loc, slot, item)| {
+                        item.as_ref()
+                            .map(|item| {
+                                match_criteria.matches_item(&item)
+                                    && state.holds.existing_hold(*loc, *slot as u32).is_none()
+                            })
+                            .unwrap_or(false)
+                    })
+                    .map(|(loc, slot, item)| (loc, slot, item.as_ref().unwrap().clone()))
+                    .collect::<Vec<_>>();
+
+                matching_items.sort_by(|(_, _, a), (_, _, b)| a.count.cmp(&b.count));
+
+                for (loc, slot, item) in matching_items.iter() {
+                    let hold = state.holds.create(*loc, *slot as u32).unwrap().clone();
+                    holds.push(hold);
+
+                    total_remaining -= item.count as u64;
+                    if total_remaining <= 0 {
+                        break;
+                    }
+                }
+
+                if holds.len() > 0 {
+                    return Ok(holds);
+                } else {
+                    return Err(HoldMatchError::NoMatch);
+                }
+            }
+            Self::SlotLocation { location, slot } => {
+                if state.holds.existing_hold(*location, *slot).is_some() {
+                    return Err(HoldMatchError::AlreadyHeld);
+                }
+
+                let hold = state.holds.create(*location, *slot).unwrap().clone();
+
+                return Ok(vec![hold]);
+            }
+        }
     }
 }
 

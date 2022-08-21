@@ -4,11 +4,11 @@ use uuid::Uuid;
 
 use crate::{
     state::{
-        holds::{Hold, HoldError},
+        holds::Hold,
         operations::{Operation, OperationKind, OperationPriority},
         StateData,
     },
-    types::{Item, Location},
+    types::{HoldMatchError, HoldRequestFilter, Item, Location},
 };
 
 #[derive(Serialize)]
@@ -56,27 +56,37 @@ async fn holds_index(state: StateData) -> impl Responder {
 
 #[derive(Deserialize)]
 struct CreateHoldRequest {
-    location: Location,
-    slot: u32,
+    requests: Vec<HoldRequestFilter>,
+}
+
+#[derive(Serialize)]
+enum HoldMatchResult {
+    Holds { holds: Vec<Hold> },
+    Error { error: HoldMatchError },
 }
 
 #[derive(Serialize)]
 #[serde(tag = "type")]
-enum CreateHoldResponse {
-    HoldCreated { hold: Hold },
-    Error(HoldError),
+struct CreateHoldResponse {
+    results: Vec<HoldMatchResult>,
 }
 
 #[post("/holds")]
 async fn holds_create(state: StateData, hold_req: web::Json<CreateHoldRequest>) -> impl Responder {
     let mut state = state.lock().unwrap();
 
-    let hold = state.holds.create(hold_req.location, hold_req.slot);
+    let results = hold_req
+        .requests
+        .iter()
+        .map(|filter| match filter.attempt_match(&mut state) {
+            Ok(holds) => HoldMatchResult::Holds {
+                holds: holds.into_iter().collect(),
+            },
+            Err(error) => HoldMatchResult::Error { error },
+        })
+        .collect();
 
-    match hold {
-        Ok(hold) => HttpResponse::Ok().json(CreateHoldResponse::HoldCreated { hold: hold.clone() }),
-        Err(err) => HttpResponse::InternalServerError().json(CreateHoldResponse::Error(err)),
-    }
+    HttpResponse::Ok().json(CreateHoldResponse { results })
 }
 
 #[derive(Serialize)]
