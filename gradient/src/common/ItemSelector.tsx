@@ -112,6 +112,7 @@ export const ItemSelector = ({ submit }: Props) => {
       const currentItem = items[hoverIdx];
 
       setModalItem(currentItem);
+      console.log(currentItem);
     }
   };
 
