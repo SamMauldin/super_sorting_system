@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { CountSelectorModal, useMcData } from '.';
 import { getInventoryContents } from '../api/automation';
 import styled from 'styled-components';
 import { ExtendedItem, itemListFromInventories } from '../helpers';
-import { distance } from 'fastest-levenshtein';
+import { Fzf } from 'fzf';
 import { Item } from '../api/types';
 
 type Props = {
@@ -35,18 +35,17 @@ export const ItemSelector = ({ submit }: Props) => {
   );
 
   const itemList = itemListFromInventories(mcData, data ? data.data : []);
+  const fzf = useMemo(
+    () =>
+      new Fzf(itemList, {
+        selector: (item) => item.prettyPrinted,
+      }),
+    [itemList],
+  );
 
   const items =
     search.length > 0
-      ? itemList
-          .filter((item) =>
-            item.prettyPrinted.toLowerCase().includes(search.toLowerCase()),
-          )
-          .map((item) => ({
-            ...item,
-            distance: distance(item.prettyPrinted, search),
-          }))
-          .sort((a, b) => a.distance - b.distance)
+      ? fzf.find(search).map((res) => res.item)
       : itemList.sort((a, b) => {
           const aSelected = Boolean(selectedItems[a.stackable_hash]);
           const bSelected = Boolean(selectedItems[b.stackable_hash]);
