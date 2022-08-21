@@ -66,7 +66,6 @@ enum HoldMatchResult {
 }
 
 #[derive(Serialize)]
-#[serde(tag = "type")]
 struct CreateHoldResponse {
     results: Vec<HoldMatchResult>,
 }
