@@ -5,7 +5,7 @@ import { KeyboardEvent, useState } from 'react';
 type Props = {
   item: ExtendedItem;
   startingCount: number;
-  close: (selectedCount: number) => void;
+  close: (selectedCount: number | null) => void;
 };
 
 export const CountSelectorModal = ({ startingCount, item, close }: Props) => {
@@ -22,7 +22,7 @@ export const CountSelectorModal = ({ startingCount, item, close }: Props) => {
     if (ev.key === 'Enter') {
       onClose();
     } else if (ev.key === 'Escape') {
-      close(startingCount);
+      close(null);
     } else if (ev.key === 'ArrowUp' || ev.key === 'Up') {
       ev.preventDefault();
 

@@ -47,7 +47,17 @@ export const ItemSelector = ({ submit }: Props) => {
             distance: distance(item.prettyPrinted, search),
           }))
           .sort((a, b) => a.distance - b.distance)
-      : itemList.sort((a, b) => b.count - a.count);
+      : itemList.sort((a, b) => {
+          const aSelected = Boolean(selectedItems[a.stackable_hash]);
+          const bSelected = Boolean(selectedItems[b.stackable_hash]);
+
+          if (aSelected && !bSelected) {
+            return -1;
+          } else if (bSelected && !aSelected) {
+            return 1;
+          }
+          return b.count - a.count;
+        });
 
   const submitSelected = () => {
     const selected = [];
@@ -151,7 +161,11 @@ export const ItemSelector = ({ submit }: Props) => {
             startingCount={selectedItems[modalItem.stackable_hash] || 0}
             item={modalItem}
             close={(count) => {
-              setSelectedForItem(modalItem, count);
+              if (count !== null) {
+                setSelectedForItem(modalItem, count);
+                setSearch('');
+              }
+
               setModalItem(null);
             }}
           />
