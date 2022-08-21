@@ -1,24 +1,24 @@
-import assert from "assert";
+import assert from 'assert';
 import {
   createHold,
   getInventoryContents,
   removeHold,
   renewHold,
-} from "../api/automation";
-import { Item, Loc, locEq } from "../api/types";
-import { searchFor, stackMatches } from ".";
+} from '../api/automation';
+import { Item, Loc, locEq } from '../api/types';
+import { searchFor, stackMatches } from '.';
 
 const verifySlot = async (
   loc: Loc,
   slot: number,
   contents: Item | null,
-  ignoreCount?: boolean
+  ignoreCount?: boolean,
 ): Promise<boolean> => {
   const { data: inventories } = await getInventoryContents();
 
   const invAtLoc = inventories.find(({ loc: invLoc }) => locEq(loc, invLoc));
   if (!invAtLoc) return false;
-  assert(invAtLoc, "Inventory not found at given location!");
+  assert(invAtLoc, 'Inventory not found at given location!');
 
   const item = invAtLoc.slots[slot];
 
@@ -29,11 +29,11 @@ export const acquireHoldVerified = async (
   loc: Loc,
   slot: number,
   contents: Item | null,
-  ignoreCount?: boolean
+  ignoreCount?: boolean,
 ): Promise<string> => {
   const { data: hold } = await createHold(loc, slot);
 
-  if (hold.type === "Error") throw new Error("Could not acquire hold");
+  if (hold.type === 'Error') throw new Error('Could not acquire hold');
 
   const verified = await verifySlot(loc, slot, contents, ignoreCount);
 
@@ -41,7 +41,7 @@ export const acquireHoldVerified = async (
 
   await removeHold(hold.hold.id);
 
-  throw new Error("Slot changed while acquiring hold!");
+  throw new Error('Slot changed while acquiring hold!');
 };
 
 export const acquireFreeSpaces = async (count: number): Promise<string[]> => {
@@ -51,7 +51,7 @@ export const acquireFreeSpaces = async (count: number): Promise<string[]> => {
     const emptySpaces = await searchFor(null);
 
     if (emptySpaces.length === 0)
-      throw new Error("Unable to reserve a free slot!");
+      throw new Error('Unable to reserve a free slot!');
 
     for (const emptySpace of emptySpaces) {
       if (located.length === count) break;
@@ -70,7 +70,7 @@ export const acquireFreeSpaces = async (count: number): Promise<string[]> => {
 export const renewHolds = async (holds: string[]): Promise<void> => {
   for (const hold_id of holds) {
     const { data } = await renewHold(hold_id);
-    assert(data.type === "HoldRenewed", "Unable to renew hold");
+    assert(data.type === 'HoldRenewed', 'Unable to renew hold');
   }
 };
 

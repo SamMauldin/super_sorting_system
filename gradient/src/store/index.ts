@@ -1,1 +1,1 @@
-export * from "./pathfindingNode";
+export * from './pathfindingNode';

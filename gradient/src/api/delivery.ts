@@ -1,4 +1,4 @@
-import assert from "assert";
+import assert from 'assert';
 import {
   acquireFreeSpaces,
   acquireHoldVerified,
@@ -7,23 +7,23 @@ import {
   searchFor,
   ExtendedItem,
   executeOperation,
-} from "../helpers";
-import { getSignConfig } from "./automation";
+} from '../helpers';
+import { getSignConfig } from './automation';
 
 export const deliverItems = async (
   destinationLoc: string,
   itemList: {
     item: ExtendedItem;
     count: number;
-  }[]
+  }[],
 ): Promise<void> => {
   const {
     data: { nodes },
   } = await getSignConfig();
   const destNode = nodes[destinationLoc];
 
-  assert(destNode, "Destination location does not exist");
-  assert(destNode.dropoff, "Destination does not have a drop-off location");
+  assert(destNode, 'Destination location does not exist');
+  assert(destNode.dropoff, 'Destination does not have a drop-off location');
 
   const slotsToDeliver: string[] = [];
   let tempHold: string | null = null;
@@ -52,14 +52,14 @@ export const deliverItems = async (
 
           if (!filledSpace) {
             const exactMatch = toMove.find(
-              ({ contents }) => contents!.count === countDesired
+              ({ contents }) => contents!.count === countDesired,
             );
 
             if (exactMatch) {
               const exactMatchHold = await acquireHoldVerified(
                 exactMatch.loc,
                 exactMatch.slot,
-                exactMatch.contents
+                exactMatch.contents,
               ).catch(() => null);
 
               if (!exactMatchHold) continue;
@@ -70,20 +70,20 @@ export const deliverItems = async (
             }
           }
 
-          if (!toMove[0]) throw new Error("Could not acquire item");
+          if (!toMove[0]) throw new Error('Could not acquire item');
 
           const { loc, slot, contents } = toMove[0];
 
           const toMoveHold = await acquireHoldVerified(
             loc,
             slot,
-            contents
+            contents,
           ).catch(() => null);
           tempHold = toMoveHold;
           if (!toMoveHold) continue;
           const toMoveCount = Math.min(
             countDesired - countAcquired,
-            contents!.count
+            contents!.count,
           );
 
           if (!filledSpace) {
@@ -94,12 +94,12 @@ export const deliverItems = async (
 
           await executeOperation(
             {
-              type: "MoveItems",
+              type: 'MoveItems',
               source_hold: toMoveHold,
               destination_hold: filledSpace,
               count: toMoveCount,
             },
-            "UserInteractive"
+            'UserInteractive',
           );
 
           await releaseHolds([toMoveHold]);
@@ -111,16 +111,16 @@ export const deliverItems = async (
     }
 
     // TODO Chunk deliveries
-    assert(slotsToDeliver.length <= 27, "Too many slots to deliver!");
+    assert(slotsToDeliver.length <= 27, 'Too many slots to deliver!');
 
     await executeOperation(
       {
-        type: "DropItems",
+        type: 'DropItems',
         source_holds: slotsToDeliver,
         drop_from: destNode.location,
         aim_towards: destNode.dropoff,
       },
-      "UserInteractive"
+      'UserInteractive',
     );
   } finally {
     clearInterval(renewInterval);

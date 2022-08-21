@@ -1,10 +1,10 @@
-import { getHolds, getInventoryContents } from "../api/automation";
-import { Item, Loc, locEq } from "../api/types";
-import { stackMatches } from ".";
+import { getHolds, getInventoryContents } from '../api/automation';
+import { Item, Loc, locEq } from '../api/types';
+import { stackMatches } from '.';
 
 export const searchFor = async (
   item: Item | null,
-  ignoreCount?: boolean
+  ignoreCount?: boolean,
 ): Promise<Array<{ loc: Loc; slot: number; contents: Item | null }>> => {
   const { data: inventories } = await getInventoryContents();
   const { data: holds } = await getHolds();
@@ -16,7 +16,7 @@ export const searchFor = async (
       if (!stackMatches(slots[slotIdx], item, ignoreCount)) continue;
       if (
         holds.holds.find(
-          (hold) => locEq(loc, hold.location) && hold.slot === slotIdx
+          (hold) => locEq(loc, hold.location) && hold.slot === slotIdx,
         )
       )
         continue;

@@ -1,29 +1,29 @@
-import React, { useState } from "react";
-import { useMutation, useQuery } from "react-query";
-import styled from "styled-components";
-import { SplashScreen } from "..";
-import { getSignConfig } from "../../api/automation";
-import { Loc } from "../../api/types";
-import { LocText } from "../../common";
-import { executeOperation } from "../../helpers";
+import React, { useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
+import styled from 'styled-components';
+import { SplashScreen } from '..';
+import { getSignConfig } from '../../api/automation';
+import { Loc } from '../../api/types';
+import { LocText } from '../../common';
+import { executeOperation } from '../../helpers';
 
 export const Config = () => {
-  const { isLoading, isError, data } = useQuery("sign_config", getSignConfig, {
+  const { isLoading, isError, data } = useQuery('sign_config', getSignConfig, {
     refetchInterval: 1000 * 5,
   });
 
-  const { mutate, status } = useMutation("rescan", async (loc: Loc) => {
+  const { mutate, status } = useMutation('rescan', async (loc: Loc) => {
     await executeOperation(
       {
-        type: "ScanSigns",
+        type: 'ScanSigns',
         location: loc,
       },
-      "UserInteractive"
+      'UserInteractive',
     );
   });
 
   const [currentlyExpanded, setCurrentlyExpanded] = useState<string | null>(
-    null
+    null,
   );
 
   if (isLoading || !data)
@@ -63,29 +63,29 @@ export const Config = () => {
                 <p>{node.name}</p>
                 {thisNodeExpanded && (
                   <ExpandContainer>
-                    {status === "loading" ? (
-                      "(busy)"
+                    {status === 'loading' ? (
+                      '(busy)'
                     ) : (
                       <button onClick={rescan}>Re-scan Location</button>
                     )}
-                    <p>Connections: {node.connections.join(", ")}</p>
+                    <p>Connections: {node.connections.join(', ')}</p>
                     <p>
                       Location: <LocText location={node.location} />
                     </p>
                     <p>
-                      Drop-off location:{" "}
+                      Drop-off location:{' '}
                       {node.dropoff ? (
                         <LocText location={node.dropoff} />
                       ) : (
-                        "(none)"
+                        '(none)'
                       )}
                     </p>
                     <p>
-                      Pickup location:{" "}
+                      Pickup location:{' '}
                       {node.pickup ? (
                         <LocText location={node.pickup} />
                       ) : (
-                        "(none)"
+                        '(none)'
                       )}
                     </p>
                   </ExpandContainer>
@@ -97,19 +97,19 @@ export const Config = () => {
       <h1>Sign Parsing and Validation Errors</h1>
       <ul>
         {data.data.validation_errors.map((err, idx) => {
-          if (err.type === "DuplicatePathfindingNode") {
+          if (err.type === 'DuplicatePathfindingNode') {
             return (
               <li key={idx}>
                 Attempt to create duplicate node with name {err.name}
               </li>
             );
-          } else if (err.type === "UnknownNode") {
+          } else if (err.type === 'UnknownNode') {
             return (
               <li key={idx}>
                 Node {err.name} was referenced, but it is unknown.
               </li>
             );
-          } else if (err.type === "InterdimentionalConnection") {
+          } else if (err.type === 'InterdimentionalConnection') {
             return (
               <li key={idx}>
                 Cannot connect nodes {err.name_a} and {err.name_b} because they
@@ -122,13 +122,13 @@ export const Config = () => {
         })}
 
         {data.data.sign_parse_errors.map((err, idx) => {
-          if (err.type === "NoMarker") {
+          if (err.type === 'NoMarker') {
             return null;
-          } else if (err.type === "NameEmpty") {
+          } else if (err.type === 'NameEmpty') {
             return <li key={idx}>Expected name, but no name was found</li>;
-          } else if (err.type === "OffsetParseFailed") {
+          } else if (err.type === 'OffsetParseFailed') {
             return <li key={idx}>Failed to parse location offset</li>;
-          } else if (err.type === "UnknownSignType") {
+          } else if (err.type === 'UnknownSignType') {
             return <li key={idx}>Unknown sign type specified</li>;
           } else {
             return <li key={idx}>Unknown error type</li>;

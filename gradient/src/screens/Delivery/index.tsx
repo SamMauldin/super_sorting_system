@@ -1,13 +1,13 @@
-import { KeyboardEvent, useEffect, useState } from "react";
-import { ItemSelector } from "../../common";
-import { ExtendedItem } from "../../helpers";
-import styled from "styled-components";
-import { useMutation, useQuery } from "react-query";
-import { getSignConfig } from "../../api/automation";
-import { SplashScreen } from "../SplashScreen";
-import { deliverItems } from "../../api/delivery";
-import { useRecoilState } from "recoil";
-import { pathfindingNode } from "../../store";
+import { KeyboardEvent, useEffect, useState } from 'react';
+import { ItemSelector } from '../../common';
+import { ExtendedItem } from '../../helpers';
+import styled from 'styled-components';
+import { useMutation, useQuery } from 'react-query';
+import { getSignConfig } from '../../api/automation';
+import { SplashScreen } from '../SplashScreen';
+import { deliverItems } from '../../api/delivery';
+import { useRecoilState } from 'recoil';
+import { pathfindingNode } from '../../store';
 
 /*
  *
@@ -26,7 +26,7 @@ export const Delivery = () => {
     | null
   >(null);
 
-  const { isLoading, isError, data } = useQuery("sign_config", getSignConfig);
+  const { isLoading, isError, data } = useQuery('sign_config', getSignConfig);
 
   const [deliveryLoc, setDeliveryLoc] = useRecoilState(pathfindingNode);
 
@@ -40,7 +40,7 @@ export const Delivery = () => {
   }, [deliveryLoc, data]);
 
   const { mutate, status, error, reset } = useMutation(
-    "delivery",
+    'delivery',
     async ({
       loc,
       items,
@@ -50,7 +50,7 @@ export const Delivery = () => {
         item: ExtendedItem;
         count: number;
       }[];
-    }) => await deliverItems(loc, items)
+    }) => await deliverItems(loc, items),
   );
 
   const back = () => {
@@ -58,7 +58,7 @@ export const Delivery = () => {
     setSelectedItems(null);
   };
 
-  if (status === "success")
+  if (status === 'success')
     return (
       <SplashScreen
         message={
@@ -69,7 +69,7 @@ export const Delivery = () => {
         }
       />
     );
-  if (status === "error")
+  if (status === 'error')
     return (
       <SplashScreen
         message={
@@ -81,7 +81,7 @@ export const Delivery = () => {
         }
       />
     );
-  if (status === "loading")
+  if (status === 'loading')
     return <SplashScreen message="Delivery in progress" />;
 
   if (!selectedItems)
@@ -95,7 +95,7 @@ export const Delivery = () => {
   const deliver = () => mutate({ loc: deliveryLoc!, items: selectedItems });
 
   const onKeyDown = (ev: KeyboardEvent) => {
-    if (ev.key === "Enter" && deliveryLoc) deliver();
+    if (ev.key === 'Enter' && deliveryLoc) deliver();
   };
 
   return (
@@ -116,7 +116,7 @@ export const Delivery = () => {
           </ul>
           <p>Deliver to:</p>
           <select
-            value={deliveryLoc || ""}
+            value={deliveryLoc || ''}
             onChange={({ target: { value } }) => setDeliveryLoc(value)}
             onKeyDown={onKeyDown}
             autoFocus

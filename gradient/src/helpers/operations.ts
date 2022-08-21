@@ -1,6 +1,6 @@
-import { createOperation, getOperation } from "../api/automation";
-import { OperationKind, OperationPriority } from "../api/automation_types";
-import { delay } from ".";
+import { createOperation, getOperation } from '../api/automation';
+import { OperationKind, OperationPriority } from '../api/automation_types';
+import { delay } from '.';
 
 export const pollOperation = async (operation_id: string): Promise<void> => {
   while (true) {
@@ -8,8 +8,8 @@ export const pollOperation = async (operation_id: string): Promise<void> => {
       data: { operation },
     } = await getOperation(operation_id);
 
-    if (operation.status === "Complete") return;
-    if (operation.status === "Aborted") throw new Error("Operation aborted!");
+    if (operation.status === 'Complete') return;
+    if (operation.status === 'Aborted') throw new Error('Operation aborted!');
 
     await delay(1000);
   }
@@ -17,7 +17,7 @@ export const pollOperation = async (operation_id: string): Promise<void> => {
 
 export const executeOperation = async (
   kind: OperationKind,
-  priority: OperationPriority
+  priority: OperationPriority,
 ) => {
   const {
     data: { operation },

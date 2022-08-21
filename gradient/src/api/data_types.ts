@@ -9,19 +9,19 @@ export type ItemType = {
 };
 
 export enum EnchantCategory {
-  Armor = "armor",
-  ArmorChest = "armor_chest",
-  ArmorFeet = "armor_feet",
-  ArmorHead = "armor_head",
-  Bow = "bow",
-  Breakable = "breakable",
-  Crossbow = "crossbow",
-  Digger = "digger",
-  FishingRod = "fishing_rod",
-  Trident = "trident",
-  Vanishable = "vanishable",
-  Weapon = "weapon",
-  Wearable = "wearable",
+  Armor = 'armor',
+  ArmorChest = 'armor_chest',
+  ArmorFeet = 'armor_feet',
+  ArmorHead = 'armor_head',
+  Bow = 'bow',
+  Breakable = 'breakable',
+  Crossbow = 'crossbow',
+  Digger = 'digger',
+  FishingRod = 'fishing_rod',
+  Trident = 'trident',
+  Vanishable = 'vanishable',
+  Weapon = 'weapon',
+  Wearable = 'wearable',
 }
 
 export type ItemTypeById = Map<number, ItemType>;

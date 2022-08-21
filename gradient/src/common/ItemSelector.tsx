@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "react-query";
-import { CountSelectorModal, useMcData } from ".";
-import { getInventoryContents } from "../api/automation";
-import styled from "styled-components";
-import { ExtendedItem, itemListFromInventories } from "../helpers";
-import { distance } from "fastest-levenshtein";
-import { Item } from "../api/types";
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
+import { CountSelectorModal, useMcData } from '.';
+import { getInventoryContents } from '../api/automation';
+import styled from 'styled-components';
+import { ExtendedItem, itemListFromInventories } from '../helpers';
+import { distance } from 'fastest-levenshtein';
+import { Item } from '../api/types';
 
 type Props = {
   submit: (selectedItems: { item: ExtendedItem; count: number }[]) => void;
@@ -14,7 +14,7 @@ type Props = {
 export const ItemSelector = ({ submit }: Props) => {
   const mcData = useMcData();
   const [hoverIdx, setHoverIdx] = useState(0);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [modalItem, setModalItem] = useState<ExtendedItem | null>();
   const [selectedItems, setSelectedItems] = useState<{
     [hashCode: string]: number | undefined;
@@ -29,9 +29,9 @@ export const ItemSelector = ({ submit }: Props) => {
   };
 
   const { isLoading, isError, data } = useQuery(
-    "inventory_contents",
+    'inventory_contents',
     getInventoryContents,
-    { refetchInterval: 1000 * 5 }
+    { refetchInterval: 1000 * 5 },
   );
 
   const itemList = itemListFromInventories(mcData, data ? data.data : []);
@@ -40,7 +40,7 @@ export const ItemSelector = ({ submit }: Props) => {
     search.length > 0
       ? itemList
           .filter((item) =>
-            item.prettyPrinted.toLowerCase().includes(search.toLowerCase())
+            item.prettyPrinted.toLowerCase().includes(search.toLowerCase()),
           )
           .map((item) => ({
             ...item,
@@ -55,7 +55,7 @@ export const ItemSelector = ({ submit }: Props) => {
     for (const [hashCode, count] of Object.entries(selectedItems)) {
       if (count === 0 || count === undefined) continue;
       const matchedItem = itemList.find(
-        (item) => item.stackable_hash === hashCode
+        (item) => item.stackable_hash === hashCode,
       );
 
       if (!matchedItem) continue;
@@ -85,15 +85,15 @@ export const ItemSelector = ({ submit }: Props) => {
   if (isError) return <p>Failed to load inventory contents</p>;
 
   const onKeyDown = (ev: React.KeyboardEvent<HTMLInputElement>) => {
-    if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
-      const up = ev.key === "ArrowUp";
+    if (ev.key === 'ArrowUp' || ev.key === 'ArrowDown') {
+      const up = ev.key === 'ArrowUp';
 
       setHoverIdx(clampHoverIdx(hoverIdx + (up ? -1 : 1)));
 
       ev.preventDefault();
     }
 
-    if (ev.key === "Enter") {
+    if (ev.key === 'Enter') {
       if (ev.shiftKey) {
         submitSelected();
         return;
@@ -115,7 +115,7 @@ export const ItemSelector = ({ submit }: Props) => {
           disabled={Boolean(modalItem)}
           onKeyDown={onKeyDown}
           value={search}
-          onChange={({ target: { value } }) => setSearch(value || "")}
+          onChange={({ target: { value } }) => setSearch(value || '')}
         />
 
         <button onClick={submitSelected}>Submit</button>
@@ -131,7 +131,7 @@ export const ItemSelector = ({ submit }: Props) => {
                 hovered={hoverIdx === idx}
                 ref={
                   hoverIdx === idx
-                    ? (elem) => elem?.scrollIntoView({ block: "nearest" })
+                    ? (elem) => elem?.scrollIntoView({ block: 'nearest' })
                     : undefined
                 }
                 onClick={() => setModalItem(item)}
@@ -196,7 +196,7 @@ const ItemOption = styled.li<{ hovered: boolean }>`
           background-color: white;
           color: black;
         `
-      : ""};
+      : ''};
 `;
 
 const SelectedText = styled.span`

@@ -1,11 +1,11 @@
-import { useQuery } from "react-query";
-import styled from "styled-components";
-import { getStats } from "../../api/admin";
-import { SplashScreen } from "../SplashScreen";
-import { StatCard } from "./components";
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { getStats } from '../../api/admin';
+import { SplashScreen } from '../SplashScreen';
+import { StatCard } from './components';
 
 export const Stats = () => {
-  const { error, isLoading, data } = useQuery("stats", getStats, {
+  const { error, isLoading, data } = useQuery('stats', getStats, {
     refetchInterval: 1000 * 3,
   });
 

@@ -1,11 +1,11 @@
-import { KeyboardEvent, useEffect } from "react";
-import styled from "styled-components";
-import { useMutation, useQuery } from "react-query";
-import { getSignConfig } from "../../api/automation";
-import { SplashScreen } from "../SplashScreen";
-import { pickupItems } from "../../api/pickup";
-import { pathfindingNode } from "../../store";
-import { useRecoilState } from "recoil";
+import { KeyboardEvent, useEffect } from 'react';
+import styled from 'styled-components';
+import { useMutation, useQuery } from 'react-query';
+import { getSignConfig } from '../../api/automation';
+import { SplashScreen } from '../SplashScreen';
+import { pickupItems } from '../../api/pickup';
+import { pathfindingNode } from '../../store';
+import { useRecoilState } from 'recoil';
 
 /*
  *
@@ -16,7 +16,7 @@ import { useRecoilState } from "recoil";
  */
 
 export const Pickup = () => {
-  const { isLoading, isError, data } = useQuery("sign_config", getSignConfig);
+  const { isLoading, isError, data } = useQuery('sign_config', getSignConfig);
 
   const [pickupLoc, setPickupLoc] = useRecoilState(pathfindingNode);
 
@@ -30,11 +30,11 @@ export const Pickup = () => {
   }, [pickupLoc, data]);
 
   const { mutate, status, error, reset } = useMutation(
-    "pickup",
-    async ({ loc }: { loc: string }) => await pickupItems(loc)
+    'pickup',
+    async ({ loc }: { loc: string }) => await pickupItems(loc),
   );
 
-  if (status === "success")
+  if (status === 'success')
     return (
       <SplashScreen
         message={
@@ -47,7 +47,7 @@ export const Pickup = () => {
         }
       />
     );
-  if (status === "error")
+  if (status === 'error')
     return (
       <SplashScreen
         message={
@@ -61,7 +61,7 @@ export const Pickup = () => {
         }
       />
     );
-  if (status === "loading")
+  if (status === 'loading')
     return <SplashScreen message="Pickup in progress" />;
 
   if (isLoading) return <SplashScreen message="Loading pickup location data" />;
@@ -71,14 +71,14 @@ export const Pickup = () => {
   const pickup = () => mutate({ loc: pickupLoc! });
 
   const onKeyDown = (ev: KeyboardEvent) => {
-    if (ev.key === "Enter" && pickupLoc) pickup();
+    if (ev.key === 'Enter' && pickupLoc) pickup();
   };
 
   return (
     <Container>
       <p>Pickup from:</p>
       <select
-        value={pickupLoc || ""}
+        value={pickupLoc || ''}
         onChange={({ target: { value } }) => setPickupLoc(value)}
         onKeyDown={onKeyDown}
         autoFocus

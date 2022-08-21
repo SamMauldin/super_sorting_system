@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import styled from "styled-components";
-import shulker from "../../assets/shulker.png";
+import { ReactNode } from 'react';
+import styled from 'styled-components';
+import shulker from '../../assets/shulker.png';
 
 type Props = {
   message?: ReactNode;

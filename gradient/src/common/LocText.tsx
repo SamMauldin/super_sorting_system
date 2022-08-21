@@ -1,10 +1,10 @@
-import React from "react";
-import { Dimension, Loc, Vec3 } from "../api/types";
+import React from 'react';
+import { Dimension, Loc, Vec3 } from '../api/types';
 
 const dimText: { [key in Dimension]: string } = {
-  TheNether: "The Nether",
-  TheEnd: "The End",
-  Overworld: "The Overworld",
+  TheNether: 'The Nether',
+  TheEnd: 'The End',
+  Overworld: 'The Overworld',
 };
 
 type Props = {
@@ -12,10 +12,10 @@ type Props = {
 };
 
 export const LocText = ({ location }: Props) => {
-  if ("dim" in location) {
+  if ('dim' in location) {
     return (
       <span>
-        X: {location.vec3.x}, Y: {location.vec3.y}, Z: {location.vec3.z} in{" "}
+        X: {location.vec3.x}, Y: {location.vec3.y}, Z: {location.vec3.z} in{' '}
         {dimText[location.dim]}
       </span>
     );

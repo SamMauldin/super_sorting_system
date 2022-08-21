@@ -4,7 +4,7 @@ export type Vec3 = {
   z: number;
 };
 
-export type Dimension = "TheNether" | "Overworld" | "TheEnd";
+export type Dimension = 'TheNether' | 'Overworld' | 'TheEnd';
 
 export type Loc = {
   vec3: Vec3;
@@ -17,7 +17,7 @@ export const vecEq = (a: Vec3, b: Vec3) =>
 export const locEq = (a: Loc, b: Loc) =>
   vecEq(a.vec3, b.vec3) && a.dim === b.dim;
 
-export type Vec2 = Omit<Vec3, "y">;
+export type Vec2 = Omit<Vec3, 'y'>;
 
 export type Hold = {
   id: string;

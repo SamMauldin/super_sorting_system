@@ -1,4 +1,4 @@
-import { atom, AtomEffect } from "recoil";
+import { atom, AtomEffect } from 'recoil';
 
 const localStorageEffect =
   <T>(key: string): AtomEffect<T> =>
@@ -15,7 +15,7 @@ const localStorageEffect =
   };
 
 export const pathfindingNode = atom<string | null>({
-  key: "pathfindingNode",
+  key: 'pathfindingNode',
   default: null,
-  effects_UNSTABLE: [localStorageEffect("pathfinding_node")],
+  effects_UNSTABLE: [localStorageEffect('pathfinding_node')],
 });

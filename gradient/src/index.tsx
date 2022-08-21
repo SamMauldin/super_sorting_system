@@ -1,11 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { App } from "./App";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
-import { theme } from "./theme";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { McDataProvider } from "./common";
-import { RecoilRoot } from "recoil";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { App } from './App';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
+import { theme } from './theme';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { McDataProvider } from './common';
+import { RecoilRoot } from 'recoil';
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -44,5 +44,5 @@ ReactDOM.render(
       </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );

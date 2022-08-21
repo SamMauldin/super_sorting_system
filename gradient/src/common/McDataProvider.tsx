@@ -1,8 +1,8 @@
-import React, { useContext, createContext, useMemo } from "react";
-import { useQuery } from "react-query";
-import { getEnchantments, getItems } from "../api/data";
-import { EnchantmentTypeByName, ItemTypeById } from "../api/data_types";
-import { SplashScreen } from "../screens/SplashScreen";
+import React, { useContext, createContext, useMemo } from 'react';
+import { useQuery } from 'react-query';
+import { getEnchantments, getItems } from '../api/data';
+import { EnchantmentTypeByName, ItemTypeById } from '../api/data_types';
+import { SplashScreen } from '../screens/SplashScreen';
 
 export type McData = {
   items: ItemTypeById;
@@ -18,7 +18,7 @@ export const McDataProvider: React.FC<{
     isLoading: mcItemsLoading,
     isError: mcItemsError,
     data: mcItemsArr,
-  } = useQuery("mc_data_items", getItems, {
+  } = useQuery('mc_data_items', getItems, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -27,7 +27,7 @@ export const McDataProvider: React.FC<{
     isLoading: mcEnchantmentsLoading,
     isError: mcEnchantmentsError,
     data: mcEnchantmentsArr,
-  } = useQuery("mc_data_enchants", getEnchantments, {
+  } = useQuery('mc_data_enchants', getEnchantments, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });

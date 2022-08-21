@@ -1,6 +1,6 @@
-import assert from "assert";
-import { acquireFreeSpaces, executeOperation, releaseHolds } from "../helpers";
-import { getSignConfig } from "./automation";
+import assert from 'assert';
+import { acquireFreeSpaces, executeOperation, releaseHolds } from '../helpers';
+import { getSignConfig } from './automation';
 
 export const pickupItems = async (destinationLoc: string): Promise<void> => {
   const {
@@ -8,20 +8,20 @@ export const pickupItems = async (destinationLoc: string): Promise<void> => {
   } = await getSignConfig();
   const destNode = nodes[destinationLoc];
 
-  assert(destNode, "Destination location does not exist");
-  assert(destNode.pickup, "Destination does not have a pickup chest");
+  assert(destNode, 'Destination location does not exist');
+  assert(destNode.pickup, 'Destination does not have a pickup chest');
 
   const destinationSlots = await acquireFreeSpaces(27);
 
   try {
     await executeOperation(
       {
-        type: "ImportInventory",
+        type: 'ImportInventory',
         chest_location: destNode.pickup,
         node_location: destNode.location,
         destination_holds: destinationSlots,
       },
-      "UserInteractive"
+      'UserInteractive',
     );
   } finally {
     await releaseHolds(destinationSlots);
