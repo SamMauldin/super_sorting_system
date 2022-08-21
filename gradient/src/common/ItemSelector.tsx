@@ -4,7 +4,7 @@ import { CountSelectorModal, useMcData } from '.';
 import { getInventoryContents } from '../api/automation';
 import styled from 'styled-components';
 import { ExtendedItem, itemListFromInventories } from '../helpers';
-import { Fzf } from 'fzf';
+import { Fzf, byLengthAsc } from 'fzf';
 import { Item } from '../api/types';
 
 type Props = {
@@ -39,6 +39,7 @@ export const ItemSelector = ({ submit }: Props) => {
     () =>
       new Fzf(itemList, {
         selector: (item) => item.prettyPrinted,
+        tiebreakers: [byLengthAsc],
       }),
     [itemList],
   );
