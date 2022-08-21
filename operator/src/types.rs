@@ -199,7 +199,7 @@ impl HoldRequestFilter {
                 match_criteria,
                 total,
             } => {
-                let mut total_remaining = *total;
+                let mut total_remaining: i64 = *total as i64;
                 let mut holds = vec![];
 
                 let mut matching_items = state
@@ -216,13 +216,13 @@ impl HoldRequestFilter {
                     .map(|(loc, slot, item)| (loc, slot, item.as_ref().unwrap().clone()))
                     .collect::<Vec<_>>();
 
-                matching_items.sort_by(|(_, _, a), (_, _, b)| a.count.cmp(&b.count));
+                matching_items.sort_by(|(_, _, a), (_, _, b)| a.count.cmp(&b.count).reverse());
 
                 for (loc, slot, item) in matching_items.iter() {
                     let hold = state.holds.create(*loc, *slot as u32).unwrap().clone();
                     holds.push(hold);
 
-                    total_remaining -= item.count as u64;
+                    total_remaining -= item.count as i64;
                     if total_remaining <= 0 {
                         break;
                     }
