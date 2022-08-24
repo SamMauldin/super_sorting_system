@@ -1,68 +1,20 @@
 import assert from 'assert';
-import {
-  createHold,
-  getInventoryContents,
-  removeHold,
-  renewHold,
-} from '../api/automation';
-import { Item, Loc, locEq } from '../api/types';
-import { searchFor, stackMatches } from '.';
+import { createHold, removeHold, renewHold } from '../api/automation';
+import { Hold } from '../api/types';
+import { HoldRequestFilter } from '../api/automation_types';
 
-const verifySlot = async (
-  loc: Loc,
-  slot: number,
-  contents: Item | null,
-  ignoreCount?: boolean,
-): Promise<boolean> => {
-  const { data: inventories } = await getInventoryContents();
+export const acquireFreeSpaces = async (count: number): Promise<Hold[]> => {
+  const filters = Array<HoldRequestFilter>(count).fill('EmptySlot');
+  const res = await createHold(filters);
 
-  const invAtLoc = inventories.find(({ loc: invLoc }) => locEq(loc, invLoc));
-  if (!invAtLoc) return false;
-  assert(invAtLoc, 'Inventory not found at given location!');
-
-  const item = invAtLoc.slots[slot];
-
-  return stackMatches(item, contents, ignoreCount);
-};
-
-export const acquireHoldVerified = async (
-  loc: Loc,
-  slot: number,
-  contents: Item | null,
-  ignoreCount?: boolean,
-): Promise<string> => {
-  const { data: hold } = await createHold(loc, slot);
-
-  if (hold.type === 'Error') throw new Error('Could not acquire hold');
-
-  const verified = await verifySlot(loc, slot, contents, ignoreCount);
-
-  if (verified) return hold.hold.id;
-
-  await removeHold(hold.hold.id);
-
-  throw new Error('Slot changed while acquiring hold!');
-};
-
-export const acquireFreeSpaces = async (count: number): Promise<string[]> => {
-  const located: string[] = [];
-
-  while (located.length < count) {
-    const emptySpaces = await searchFor(null);
-
-    if (emptySpaces.length === 0)
-      throw new Error('Unable to reserve a free slot!');
-
-    for (const emptySpace of emptySpaces) {
-      if (located.length === count) break;
-
-      const { loc, slot } = emptySpace;
-
-      const hold = await acquireHoldVerified(loc, slot, null).catch(() => null);
-
-      if (hold) located.push(hold);
+  const located = res.data.results.map((holds) => {
+    if ('Error' in holds) {
+      console.error(holds.Error.error);
+      throw new Error('Failed to acquire empty slots!');
     }
-  }
+
+    return holds.Holds.holds[0];
+  });
 
   return located;
 };

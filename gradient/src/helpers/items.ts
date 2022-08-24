@@ -68,25 +68,10 @@ export const stackMatches = (
 
 export const itemListFromInventories = (
   mcData: McData,
-  inventories: InventoriesWithLoc,
+  items: Item[],
 ): ExtendedItem[] => {
-  const items = new Map<string, ExtendedItem>();
-
-  for (const inventory of inventories) {
-    for (const slot of inventory.slots) {
-      if (!slot) continue;
-      const existing = items.get(slot.stackable_hash);
-
-      if (existing) {
-        existing.count += slot.count;
-      } else {
-        items.set(slot.stackable_hash, {
-          prettyPrinted: prettyPrint(mcData, slot),
-          ...slot,
-        });
-      }
-    }
-  }
-
-  return [...items.values()];
+  return items.map((item) => ({
+    prettyPrinted: prettyPrint(mcData, item),
+    ...item,
+  }));
 };

@@ -33,6 +33,13 @@ async fn inventory_contents(state: StateData) -> impl Responder {
     HttpResponse::Ok().json(contents)
 }
 
+#[get("/inventory_listing")]
+async fn inventory_listing(state: StateData) -> impl Responder {
+    let state = state.lock().unwrap();
+
+    HttpResponse::Ok().json(state.inventories.get_listing())
+}
+
 #[get("/sign_config")]
 async fn sign_config(state: StateData) -> impl Responder {
     let state = state.lock().unwrap();
@@ -174,6 +181,7 @@ pub fn configure(app: &mut web::ServiceConfig) {
     app.service(
         web::scope("/automation")
             .service(inventory_contents)
+            .service(inventory_listing)
             .service(sign_config)
             .service(holds_index)
             .service(holds_create)

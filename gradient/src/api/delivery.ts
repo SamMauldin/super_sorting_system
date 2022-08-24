@@ -1,14 +1,13 @@
 import assert from 'assert';
 import {
   acquireFreeSpaces,
-  acquireHoldVerified,
   releaseHolds,
   renewHolds,
-  searchFor,
   ExtendedItem,
   executeOperation,
 } from '../helpers';
-import { getSignConfig } from './automation';
+import { createHold, getSignConfig } from './automation';
+import { HoldRequestFilter } from './automation_types';
 
 export const deliverItems = async (
   destinationLoc: string,
@@ -25,106 +24,42 @@ export const deliverItems = async (
   assert(destNode, 'Destination location does not exist');
   assert(destNode.dropoff, 'Destination does not have a drop-off location');
 
-  const slotsToDeliver: string[] = [];
-  let tempHold: string | null = null;
-
-  const renewInterval = setInterval(() => {
-    renewHolds(slotsToDeliver).catch(() => {});
-  }, 1000 * 60 * 2);
+  const holdsToDeliver: string[] = [];
 
   try {
-    // Collect slots for every type of item
-    for (const item of itemList) {
-      // Collect all items neccesary
-      const slotsNeeded = Math.ceil(item.count / item.item.stack_size);
-      for (let i = 0; i < slotsNeeded; i++) {
-        const countDesired =
-          i === slotsNeeded - 1
-            ? item.count - item.item.stack_size * (slotsNeeded - 1)
-            : item.item.stack_size;
+    const itemRequests: HoldRequestFilter[] = itemList.map(
+      ({ item, count }) => ({
+        ItemMatch: {
+          match_criteria: {
+            StackableHash: { stackable_hash: item.stackable_hash },
+          },
+          total: count,
+        },
+      }),
+    );
+    const holdRequestResults = await createHold(itemRequests);
 
-        let countAcquired = 0;
-        let filledSpace = null;
-
-        // Fill up this slot
-        while (countAcquired < countDesired) {
-          const toMove = await searchFor(item.item, true);
-
-          if (!filledSpace) {
-            const exactMatch = toMove.find(
-              ({ contents }) => contents!.count === countDesired,
-            );
-
-            if (exactMatch) {
-              const exactMatchHold = await acquireHoldVerified(
-                exactMatch.loc,
-                exactMatch.slot,
-                exactMatch.contents,
-              ).catch(() => null);
-
-              if (!exactMatchHold) continue;
-
-              slotsToDeliver.push(exactMatchHold);
-
-              break;
-            }
-          }
-
-          if (!toMove[0]) throw new Error('Could not acquire item');
-
-          const { loc, slot, contents } = toMove[0];
-
-          const toMoveHold = await acquireHoldVerified(
-            loc,
-            slot,
-            contents,
-          ).catch(() => null);
-          tempHold = toMoveHold;
-          if (!toMoveHold) continue;
-          const toMoveCount = Math.min(
-            countDesired - countAcquired,
-            contents!.count,
-          );
-
-          if (!filledSpace) {
-            [filledSpace] = await acquireFreeSpaces(1);
-
-            slotsToDeliver.push(filledSpace);
-          }
-
-          await executeOperation(
-            {
-              type: 'MoveItems',
-              source_hold: toMoveHold,
-              destination_hold: filledSpace,
-              count: toMoveCount,
-            },
-            'UserInteractive',
-          );
-
-          await releaseHolds([toMoveHold]);
-
-          tempHold = null;
-          countAcquired += toMoveCount;
-        }
+    for (const holdRes of holdRequestResults.data.results) {
+      if ('Error' in holdRes) {
+        throw new Error('Failed to acquire items');
       }
+
+      holdsToDeliver.push(...holdRes.Holds.holds.map(({ id }) => id));
     }
 
     // TODO Chunk deliveries
-    assert(slotsToDeliver.length <= 27, 'Too many slots to deliver!');
+    assert(holdsToDeliver.length <= 27, 'Too many slots to deliver!');
 
     await executeOperation(
       {
         type: 'DropItems',
-        source_holds: slotsToDeliver,
+        source_holds: holdsToDeliver,
         drop_from: destNode.location,
         aim_towards: destNode.dropoff,
       },
       'UserInteractive',
     );
   } finally {
-    clearInterval(renewInterval);
-    await releaseHolds(slotsToDeliver).catch(() => null);
-    if (tempHold) await releaseHolds([tempHold]).catch(() => null);
+    await releaseHolds(holdsToDeliver).catch(() => null);
   }
 };

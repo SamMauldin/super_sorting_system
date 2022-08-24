@@ -6,8 +6,10 @@ import {
   Operation,
   OperationPriority,
   CompiledSignConfig,
+  HoldMatchResult,
+  HoldRequestFilter,
 } from './automation_types';
-import { Loc } from './types';
+import { Item } from './types';
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL!;
 const API_KEY = process.env.REACT_APP_API_KEY!;
@@ -19,26 +21,23 @@ export const getInventoryContents = (): Promise<
   AxiosResponse<InventoriesWithLoc>
 > => axios.get(endpoint('inventory_contents'), { headers });
 
+export const getInventoryListing = (): Promise<AxiosResponse<Array<Item>>> =>
+  axios.get(endpoint('inventory_listing'), { headers });
+
 export const getSignConfig = (): Promise<AxiosResponse<CompiledSignConfig>> =>
   axios.get(endpoint('sign_config'), { headers });
 
 export const getHolds = (): Promise<AxiosResponse<{ holds: Hold[] }>> =>
   axios.get(endpoint('holds'), { headers });
 
-type CreateHoldResponse =
-  | {
-      type: 'HoldCreated';
-      hold: Hold;
-    }
-  | {
-      type: 'Error';
-    };
+type CreateHoldResponse = {
+  results: HoldMatchResult[];
+};
 
 export const createHold = (
-  location: Loc,
-  slot: number,
+  requests: HoldRequestFilter[],
 ): Promise<AxiosResponse<CreateHoldResponse>> =>
-  axios.post(endpoint('holds'), { location, slot }, { headers });
+  axios.post(endpoint('holds'), { requests }, { headers });
 
 type RemoveHoldResponse =
   | { type: 'HoldRemoved'; hold: Hold }

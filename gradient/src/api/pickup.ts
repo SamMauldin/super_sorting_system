@@ -11,7 +11,9 @@ export const pickupItems = async (destinationLoc: string): Promise<void> => {
   assert(destNode, 'Destination location does not exist');
   assert(destNode.pickup, 'Destination does not have a pickup chest');
 
-  const destinationSlots = await acquireFreeSpaces(27);
+  const destinationSlotHoldIds = (await acquireFreeSpaces(27)).map(
+    ({ id }) => id,
+  );
 
   try {
     await executeOperation(
@@ -19,11 +21,11 @@ export const pickupItems = async (destinationLoc: string): Promise<void> => {
         type: 'ImportInventory',
         chest_location: destNode.pickup,
         node_location: destNode.location,
-        destination_holds: destinationSlots,
+        destination_holds: destinationSlotHoldIds,
       },
       'UserInteractive',
     );
   } finally {
-    await releaseHolds(destinationSlots);
+    await releaseHolds(destinationSlotHoldIds);
   }
 };

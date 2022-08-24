@@ -56,6 +56,35 @@ export type Hold = {
   valid_until: string;
 };
 
+export type ItemMatchCriteria = {
+  StackableHash: { stackable_hash: string };
+};
+
+export type HoldRequestFilter =
+  | 'EmptySlot'
+  | {
+      ItemMatch: {
+        match_criteria: ItemMatchCriteria;
+        total: number;
+      };
+    }
+  | {
+      SlotLocation: {
+        location: Loc;
+        slot: number;
+      };
+    };
+
+export type HoldMatchResult =
+  | { Holds: { holds: Hold[] } }
+  | { Error: { error: HoldMatchError } };
+
+export type HoldMatchError =
+  | {
+      AlreadyHeld: {};
+    }
+  | { NoMatch: {} };
+
 export type OperationPriority =
   | 'SystemCritical'
   | 'UserInteractive'

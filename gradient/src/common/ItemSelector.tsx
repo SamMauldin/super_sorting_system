@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { CountSelectorModal, useMcData } from '.';
-import { getInventoryContents } from '../api/automation';
+import { getInventoryListing } from '../api/automation';
 import styled from 'styled-components';
 import { ExtendedItem, itemListFromInventories } from '../helpers';
 import { Fzf, byLengthAsc } from 'fzf';
@@ -29,12 +29,12 @@ export const ItemSelector = ({ submit }: Props) => {
   };
 
   const { isLoading, isError, data } = useQuery(
-    'inventory_contents',
-    getInventoryContents,
+    'inventory_listing',
+    getInventoryListing,
     { refetchInterval: 1000 * 5 },
   );
 
-  const itemList = itemListFromInventories(mcData, data ? data.data : []);
+  const itemList = itemListFromInventories(mcData, data?.data ?? []);
   const fzf = useMemo(
     () =>
       new Fzf(itemList, {
