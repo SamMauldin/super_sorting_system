@@ -110,7 +110,9 @@ export const getFreeHold = async (
   });
 
 export const releaseHold = async (hold_id: string) =>
-  axios.delete(automationEndpoint(`holds/${hold_id}`));
+  axios.delete(automationEndpoint(`holds/${hold_id}`), {
+    headers: authHeader
+  });
 
 type PathfindingResponse =
   | {

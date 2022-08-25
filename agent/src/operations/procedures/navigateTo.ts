@@ -40,7 +40,7 @@ function vecMagnitude(vec: depVec3) {
 }
 
 async function flyTo(bot: Bot, destination: depVec3) {
-  const flyingSpeedPerUpdate = 5;
+  const flyingSpeedPerUpdate = 10;
   const flyingSpeedEaseOut = 0.5;
 
   bot.creative.startFlying();
