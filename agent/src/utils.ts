@@ -1,5 +1,5 @@
 import { Bot } from 'mineflayer';
-import { getFreeHold } from './controllerApi';
+import { getFreeHold, releaseHold } from './controllerApi';
 import {
   openChestAt,
   sendChestData,
@@ -22,7 +22,7 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
       throw new Error('Could not acquire a free hold to clear inventory!');
 
     const {
-      hold: { location, slot }
+      hold: { location, slot, id }
     } = data;
 
     const chest = await openChestAt(location, bot, agent);
@@ -39,5 +39,7 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
     await sendChestData(chest, location, agent);
 
     chest.close();
+
+    await releaseHold(id);
   }
 };

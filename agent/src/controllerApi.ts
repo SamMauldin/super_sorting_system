@@ -109,6 +109,9 @@ export const getFreeHold = async (
     headers: agentHeader(agent)
   });
 
+export const releaseHold = async (hold_id: string) =>
+  axios.delete(automationEndpoint(`holds/${hold_id}`));
+
 type PathfindingResponse =
   | {
       type: 'PathFound';
