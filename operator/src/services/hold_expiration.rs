@@ -34,7 +34,7 @@ impl Service for HoldExpirationService {
             .collect::<Vec<Uuid>>();
 
         for hold_id in holds_to_remove {
-            state.holds.renew(hold_id);
+            state.holds.remove(hold_id);
         }
     }
 }
