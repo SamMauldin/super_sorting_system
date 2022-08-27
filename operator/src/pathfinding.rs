@@ -42,7 +42,7 @@ fn is_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
 
     let actual_dist = a.dist(b) + a.dist(c);
 
-    actual_dist - 1_f64 <= target_dist
+    actual_dist - 3_f64 <= target_dist
 }
 
 fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> Option<String> {
