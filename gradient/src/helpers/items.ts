@@ -1,55 +1,9 @@
-import { InventoriesWithLoc } from '../api/automation_types';
 import { Item } from '../api/types';
 import { McData } from '../common';
+import { decorators } from './decorators';
 
-export type ExtendedItem = Item & { prettyPrinted: string };
-
-const anvilName = (item: Item): string | null => {
-  const nbtDisplayNameJson = item.nbt?.value?.display?.value?.Name?.value;
-
-  try {
-    return JSON.parse(nbtDisplayNameJson).text;
-  } catch (_) {
-    return null;
-  }
-};
-
-const enchantmentData = (mcData: McData, item: Item): string | null => {
-  const nbtEnchantments =
-    item.nbt?.value?.Enchantments || item.nbt?.value?.StoredEnchantments;
-  if (!nbtEnchantments) return null;
-
-  const enchantments = nbtEnchantments.value.value.map((enchant: any) => {
-    const name = enchant.id.value.split(':')[1];
-    const level = enchant.lvl.value;
-
-    const enchantmentType = mcData.enchantments.get(name);
-
-    const displayName = enchantmentType?.displayName || name;
-
-    return `${displayName} ${level}`;
-  });
-
-  return enchantments.join(', ');
-};
-
-export const prettyPrint = (mcData: McData, item: Item): string => {
-  const itemType = mcData.items.get(item!.item_id)!;
-
-  const enchants = enchantmentData(mcData, item);
-  const anvilDisplayName = anvilName(item);
-
-  let text = itemType.displayName;
-
-  if (anvilDisplayName) {
-    text += ` "${anvilDisplayName}"`;
-  }
-
-  if (enchants) {
-    text += ` (${enchants})`;
-  }
-
-  return text;
+export type ExtendedItem = Item & {
+  prettyPrinted: string;
 };
 
 export const stackMatches = (
@@ -70,8 +24,27 @@ export const itemListFromInventories = (
   mcData: McData,
   items: Item[],
 ): ExtendedItem[] => {
-  return items.map((item) => ({
-    prettyPrinted: prettyPrint(mcData, item),
-    ...item,
-  }));
+  return items.map((item) => {
+    const itemType = mcData.items.get(item!.item_id)!;
+
+    const decoratorOutputs = [];
+
+    for (const decorator of decorators) {
+      const res = decorator(item, mcData);
+      if (res) decoratorOutputs.push(res);
+    }
+
+    let prettyPrinted = itemType.displayName;
+
+    if (decoratorOutputs.length > 0) {
+      const decoratorText = decoratorOutputs.join(', ');
+
+      prettyPrinted += ` (${decoratorText})`;
+    }
+
+    return {
+      prettyPrinted,
+      ...item,
+    };
+  });
 };

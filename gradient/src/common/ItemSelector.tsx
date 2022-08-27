@@ -11,6 +11,16 @@ type Props = {
   submit: (selectedItems: { item: ExtendedItem; count: number }[]) => void;
 };
 
+const itemCompareTieBreaker = (a: Item, b: Item) => {
+  if (b.count > a.count) {
+    return 1;
+  } else if (b.count < a.count) {
+    return -1;
+  }
+
+  return b.stackable_hash.localeCompare(a.stackable_hash);
+};
+
 export const ItemSelector = ({ submit }: Props) => {
   const mcData = useMcData();
   const [hoverIdx, setHoverIdx] = useState(0);
@@ -39,7 +49,7 @@ export const ItemSelector = ({ submit }: Props) => {
     () =>
       new Fzf(itemList, {
         selector: (item) => item.prettyPrinted,
-        tiebreakers: [byLengthAsc],
+        tiebreakers: [(a, b) => itemCompareTieBreaker(a.item, b.item)],
       }),
     [itemList],
   );
@@ -56,7 +66,8 @@ export const ItemSelector = ({ submit }: Props) => {
           } else if (bSelected && !aSelected) {
             return 1;
           }
-          return b.count - a.count;
+
+          return itemCompareTieBreaker(a, b);
         });
 
   const submitSelected = () => {
