@@ -91,12 +91,28 @@ export type ImportInventoryOperationKind = {
   destination_holds: string[];
 };
 
+export type LoadShulkerOperationKind = {
+  type: 'LoadShulker';
+  shulker_station_location: Location;
+  shulker_hold: string;
+  source_holds: (string | null)[];
+};
+
+export type UnloadShulkerOperationKind = {
+  type: 'UnloadShulker';
+  shulker_station_location: Location;
+  shulker_hold: string;
+  destination_holds: string[];
+};
+
 export type OperationKind =
   | ScanInventoryOperationKind
   | ScanSignsOperationKind
   | MoveItemsOperationKind
   | DropItemsOperationKind
-  | ImportInventoryOperationKind;
+  | ImportInventoryOperationKind
+  | UnloadShulkerOperationKind
+  | LoadShulkerOperationKind;
 
 export type OperationStatus = 'Pending' | 'InProgress' | 'Complete' | 'Aborted';
 
