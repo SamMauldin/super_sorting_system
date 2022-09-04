@@ -17,10 +17,11 @@ import {
   moveItems,
   scanInventory,
   importInventory,
-  scanSigns
+  scanSigns,
+  unloadShulker,
+  loadShulker,
 } from './operations';
 import { navigateTo, sendVisibleSignData } from './operations/procedures';
-import { unloadShulker } from './operations/unloadShulker';
 import { clearInventory, sleep } from './utils';
 
 const main = async () => {
@@ -96,6 +97,8 @@ const main = async () => {
           await scanSigns(operation.kind, bot, agent);
         } else if (operation.kind.type === 'UnloadShulker') {
           await unloadShulker(operation.kind, bot, agent);
+	} else if (operation.kind.type === 'LoadShulker') {
+	  await loadShulker(operation.kind, bot, agent);
         } else {
           throw new Error('Unknown operation kind dispatched!');
         }

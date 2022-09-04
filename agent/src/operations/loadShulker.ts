@@ -3,7 +3,7 @@ import { Window } from 'prismarine-windows';
 import { getHold } from '../controllerApi';
 import vec3 from 'vec3';
 
-import { Agent, locEq, Location, UnloadShulkerOperationKind } from '../types';
+import { Agent, locEq, Location, LoadShulkerOperationKind } from '../types';
 import {
   navigateTo,
   openChestAt,
@@ -13,12 +13,12 @@ import {
 import assert from 'assert';
 import { setTimeout } from 'timers/promises';
 
-export const unloadShulker = async (
+export const loadShulker = async (
   {
     shulker_station_location,
     shulker_hold,
-    destination_holds
-  }: UnloadShulkerOperationKind,
+    source_holds
+  }: LoadShulkerOperationKind,
   bot: Bot,
   agent: Agent
 ) => {
@@ -33,6 +33,43 @@ export const unloadShulker = async (
   await transferItems(bot, shulkerChest, shulkerChestSlot, 27, 1, 'from_chest');
   await sendChestData(shulkerChest, shulkerChestLocation, agent);
   shulkerChest.close();
+
+  // Grab Items to load
+  let lastChest: { location: Location; chest: Chest & Window } | null = null;
+
+  for (const [inv_slot, hold_id] of source_holds.entries()) {
+    if (!hold_id) continue;
+    const {
+      data: {
+        hold: { location: sourceLocation, slot: sourceSlot }
+      }
+    } = await getHold(hold_id, agent);
+
+    if (lastChest && !locEq(sourceLocation, lastChest.location)) {
+      await sendChestData(lastChest.chest, lastChest.location, agent);
+      lastChest.chest.close();
+      lastChest = null;
+    }
+
+    const chest: Chest & Window =
+      lastChest?.chest || (await openChestAt(sourceLocation, bot, agent));
+
+    await transferItems(
+      bot,
+      chest,
+      sourceSlot,
+      inv_slot,
+      Infinity,
+      'from_chest'
+    );
+
+    lastChest = { chest, location: sourceLocation };
+  }
+
+  if (lastChest) {
+    await sendChestData(lastChest.chest, lastChest.location, agent);
+    lastChest.chest.close();
+  }
 
   // Place Shulker
   await navigateTo(shulker_station_location, bot, agent);
@@ -53,18 +90,10 @@ export const unloadShulker = async (
   // @ts-ignore mineflayer typing is wrong
   const shulker: Chest & Window = await bot.openBlock(shulkerBlock);
 
-  const items = shulker.slots
-    .slice(0, shulker.inventoryStart)
-    .map((item, slot) => ({
-      item,
-      slot
-    }));
+  for (let i = 0; i < 27; i++) {
+    if (!bot.inventory.slots[bot.inventory.inventoryStart + i]) continue;
 
-  for (const { slot, item } of items) {
-    if (!item) continue;
-    if (slot >= destination_holds.length) continue;
-
-    await transferItems(bot, shulker, slot, slot, Infinity, 'from_chest');
+    await transferItems(bot, shulker, i, i, Infinity, 'to_chest');
   }
 
   shulker.close();
@@ -87,43 +116,4 @@ export const unloadShulker = async (
   await transferItems(bot, shulkerChest, shulkerChestSlot, 27, 1, 'to_chest');
   await sendChestData(shulkerChest, shulkerChestLocation, agent);
   shulkerChest.close();
-
-  // Transfer collected items to destination holds
-  let lastChest: { location: Location; chest: Chest & Window } | null = null;
-
-  for (let i = 0; i < 27; i++) {
-    if (!bot.inventory.slots[bot.inventory.inventoryStart + i]) continue;
-    if (destination_holds.length <= i) continue;
-
-    const {
-      data: {
-        hold: { location: destinationLocation, slot: destinationSlot }
-      }
-    } = await getHold(destination_holds[i], agent);
-
-    if (lastChest && !locEq(destinationLocation, lastChest.location)) {
-      await sendChestData(lastChest.chest, lastChest.location, agent);
-      lastChest.chest.close();
-      lastChest = null;
-    }
-
-    const destChest: Chest & Window =
-      lastChest?.chest || (await openChestAt(destinationLocation, bot, agent));
-
-    await transferItems(
-      bot,
-      destChest,
-      destinationSlot,
-      i,
-      Infinity,
-      'to_chest'
-    );
-
-    lastChest = { chest: destChest, location: destinationLocation };
-  }
-
-  if (lastChest) {
-    await sendChestData(lastChest.chest, lastChest.location, agent);
-    lastChest.chest.close();
-  }
 };

@@ -1,3 +1,17 @@
+diff --git a/node_modules/mineflayer/lib/plugins/generic_place.js b/node_modules/mineflayer/lib/plugins/generic_place.js
+index 56465f0..59d7713 100644
+--- a/node_modules/mineflayer/lib/plugins/generic_place.js
++++ b/node_modules/mineflayer/lib/plugins/generic_place.js
+@@ -34,7 +34,8 @@ function inject (bot) {
+       dz = options.delta.z
+     }
+     if (options.forceLook !== 'ignore') {
+-      await bot.lookAt(referenceBlock.position.offset(dx, dy, dz), options.forceLook)
++      // Skip looking for performance reasons
++      // await bot.lookAt(referenceBlock.position.offset(dx, dy, dz), options.forceLook)
+     }
+     // TODO: tell the server that we are sneaking while doing this
+     const pos = referenceBlock.position
 diff --git a/node_modules/mineflayer/lib/plugins/inventory.js b/node_modules/mineflayer/lib/plugins/inventory.js
 index 76ccbb6..243e8bb 100644
 --- a/node_modules/mineflayer/lib/plugins/inventory.js
