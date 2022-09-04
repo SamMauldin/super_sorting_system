@@ -105,11 +105,24 @@ impl OperationState {
     }
 
     pub fn take_next_operation(&mut self) -> Option<&Operation> {
+        let shulker_stations_in_use = self
+            .iter(OperationStatus::InProgress)
+            .map(|op| op.shulker_station_location())
+            .flatten()
+            .collect::<Vec<Location>>();
+
         self.operations.sort_by(|a, b| a.priority.cmp(&b.priority));
 
         self.operations
             .iter_mut()
-            .find(|op| matches!(op.status, OperationStatus::Pending))
+            .filter(|op| matches!(op.status, OperationStatus::Pending))
+            .filter(|op| {
+                op.shulker_station_location()
+                    .as_ref()
+                    .map(|station| !shulker_stations_in_use.contains(station))
+                    .unwrap_or(true)
+            })
+            .nth(0)
             .map(|op| {
                 op.status = OperationStatus::InProgress;
 
@@ -185,6 +198,20 @@ impl Operation {
                 holds.push(*shulker_hold);
                 holds
             }
+        }
+    }
+
+    pub fn shulker_station_location(&self) -> Option<Location> {
+        match &self.kind {
+            OperationKind::LoadShulker {
+                shulker_station_location,
+                ..
+            } => Some(*shulker_station_location),
+            OperationKind::UnloadShulker {
+                shulker_station_location,
+                ..
+            } => Some(*shulker_station_location),
+            _ => None,
         }
     }
 }
