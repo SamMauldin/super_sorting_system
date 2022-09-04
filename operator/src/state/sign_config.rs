@@ -111,6 +111,19 @@ pub struct Sign {
 // overworld_node
 
 /*
+ * Shulker Station Sign
+ * These signs indicate that a pathfinding node is a station for loading / unloading shulkers
+ */
+
+// Line 2: Sign type "shulker station"
+// Line 3: Node to mark as a shulker station
+
+// Example:
+// SSSS
+// shulker station
+// Hallway A
+
+/*
  * Storage Complex Signs
  * These signs indicate an area of storage containers to be used by the network
  * This will also act as a pathfinding node of the given name
@@ -144,6 +157,9 @@ pub enum ParsedSign {
         effective_location: Vec3,
         source_node_name: String,
         destination_node_name: String,
+    },
+    ShulkerStation {
+        node_name: String,
     },
     StorageComplex {
         dimension: Dimension,
@@ -267,6 +283,11 @@ impl TryFrom<&Sign> for ParsedSign {
                     destination_node_name,
                 })
             }
+            "shulker station" => {
+                let node_name = s.lines[2].clone();
+
+                Ok(ParsedSign::ShulkerStation { node_name })
+            }
             "storage complex" => {
                 let name = s.lines[3].clone();
                 let second_offset = parse_offset(s.lines[2].as_str())?;
@@ -300,6 +321,7 @@ pub struct PathfindingNode {
     pub pickup: Option<Vec3>,
     pub dropoff: Option<Vec3>,
     pub portal: Option<Portal>,
+    pub shulker_station: bool,
 }
 
 #[derive(Serialize)]
@@ -380,6 +402,7 @@ impl SignConfigState {
                             pickup: None,
                             dropoff: None,
                             portal: None,
+                            shulker_station: false,
                         },
                     );
 
@@ -413,6 +436,7 @@ impl SignConfigState {
                             pickup: None,
                             dropoff: None,
                             portal: None,
+                            shulker_station: false,
                         },
                     );
 
@@ -497,6 +521,18 @@ impl SignConfigState {
                 }
 
                 node.unwrap().pickup = Some(*effective_location)
+            }
+            ParsedSign::ShulkerStation { node_name } => {
+                let node = nodes.get_mut(node_name);
+
+                if node.is_none() {
+                    validation_errors.push(SignConfigValidationError::UnknownNode {
+                        name: node_name.clone(),
+                    });
+                    return;
+                }
+
+                node.unwrap().shulker_station = true
             }
             ParsedSign::Portal {
                 effective_location,

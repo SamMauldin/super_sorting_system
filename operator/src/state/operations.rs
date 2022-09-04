@@ -58,6 +58,16 @@ pub enum OperationKind {
         recipe_source_holds: Vec<Option<Uuid>>,
         destination_holds: Vec<Uuid>,
     },
+    LoadShulker {
+        shulker_station_location: Location,
+        shulker_hold: Uuid,
+        source_holds: Vec<Option<Uuid>>,
+    },
+    UnloadShulker {
+        shulker_station_location: Location,
+        shulker_hold: Uuid,
+        destination_holds: Vec<Uuid>,
+    },
 }
 
 pub struct OperationState {
@@ -153,6 +163,26 @@ impl Operation {
                 let mut holds = vec![];
                 holds.extend(recipe_source_holds.iter().filter_map(|op_hold| *op_hold));
                 holds.extend(destination_holds.iter());
+                holds
+            }
+            OperationKind::LoadShulker {
+                shulker_hold,
+                source_holds,
+                ..
+            } => {
+                let mut holds = vec![];
+                holds.extend(source_holds.iter().filter_map(|op_hold| *op_hold));
+                holds.push(*shulker_hold);
+                holds
+            }
+            OperationKind::UnloadShulker {
+                shulker_hold,
+                destination_holds,
+                ..
+            } => {
+                let mut holds = vec![];
+                holds.extend(destination_holds.iter());
+                holds.push(*shulker_hold);
                 holds
             }
         }
