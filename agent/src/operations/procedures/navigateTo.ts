@@ -41,7 +41,6 @@ function vecMagnitude(vec: depVec3) {
 
 async function flyTo(bot: Bot, destination: depVec3) {
   const flyingSpeedPerUpdate = 10;
-  const flyingSpeedEaseOut = 0.5;
 
   bot.creative.startFlying();
 
@@ -59,24 +58,11 @@ async function flyTo(bot: Bot, destination: depVec3) {
     bot.entity.velocity = vec3([0, 0, 0]);
 
     const normalizedVector = vector.scaled(1 / magnitude);
-    bot.entity.position.add(normalizedVector.scaled(flyingSpeedPerUpdate));
+    bot.entity.position.add(
+      normalizedVector.scaled(Math.min(magnitude, flyingSpeedPerUpdate))
+    );
 
     await setTimeout(50);
-
-    vector = destination.minus(bot.entity.position);
-    magnitude = vecMagnitude(vector);
-
-    if (travelTimeExceeded) throw new FlyTimeoutError();
-  }
-
-  while (magnitude > flyingSpeedEaseOut) {
-    bot.physics.gravity = 0;
-    bot.entity.velocity = vec3([0, 0, 0]);
-
-    const normalizedVector = vector.scaled(1 / magnitude);
-    bot.entity.position.add(normalizedVector.scaled(flyingSpeedEaseOut));
-
-    await awaitMoveOrMs(bot, 50);
 
     vector = destination.minus(bot.entity.position);
     magnitude = vecMagnitude(vector);
