@@ -1209,6 +1209,7 @@ dependencies = [
  "env_logger",
  "figment",
  "futures-util",
+ "lazy_static",
  "log",
  "pathfinding",
  "serde",

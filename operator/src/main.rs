@@ -4,6 +4,7 @@ extern crate log;
 
 mod api;
 mod config;
+mod data;
 mod pathfinding;
 mod services;
 mod state;
