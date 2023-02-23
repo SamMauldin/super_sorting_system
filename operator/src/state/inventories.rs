@@ -44,7 +44,7 @@ impl InventoryState {
         })
     }
 
-    pub fn get_listing(&self) -> Vec<Item> {
+    pub fn get_listing(&self, options: InventoryListingOptions) -> Vec<Item> {
         let mut item_map = HashMap::<String, Item>::new();
 
         let mut insert_item = |item: &Item| {
@@ -60,7 +60,12 @@ impl InventoryState {
         for (_loc, _slot, item) in self.iter_slots() {
             if let Some(item) = item {
                 if let Some(shulker_data) = item.shulker_data() {
-                    let should_unpack = shulker_data.name.is_none() && shulker_data.contained_items.len() > 0;
+                    let is_empty = shulker_data.contained_items.len() == 0;
+
+                    let should_unpack = !is_empty
+                        && (options.shulker_unpacking == ShulkerUnpacking::FullListing
+                            || (options.shulker_unpacking == ShulkerUnpacking::UnnamedOnly
+                                && shulker_data.name.is_none()));
 
                     if should_unpack {
                         for contained_item in shulker_data.contained_items {
@@ -79,10 +84,22 @@ impl InventoryState {
     }
 }
 
-struct ShulkerData {
-    name: Option<String>,
-    color: Option<String>,
-    contained_items: Vec<Item>,
+#[derive(PartialEq, Eq)]
+pub enum ShulkerUnpacking {
+    FullListing,
+    UnnamedOnly,
+    None,
+}
+
+pub struct InventoryListingOptions {
+    pub shulker_unpacking: ShulkerUnpacking,
+}
+
+pub struct ShulkerData {
+    pub name: Option<String>,
+    pub color: Option<String>,
+    pub contained_items: Vec<Item>,
+    pub empty: bool,
 }
 
 #[derive(Deserialize)]
@@ -91,7 +108,7 @@ struct NbtNameStr {
 }
 
 impl Item {
-    fn shulker_data(&self) -> Option<ShulkerData> {
+    pub fn shulker_data(&self) -> Option<ShulkerData> {
         let mc_data_item = MC_DATA.items_by_id.get(&self.item_id)?;
         if !mc_data_item.name.ends_with("shulker_box") {
             return None;
@@ -114,29 +131,39 @@ impl Item {
             .pointer("/value/BlockEntityTag/value/Items/value/value")
             .and_then(|nbt_val| nbt_val.as_array());
 
+        let empty = contained_items_nbt
+            .map(|items_list| items_list.len() == 0)
+            .unwrap_or(true);
+
         let contained_items = contained_items_nbt.map(|items_list| {
             items_list
                 .iter()
                 .map(|nbt_item| {
-                    let item_mc_name = nbt_item.pointer("/id/value").unwrap().as_str().unwrap().strip_prefix("minecraft:").unwrap();
-                    let mc_data_item = MC_DATA
-                        .items_by_name
-                        .get(item_mc_name)?;
+                    let item_mc_name = nbt_item
+                        .pointer("/id/value")
+                        .unwrap()
+                        .as_str()
+                        .unwrap()
+                        .strip_prefix("minecraft:")
+                        .unwrap();
+                    let mc_data_item = MC_DATA.items_by_name.get(item_mc_name)?;
                     let count = nbt_item.pointer("/Count/value").unwrap().as_u64().unwrap();
                     let nbt = nbt_item
                         .pointer("/tag")
                         .map(|tag| tag.clone())
                         .unwrap_or(serde_json::Value::Null);
 
-                    Some(UnhashedItem {
-                        item_id: mc_data_item.id,
-                        stack_size: mc_data_item.stack_size,
-                        nbt,
+                    Some(
+                        UnhashedItem {
+                            item_id: mc_data_item.id,
+                            stack_size: mc_data_item.stack_size,
+                            nbt,
 
-                        count: count as u32,
-                        metadata: 0,
-                    }
-                    .into_item())
+                            count: count as u32,
+                            metadata: 0,
+                        }
+                        .into_item(),
+                    )
                 })
                 .flatten()
                 .collect::<Vec<Item>>()
@@ -146,6 +173,7 @@ impl Item {
             name,
             color,
             contained_items,
+            empty,
         })
     }
 }

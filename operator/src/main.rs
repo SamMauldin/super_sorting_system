@@ -23,6 +23,7 @@ use crate::{
         agent_expiration::AgentExpirationService, defragger::DefraggerService,
         hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
         node_scanner::NodeScannerService, service::Service,
+        shulker_unloader::ShulkerUnloaderService, shulker_loader::ShulkerLoaderService,
     },
     state::StateData,
 };
@@ -56,6 +57,8 @@ async fn main() -> Result<(), StartupError> {
         let mut defragger_service = DefraggerService::new(&config);
         let mut hold_expiration_service = HoldExpirationService::new(&config);
         let mut node_scanner_service = NodeScannerService::new(&config);
+        let mut shulker_unloader_service = ShulkerUnloaderService::new(&config);
+        let mut shulker_loader_service = ShulkerLoaderService::new(&config);
 
         loop {
             thread::sleep(Duration::from_millis(1000));
@@ -66,6 +69,8 @@ async fn main() -> Result<(), StartupError> {
             defragger_service.tick(&mut state);
             hold_expiration_service.tick(&mut state);
             node_scanner_service.tick(&mut state);
+            shulker_unloader_service.tick(&mut state);
+            shulker_loader_service.tick(&mut state);
         }
     });
 

@@ -5,6 +5,7 @@ use uuid::Uuid;
 use crate::{
     state::{
         holds::Hold,
+        inventories::{InventoryListingOptions, ShulkerUnpacking},
         operations::{Operation, OperationKind, OperationPriority},
         StateData,
     },
@@ -37,7 +38,9 @@ async fn inventory_contents(state: StateData) -> impl Responder {
 async fn inventory_listing(state: StateData) -> impl Responder {
     let state = state.lock().unwrap();
 
-    HttpResponse::Ok().json(state.inventories.get_listing())
+    HttpResponse::Ok().json(state.inventories.get_listing(InventoryListingOptions {
+        shulker_unpacking: ShulkerUnpacking::UnnamedOnly,
+    }))
 }
 
 #[get("/sign_config")]
