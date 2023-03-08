@@ -20,19 +20,6 @@ class FlyTimeoutError extends Error {
   }
 }
 
-function awaitMoveOrMs(bot: Bot, ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    const handler = () => {
-      timers.clearTimeout(timeout);
-      bot.off('move', handler);
-      resolve();
-    };
-
-    const timeout = timers.setTimeout(handler, ms);
-    bot.on('move', handler);
-  });
-}
-
 // Largely adapted from mineflayer
 
 function vecMagnitude(vec: depVec3) {
@@ -40,12 +27,13 @@ function vecMagnitude(vec: depVec3) {
 }
 
 async function flyTo(bot: Bot, destination: depVec3) {
-  const flyingSpeedPerUpdate = 10;
+  const segmentLength = 5;
 
   bot.creative.startFlying();
 
   let vector = destination.minus(bot.entity.position);
   let magnitude = vecMagnitude(vector);
+  const normalizedVector = vector.scaled(1 / magnitude);
 
   const allowedTravelTimeMs = 5000 + magnitude * 200;
   let travelTimeExceeded = false;
@@ -53,28 +41,37 @@ async function flyTo(bot: Bot, destination: depVec3) {
     travelTimeExceeded = true;
   }, allowedTravelTimeMs);
 
-  while (magnitude > flyingSpeedPerUpdate) {
-    bot.physics.gravity = 0;
-    bot.entity.velocity = vec3([0, 0, 0]);
+  while (true) {
+    let nextSegment = bot.entity.position;
+    while (true) {
+      const distToEnd = vecMagnitude(destination.minus(nextSegment));
 
-    const normalizedVector = vector.scaled(1 / magnitude);
-    bot.entity.position.add(
-      normalizedVector.scaled(Math.min(magnitude, flyingSpeedPerUpdate))
-    );
+      const candidateSegment =
+        distToEnd < segmentLength
+          ? destination
+          : nextSegment.add(normalizedVector.scaled(segmentLength));
+
+      if (bot.world.getColumnAt(candidateSegment)) {
+        nextSegment = candidateSegment;
+        if (nextSegment.equals(destination)) break;
+      } else {
+        break;
+      }
+    }
+
+    bot.entity.position = nextSegment;
+
+    if (nextSegment.equals(destination)) {
+      await once(bot, 'move');
+      timers.clearTimeout(travelTimeTimeout);
+
+      return;
+    }
 
     await setTimeout(50);
 
-    vector = destination.minus(bot.entity.position);
-    magnitude = vecMagnitude(vector);
-
     if (travelTimeExceeded) throw new FlyTimeoutError();
   }
-
-  // last step
-  bot.entity.position = destination;
-  await once(bot, 'move');
-
-  timers.clearTimeout(travelTimeTimeout);
 }
 
 export const takePortal = async (vec: Vec3, bot: Bot) => {
