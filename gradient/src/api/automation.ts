@@ -48,15 +48,6 @@ export const removeHold = (
 ): Promise<AxiosResponse<RemoveHoldResponse>> =>
   axios.delete(endpoint(`holds/${hold_id}`), { headers });
 
-type RenewHoldResponse =
-  | { type: 'HoldRenewed'; hold: Hold }
-  | { type: 'HoldNotFound' };
-
-export const renewHold = (
-  hold_id: string,
-): Promise<AxiosResponse<RenewHoldResponse>> =>
-  axios.post(endpoint(`holds/${hold_id}/renew`), { headers });
-
 export const createOperation = (
   kind: OperationKind,
   priority: OperationPriority,

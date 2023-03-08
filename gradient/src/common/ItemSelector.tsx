@@ -4,7 +4,7 @@ import { CountSelectorModal, useMcData } from '.';
 import { getInventoryListing } from '../api/automation';
 import styled from 'styled-components';
 import { ExtendedItem, itemListFromInventories } from '../helpers';
-import { Fzf, byLengthAsc } from 'fzf';
+import { Fzf } from 'fzf';
 import { Item } from '../api/types';
 
 type Props = {

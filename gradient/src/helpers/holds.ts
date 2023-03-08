@@ -1,5 +1,4 @@
-import assert from 'assert';
-import { createHold, removeHold, renewHold } from '../api/automation';
+import { createHold, removeHold } from '../api/automation';
 import { Hold } from '../api/types';
 import { HoldRequestFilter } from '../api/automation_types';
 
@@ -17,13 +16,6 @@ export const acquireFreeSpaces = async (count: number): Promise<Hold[]> => {
   });
 
   return located;
-};
-
-export const renewHolds = async (holds: string[]): Promise<void> => {
-  for (const hold_id of holds) {
-    const { data } = await renewHold(hold_id);
-    assert(data.type === 'HoldRenewed', 'Unable to renew hold');
-  }
 };
 
 export const releaseHolds = async (holds: string[]): Promise<void> => {

@@ -1,8 +1,6 @@
 import assert from 'assert';
 import {
-  acquireFreeSpaces,
   releaseHolds,
-  renewHolds,
   ExtendedItem,
   executeOperation,
 } from '../helpers';
