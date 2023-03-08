@@ -22,8 +22,8 @@ use crate::{
     services::{
         agent_expiration::AgentExpirationService, defragger::DefraggerService,
         hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
-        node_scanner::NodeScannerService, service::Service,
-        shulker_unloader::ShulkerUnloaderService, shulker_loader::ShulkerLoaderService,
+        node_scanner::NodeScannerService, service::Service, shulker_loader::ShulkerLoaderService,
+        shulker_unloader::ShulkerUnloaderService,
     },
     state::StateData,
 };

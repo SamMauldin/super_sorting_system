@@ -36,13 +36,27 @@ fn is_in_complex(loc: Location, sign_config: &CompiledSignConfig) -> Option<Stri
     None
 }
 
-// Is a inbetween b and c?
-fn is_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
+fn is_roughly_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
     let target_dist = b.dist(c);
 
     let actual_dist = a.dist(b) + a.dist(c);
 
     actual_dist - 3_f64 <= target_dist
+}
+
+fn is_exactly_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
+    let mut equality_count = 0;
+    if a.x == b.x && b.x == c.x {
+        equality_count += 1;
+    }
+    if a.y == b.y && b.y == c.y {
+        equality_count += 1;
+    }
+    if a.z == b.z && b.z == c.z {
+        equality_count += 1;
+    }
+
+    return equality_count >= 2;
 }
 
 fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> Option<String> {
@@ -86,7 +100,11 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
             node.connections.iter().find_map(|other_name| {
                 let other_node = sign_config.nodes.get(other_name).unwrap();
 
-                if is_in_between(start_loc.vec3, node.location.vec3, other_node.location.vec3) {
+                if is_roughly_in_between(
+                    start_loc.vec3,
+                    node.location.vec3,
+                    other_node.location.vec3,
+                ) {
                     if start_loc.vec3.dist(node.location.vec3)
                         < start_loc.vec3.dist(other_node.location.vec3)
                     {
@@ -212,6 +230,31 @@ pub fn find_path(
         path.insert(0, PfResultNode::Vec(starting_config_node.location.vec3));
         path.push(PfResultNode::Vec(end_loc.vec3));
 
+        path
+    })
+    .map(|mut path| {
+        let mut keep = vec![];
+        for (i, node) in path.iter().enumerate() {
+            let prev_node = path.get(i - 1);
+            let next_node = path.get(i + 1);
+
+            if let PfResultNode::Vec(curr_vec) = node {
+                if let Some(PfResultNode::Vec(prev_vec)) = prev_node {
+                    if let Some(PfResultNode::Vec(next_vec)) = next_node {
+                        keep.push(!is_exactly_in_between(*prev_vec, *curr_vec, *next_vec))
+                    } else {
+                        keep.push(true)
+                    }
+                } else {
+                    keep.push(true)
+                }
+            } else {
+                keep.push(true)
+            }
+        }
+
+        let mut iter = keep.iter();
+        path.retain(|_| *iter.next().unwrap());
         path
     })
     .ok_or(PathfindingError::NoPath)
