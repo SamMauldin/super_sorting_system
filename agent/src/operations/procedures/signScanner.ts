@@ -4,6 +4,7 @@ import vec3 from 'vec3';
 import { ScanRegion, sendSignScanData, Sign } from '../../controllerApi';
 
 export const sendVisibleSignData = async (bot: Bot, agent: Agent) => {
+  await bot.waitForChunksToLoad();
   const scanRegions = await scanVisibleRegion(bot);
 
   await sendSignScanData(agent, scanRegions);
