@@ -2,9 +2,11 @@ import { Bot } from 'mineflayer';
 import { Agent, stringToDim, Vec3 } from '../../types';
 import vec3 from 'vec3';
 import { ScanRegion, sendSignScanData, Sign } from '../../controllerApi';
+import { setTimeout } from 'timers/promises';
 
 export const sendVisibleSignData = async (bot: Bot, agent: Agent) => {
   await bot.waitForChunksToLoad();
+  await setTimeout(5000);
   const scanRegions = await scanVisibleRegion(bot);
 
   await sendSignScanData(agent, scanRegions);
