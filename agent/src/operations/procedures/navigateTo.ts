@@ -81,10 +81,10 @@ export const takePortal = async (vec: Vec3, bot: Bot) => {
   await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
 
   while (bot.game.dimension === startingDim) {
-    await setTimeout(500);
+    await setTimeout(100);
   }
 
-  await setTimeout(5000);
+  await bot.waitForChunksToLoad();
 };
 
 const navigateToImpl = async (
