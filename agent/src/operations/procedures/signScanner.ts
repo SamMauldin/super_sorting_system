@@ -2,11 +2,32 @@ import { Bot } from 'mineflayer';
 import { Agent, stringToDim, Vec3 } from '../../types';
 import vec3 from 'vec3';
 import { ScanRegion, sendSignScanData, Sign } from '../../controllerApi';
-import { setTimeout } from 'timers/promises';
+import { setTimeout } from 'timers';
+
+const CHUNK_LOAD_DEBOUNCE_TIMER = 2000;
+
+export const waitChunksRoughlyFinishedLoading = (bot: Bot): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    let currTimeout: NodeJS.Timeout;
+    const handler = () => {
+      clearTimeout(currTimeout);
+
+      setTimeout(finish, CHUNK_LOAD_DEBOUNCE_TIMER);
+    };
+
+    const finish = () => {
+      bot.world.off('chunkColumnLoad', handler);
+      resolve();
+    };
+
+    bot.world.on('chunkColumnLoad', handler);
+
+    currTimeout = setTimeout(finish, CHUNK_LOAD_DEBOUNCE_TIMER);
+  });
+};
 
 export const sendVisibleSignData = async (bot: Bot, agent: Agent) => {
-  await bot.waitForChunksToLoad();
-  await setTimeout(5000);
+  await waitChunksRoughlyFinishedLoading(bot);
   const scanRegions = await scanVisibleRegion(bot);
 
   await sendSignScanData(agent, scanRegions);
