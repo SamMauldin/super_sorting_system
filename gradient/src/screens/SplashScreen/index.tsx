@@ -10,7 +10,7 @@ export const SplashScreen = ({ message }: Props) => (
   <Container>
     <ShulkerImg src={shulker} alt="Shulker Box" />
     <MessageContainer>
-      <h1>Gradient</h1>
+      <h1>Super Sorting System</h1>
       {message && <p>{message}</p>}
     </MessageContainer>
   </Container>

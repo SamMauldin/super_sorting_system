@@ -1,14 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQuery } from 'react-query';
 import { CountSelectorModal, useMcData } from '.';
 import { getInventoryListing } from '../api/automation';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ExtendedItem, itemListFromInventories } from '../helpers';
 import { Fzf } from 'fzf';
 import { Item } from '../api/types';
 
+export type SelectedItemsFinal = { item: ExtendedItem; count: number }[];
+export type SelectedItems = { [hashCode: string]: number | undefined };
 type Props = {
-  submit: (selectedItems: { item: ExtendedItem; count: number }[]) => void;
+  submit: (final: SelectedItemsFinal) => void;
+  selectedItems: SelectedItems;
+  setSelectedItems: (upd_func: (items: SelectedItems) => SelectedItems) => void;
 };
 
 const itemCompareTieBreaker = (a: Item, b: Item) => {
@@ -21,14 +26,15 @@ const itemCompareTieBreaker = (a: Item, b: Item) => {
   return b.stackable_hash.localeCompare(a.stackable_hash);
 };
 
-export const ItemSelector = ({ submit }: Props) => {
+export const ItemSelector = ({
+  selectedItems,
+  setSelectedItems,
+  submit,
+}: Props) => {
   const mcData = useMcData();
   const [hoverIdx, setHoverIdx] = useState(0);
   const [search, setSearch] = useState('');
   const [modalItem, setModalItem] = useState<ExtendedItem | null>();
-  const [selectedItems, setSelectedItems] = useState<{
-    [hashCode: string]: number | undefined;
-  }>({});
   const mainInputRef = useRef<HTMLInputElement>(null);
 
   const setSelectedForItem = (item: Item, count: number) => {
@@ -160,29 +166,33 @@ export const ItemSelector = ({ submit }: Props) => {
               >
                 {item.prettyPrinted} x{item.count}
                 {selectedCount > 0 && (
-                  <SelectedText>({selectedCount} selected)</SelectedText>
+                  <SelectedText hovered={hoverIdx === idx}>
+                    ({selectedCount} selected)
+                  </SelectedText>
                 )}
               </ItemOption>
             );
           })}
         </ItemList>
       </InnerContainer>
-      {modalItem && (
-        <ModalContainer>
-          <CountSelectorModal
-            startingCount={selectedItems[modalItem.stackable_hash] || 0}
-            item={modalItem}
-            close={(count) => {
-              if (count !== null) {
-                setSelectedForItem(modalItem, count);
-                setSearch('');
-              }
+      {modalItem &&
+        createPortal(
+          <ModalContainer>
+            <CountSelectorModal
+              startingCount={selectedItems[modalItem.stackable_hash]}
+              item={modalItem}
+              close={(count) => {
+                if (count !== null) {
+                  setSelectedForItem(modalItem, count);
+                  setSearch('');
+                }
 
-              setModalItem(null);
-            }}
-          />
-        </ModalContainer>
-      )}
+                setModalItem(null);
+              }}
+            />
+          </ModalContainer>,
+          document.body,
+        )}
     </Container>
   );
 };
@@ -218,16 +228,16 @@ const ItemOption = styled.li<{ hovered: boolean }>`
 
   ${({ hovered }) =>
     hovered
-      ? `
-          background-color: white;
-          color: black;
+      ? css`
+          background-color: ${({ theme }) => theme.fg0};
+          color: ${({ theme }) => theme.bg0};
         `
       : ''};
 `;
 
-const SelectedText = styled.span`
+const SelectedText = styled.span<{ hovered: boolean }>`
   margin-left: 2em;
-  color: ${({ theme }) => theme.orange};
+  color: ${({ theme, hovered }) => (hovered ? theme.red : theme.purple)};
 `;
 
 const ModalContainer = styled.div`

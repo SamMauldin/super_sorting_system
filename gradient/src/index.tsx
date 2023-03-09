@@ -11,8 +11,8 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    color: white;
-    background-color: ${({ theme }) => theme.grey};
+    color: ${({ theme }) => theme.fg1};
+    background-color: ${({ theme }) => theme.bg0};
   }
 
   #root {
@@ -20,6 +20,15 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     width: 100%;
     height: 100%;
+  }
+
+  @font-face {
+    font-family: Minecraft;
+    src: url("/minecraft.otf") format("opentype");
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: Minecraft;
   }
 
   * {

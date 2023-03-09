@@ -146,8 +146,7 @@ const List = styled.ul`
 
 const ListItem = styled.li`
   padding: 10px;
-  background-color: grey;
-  color: black;
+  background-color: ${({ theme }) => theme.bg2};
   border-radius: 5px;
   margin-bottom: 10px;
 

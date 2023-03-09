@@ -3,108 +3,94 @@ import styled from 'styled-components';
 
 import { Delivery, Pickup, Config, Stats, Help } from './screens';
 import shulker from './assets/shulker.png';
+import {
+  ActionStatusDisplay,
+  Screen,
+  ScreenMenu,
+  useActionController,
+} from './common';
 
 export const App = () => {
-  const [currentLocation, setCurrentLocation] = useState<
-    'delivery' | 'pickup' | 'config' | 'stats' | 'help'
-  >('delivery');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('delivery');
+  const actionController = useActionController();
+
+  const goHome = () => setCurrentScreen('delivery');
 
   useEffect(() => {
     const handler = (ev: KeyboardEvent) => {
-      if (!ev.ctrlKey && !ev.altKey) return;
-
-      if (ev.key === 'd') {
-        setCurrentLocation('delivery');
-        ev.preventDefault();
-      } else if (ev.key === 'p') {
-        setCurrentLocation('pickup');
-        ev.preventDefault();
-      } else if (ev.key === 'c') {
-        setCurrentLocation('config');
-        ev.preventDefault();
-      } else if (ev.key === 's') {
-        setCurrentLocation('stats');
-        ev.preventDefault();
-      } else if (ev.key === 'h') {
-        setCurrentLocation('help');
-        ev.preventDefault();
+      if (ev.ctrlKey) {
+        if (ev.key === 'd') {
+          setCurrentScreen('delivery');
+          ev.preventDefault();
+        } else if (ev.key === 'p') {
+          setCurrentScreen('pickup');
+          ev.preventDefault();
+        } else if (ev.key === 'c') {
+          setCurrentScreen('config');
+          ev.preventDefault();
+        } else if (ev.key === 's') {
+          setCurrentScreen('stats');
+          ev.preventDefault();
+        } else if (ev.key === 'h') {
+          setCurrentScreen('help');
+          ev.preventDefault();
+        }
       }
     };
 
     document.addEventListener('keydown', handler);
 
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  });
 
   return (
     <Container>
       <TitleBar>
         <Logo src={shulker} />
-        <Title>Gradient</Title>
-        <Button
-          disabled={currentLocation === 'delivery'}
-          onClick={() => setCurrentLocation('delivery')}
-        >
-          Delivery
-        </Button>
-        <Button
-          disabled={currentLocation === 'pickup'}
-          onClick={() => setCurrentLocation('pickup')}
-        >
-          Pickup
-        </Button>
-        <Button
-          disabled={currentLocation === 'config'}
-          onClick={() => setCurrentLocation('config')}
-        >
-          Config
-        </Button>
-        <Button
-          disabled={currentLocation === 'stats'}
-          onClick={() => setCurrentLocation('stats')}
-        >
-          Stats
-        </Button>
-        <Button
-          disabled={currentLocation === 'help'}
-          onClick={() => setCurrentLocation('help')}
-        >
-          Help
-        </Button>
+        <Title>Super Sorting System</Title>
       </TitleBar>
-      {currentLocation === 'delivery' && <Delivery />}
-      {currentLocation === 'pickup' && <Pickup />}
-      {currentLocation === 'config' && <Config />}
-      {currentLocation === 'stats' && <Stats />}
-      {currentLocation === 'help' && <Help />}
+
+      <ScreenMenu screen={currentScreen} setScreen={setCurrentScreen} />
+
+      <ActionStatusDisplay actionController={actionController} />
+
+      {currentScreen === 'delivery' && (
+        <Delivery actionController={actionController} />
+      )}
+      {currentScreen === 'pickup' && (
+        <Pickup actionController={actionController} finished={goHome} />
+      )}
+      {currentScreen === 'config' && <Config />}
+      {currentScreen === 'stats' && <Stats />}
+      {currentScreen === 'help' && <Help />}
     </Container>
   );
 };
 
 const Container = styled.div`
   display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-columns: 1fr min(100vw, 800px) 1fr;
+  position: absolute;
   height: 100%;
   width: 100%;
-  position: absolute;
-  grid-template-rows: min-content 1fr;
-  grid-template-columns: 1fr;
+
+  & > * {
+    grid-column: 2;
+  }
 `;
 
 const TitleBar = styled.div`
   display: flex;
   align-items: center;
-  margin: 2px 10px;
+  justify-content: center;
+  margin: 20px 10px;
 `;
 
 const Title = styled.h1`
   margin: 0px 0px 0px 10px;
-  font-size: px;
 `;
 
 const Logo = styled.img`
   height: 50px;
-`;
-
-const Button = styled.button`
-  margin-left: 10px;
 `;

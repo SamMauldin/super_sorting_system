@@ -1,18 +1,16 @@
 import assert from 'assert';
-import {
-  releaseHolds,
-  ExtendedItem,
-  executeOperation,
-} from '../helpers';
+import { releaseHolds, ExtendedItem, executeOperation } from '../helpers';
 import { createHold, getSignConfig } from './automation';
 import { HoldRequestFilter } from './automation_types';
 
+export type DeliveryItems = {
+  item: ExtendedItem;
+  count: number;
+}[];
+
 export const deliverItems = async (
   destinationLoc: string,
-  itemList: {
-    item: ExtendedItem;
-    count: number;
-  }[],
+  itemList: DeliveryItems,
 ): Promise<void> => {
   const {
     data: { nodes },
