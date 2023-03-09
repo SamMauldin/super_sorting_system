@@ -80,11 +80,13 @@ export const takePortal = async (vec: Vec3, bot: Bot) => {
   await setTimeout(500);
   await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
 
+  console.log('At portal, awaiting new dimension...');
   while (bot.game.dimension === startingDim) {
     await setTimeout(100);
   }
+  console.log('Portal traversed. Loading chunks.');
 
-  await bot.waitForChunksToLoad();
+  await setTimeout(3000);
 };
 
 const navigateToImpl = async (
@@ -120,6 +122,8 @@ const navigateToImpl = async (
       await takePortal(node.Portal.vec, bot);
     }
   }
+
+  console.log('=== Navigation Finished ===');
 };
 
 export const navigateTo = async (
