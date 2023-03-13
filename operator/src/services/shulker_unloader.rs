@@ -99,7 +99,17 @@ impl Service for ShulkerUnloaderService {
                             let hold = state.holds.create(loc, slot as u32).unwrap();
 
                             destination_hold_ids.push(hold.id);
+
+                            break;
                         }
+                    }
+
+                    if destination_hold_ids.len() < 27 {
+                        for hold in destination_hold_ids.iter() {
+                            state.holds.remove(*hold);
+                        }
+
+                        return;
                     }
 
                     let sign_config = state.sign_config.get_config();
