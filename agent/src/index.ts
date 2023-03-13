@@ -19,7 +19,7 @@ import {
   importInventory,
   scanSigns,
   unloadShulker,
-  loadShulker,
+  loadShulker
 } from './operations';
 import { navigateTo, sendVisibleSignData } from './operations/procedures';
 import { clearInventory, sleep } from './utils';
@@ -47,7 +47,7 @@ const main = async () => {
       : undefined,
     username: process.env.AGENT_USERNAME!,
     auth: 'microsoft',
-    version: '1.18.2'
+    version: '1.19.3'
   });
 
   bot.on('error', (err) => {
@@ -97,8 +97,8 @@ const main = async () => {
           await scanSigns(operation.kind, bot, agent);
         } else if (operation.kind.type === 'UnloadShulker') {
           await unloadShulker(operation.kind, bot, agent);
-	} else if (operation.kind.type === 'LoadShulker') {
-	  await loadShulker(operation.kind, bot, agent);
+        } else if (operation.kind.type === 'LoadShulker') {
+          await loadShulker(operation.kind, bot, agent);
         } else {
           throw new Error('Unknown operation kind dispatched!');
         }

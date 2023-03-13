@@ -23,11 +23,11 @@ export type PfResultNode =
     };
 
 export const stringToDim = (dim: string): Dimension => {
-  if (dim === 'minecraft:overworld') {
+  if (dim === 'overworld') {
     return 'Overworld';
-  } else if (dim === 'minecraft:the_nether') {
+  } else if (dim === 'the_nether') {
     return 'TheNether';
-  } else if (dim === 'minecraft:the_end') {
+  } else if (dim === 'the_end') {
     return 'TheEnd';
   } else {
     throw new Error(`Unknown dimension ${dim}`);
@@ -36,11 +36,11 @@ export const stringToDim = (dim: string): Dimension => {
 
 export const dimToString = (dim: Dimension): string => {
   if (dim === 'Overworld') {
-    return 'minecraft:overworld';
+    return 'overworld';
   } else if (dim === 'TheNether') {
-    return 'minecraft:nether';
+    return 'the_nether';
   } else if (dim === 'TheEnd') {
-    return 'minecraft:end';
+    return 'the_end';
   } else {
     throw new Error(`Unknown dimension ${dim}`);
   }

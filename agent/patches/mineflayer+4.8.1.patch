@@ -1,5 +1,5 @@
 diff --git a/node_modules/mineflayer/lib/plugins/generic_place.js b/node_modules/mineflayer/lib/plugins/generic_place.js
-index 56465f0..59d7713 100644
+index 8fddeba..5d7932b 100644
 --- a/node_modules/mineflayer/lib/plugins/generic_place.js
 +++ b/node_modules/mineflayer/lib/plugins/generic_place.js
 @@ -34,7 +34,8 @@ function inject (bot) {
@@ -13,12 +13,12 @@ index 56465f0..59d7713 100644
      // TODO: tell the server that we are sneaking while doing this
      const pos = referenceBlock.position
 diff --git a/node_modules/mineflayer/lib/plugins/inventory.js b/node_modules/mineflayer/lib/plugins/inventory.js
-index 76ccbb6..243e8bb 100644
+index 85e545e..d98ab2e 100644
 --- a/node_modules/mineflayer/lib/plugins/inventory.js
 +++ b/node_modules/mineflayer/lib/plugins/inventory.js
-@@ -152,7 +152,8 @@ function inject (bot, { hideErrors }) {
- 
-   async function activateBlock (block) {
+@@ -155,7 +155,8 @@ function inject (bot, { hideErrors }) {
+     const directionNum = vectorToDirection(direction) // The packet needs a number as the direction
+     cursorPos = cursorPos ?? new Vec3(0.5, 0.5, 0.5)
      // TODO: tell the server that we are not sneaking while doing this
 -    await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), false)
 +    // Skip looking for performance reasons
@@ -27,20 +27,20 @@ index 76ccbb6..243e8bb 100644
      if (bot.supportFeature('blockPlaceHasHeldItem')) {
        bot._client.write('block_place', {
 diff --git a/node_modules/mineflayer/lib/plugins/physics.js b/node_modules/mineflayer/lib/plugins/physics.js
-index d38f8aa..de40c33 100644
+index a6dd8c8..b4b84f8 100644
 --- a/node_modules/mineflayer/lib/plugins/physics.js
 +++ b/node_modules/mineflayer/lib/plugins/physics.js
-@@ -235,8 +235,11 @@ function inject (bot, { physicsEnabled }) {
-     const yawChange = Math.round((yaw - bot.entity.yaw) / sensitivity) * sensitivity
-     const pitchChange = Math.round((pitch - bot.entity.pitch) / sensitivity) * sensitivity
+@@ -229,11 +229,8 @@ function inject (bot, { physicsEnabled }) {
+     }
+     lookingTask = createTask()
  
--    bot.entity.yaw += yawChange
--    bot.entity.pitch += pitchChange
-+    if (Math.abs(deltaYaw(bot.yaw)) < 0.01) return;
-+
-+    // We don't care about smoothly animating the look animation, just go as fast as possible
-+    bot.entity.yaw = yaw
-+    bot.entity.pitch = pitch
+-    // this is done to bypass certain anticheat checks that detect the player's sensitivity
+-    // by calculating the gcd of how much they move the mouse each tick
+-    const sensitivity = conv.fromNotchianPitch(0.15) // this is equal to 100% sensitivity in vanilla
+-    const yawChange = Math.round((yaw - bot.entity.yaw) / sensitivity) * sensitivity
+-    const pitchChange = Math.round((pitch - bot.entity.pitch) / sensitivity) * sensitivity
++    const yawChange = yaw - bot.entity.yaw
++    const pitchChange = pitch - bot.entity.pitch
  
-     if (force) {
-       lastSentYaw = yaw
+     if (yawChange === 0 && pitchChange === 0) {
+       return

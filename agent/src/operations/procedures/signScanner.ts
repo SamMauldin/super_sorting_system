@@ -70,7 +70,7 @@ const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
   const signs: Sign[] = [];
 
   for (let x = 0; x < 16; x++) {
-    for (let y = 0; y < 256; y++) {
+    for (let y = chunk.minY; y < chunk.worldHeight; y++) {
       for (let z = 0; z < 16; z++) {
         const type = chunk.getBlockType({ x, y, z });
 
