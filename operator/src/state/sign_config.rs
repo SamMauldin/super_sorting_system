@@ -56,7 +56,7 @@ pub struct Sign {
 
 // Example
 // SSS 0,-4,0
-// pickup chest
+// pickup
 // Hallway A
 // (4th line empty)
 
@@ -96,7 +96,8 @@ pub struct Sign {
  * Portal Signs
  * These signs indicate that a pathfinding node has a portal that connects to another pathfinding
  * node. This point will be inside of the portal. Note that this only establishes
- * a one-way connection.
+ * a one-way connection - you will need to place another on the other side of the portal for
+ * a two-way connection.
  * Only one of these is permitted for a given pathfinding node.
  */
 
