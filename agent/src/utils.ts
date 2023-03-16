@@ -14,7 +14,11 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
   // Verify inventory empty
   for (const [invSlot, contents] of bot.inventory.slots.entries()) {
     if (!contents) continue;
-    if (invSlot < bot.inventory.inventoryStart) continue;
+    if (
+      invSlot < bot.inventory.inventoryStart ||
+      invSlot > bot.inventory.inventoryEnd
+    )
+      continue;
 
     const { data } = await getFreeHold(agent);
 
