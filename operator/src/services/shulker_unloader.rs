@@ -1,5 +1,3 @@
-use uuid::Uuid;
-
 use super::service::Service;
 use crate::{
     config::Config,
@@ -7,6 +5,7 @@ use crate::{
     state::operations::{OperationKind, OperationPriority, OperationStatus},
     state::State,
 };
+use uuid::Uuid;
 
 pub struct ShulkerUnloaderService {
     outstanding_operation: Option<Uuid>,
@@ -43,8 +42,7 @@ impl Service for ShulkerUnloaderService {
 
         'shulker: for (loc, slot, item) in state.inventories.iter_slots() {
             if let Some(item) = item {
-                let shulker_data = item.shulker_data();
-                if let Some(shulker_data) = shulker_data {
+                if let Some(shulker_data) = &item.shulker_data {
                     if shulker_data.name.is_some() {
                         continue;
                     }

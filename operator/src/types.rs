@@ -8,6 +8,7 @@ use std::ops::Add;
 use std::{fmt::Display, hash::Hasher};
 use thiserror::Error;
 
+use crate::data::McData;
 use crate::state::{holds::Hold, State};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Eq, Hash, Clone, Copy)]
@@ -103,9 +104,14 @@ pub struct UnhashedItem {
     pub stack_size: u32,
 }
 
+lazy_static::lazy_static! {
+    static ref MC_DATA: McData = McData::init();
+}
+
 impl UnhashedItem {
     pub fn into_item(self) -> Item {
         let stackable_hash = self.stackable_hash();
+        let shulker_data = self.shulker_data();
 
         Item {
             item_id: self.item_id,
@@ -114,10 +120,11 @@ impl UnhashedItem {
             nbt: self.nbt,
             stack_size: self.stack_size,
             stackable_hash,
+            shulker_data,
         }
     }
 
-    fn stackable_hash(&self) -> String {
+    fn stackable_hash(&self) -> u64 {
         let mut s = DefaultHasher::new();
 
         self.item_id.hash(&mut s);
@@ -125,8 +132,118 @@ impl UnhashedItem {
         let serialized_nbt = serde_json::to_string(&self.nbt).unwrap();
         serialized_nbt.hash(&mut s);
 
-        s.finish().to_string()
+        s.finish()
     }
+
+    pub fn shulker_data(&self) -> Option<ShulkerData> {
+        let mc_data_item = MC_DATA.items_by_id.get(&self.item_id)?;
+        if !mc_data_item.name.ends_with("shulker_box") {
+            return None;
+        }
+
+        let color = mc_data_item
+            .name
+            .strip_suffix("_shulker_box")
+            .map(|color| color.to_string());
+
+        let name = self
+            .nbt
+            .pointer("/value/display/value/Name/value")
+            .and_then(|nbt_val| nbt_val.as_str())
+            .and_then(|nbt_str| serde_json::from_str::<NbtNameStr>(nbt_str).ok())
+            .map(|name| name.text);
+
+        let contained_items_nbt = self
+            .nbt
+            .pointer("/value/BlockEntityTag/value/Items/value/value")
+            .and_then(|nbt_val| nbt_val.as_array());
+
+        let empty = contained_items_nbt
+            .map(|items_list| items_list.len() == 0)
+            .unwrap_or(true);
+
+        let contained_items = contained_items_nbt
+            .map(|items_list| {
+                items_list
+                    .iter()
+                    .map(|nbt_item| {
+                        let item_mc_name = nbt_item
+                            .pointer("/id/value")
+                            .unwrap()
+                            .as_str()
+                            .unwrap()
+                            .strip_prefix("minecraft:")
+                            .unwrap();
+                        let mc_data_item = MC_DATA.items_by_name.get(item_mc_name)?;
+                        let count = nbt_item.pointer("/Count/value").unwrap().as_u64().unwrap();
+                        let nbt = nbt_item
+                            .pointer("/tag")
+                            .map(|tag| tag.clone())
+                            .unwrap_or(serde_json::Value::Null);
+
+                        Some(
+                            UnhashedItem {
+                                item_id: mc_data_item.id,
+                                stack_size: mc_data_item.stack_size,
+                                nbt,
+
+                                count: count as u32,
+                                metadata: 0,
+                            }
+                            .into_item(),
+                        )
+                    })
+                    .flatten()
+                    .collect::<Vec<Item>>()
+            })
+            .unwrap_or_else(|| vec![]);
+
+        Some(ShulkerData {
+            name,
+            color,
+            contained_items,
+            empty,
+        })
+    }
+}
+
+mod string {
+    use std::fmt::Display;
+    use std::str::FromStr;
+
+    use serde::{de, Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<T, S>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        T: Display,
+        S: Serializer,
+    {
+        serializer.collect_str(value)
+    }
+
+    pub fn deserialize<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+    where
+        T: FromStr,
+        T::Err: Display,
+        D: Deserializer<'de>,
+    {
+        String::deserialize(deserializer)?
+            .parse()
+            .map_err(de::Error::custom)
+    }
+}
+
+#[derive(Clone, PartialEq, Debug)]
+pub struct ShulkerData {
+    pub name: Option<String>,
+    pub color: Option<String>,
+    pub contained_items: Vec<Item>,
+    pub empty: bool,
+}
+
+#[derive(Deserialize)]
+struct NbtNameStr {
+    text: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
@@ -136,7 +253,12 @@ pub struct Item {
     pub metadata: u32,
     pub nbt: Value,
     pub stack_size: u32,
-    pub stackable_hash: String,
+
+    #[serde(with = "string")]
+    pub stackable_hash: u64,
+
+    #[serde(skip)]
+    pub shulker_data: Option<ShulkerData>,
 }
 
 impl Display for Item {
@@ -147,13 +269,16 @@ impl Display for Item {
 
 #[derive(Deserialize, Debug, Clone)]
 pub enum ItemMatchCriteria {
-    StackableHash { stackable_hash: String },
+    StackableHash {
+        #[serde(with = "string")]
+        stackable_hash: u64,
+    },
 }
 
 impl ItemMatchCriteria {
     pub fn matches_item(&self, item: &Item) -> bool {
         match self {
-            Self::StackableHash { stackable_hash } => &item.stackable_hash == stackable_hash,
+            Self::StackableHash { stackable_hash } => item.stackable_hash == *stackable_hash,
         }
     }
 }

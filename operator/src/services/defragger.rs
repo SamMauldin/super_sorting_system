@@ -1,4 +1,5 @@
-use std::{cmp::min, collections::HashMap};
+use hashbrown::HashMap;
+use std::cmp::min;
 
 use uuid::Uuid;
 
@@ -47,7 +48,7 @@ impl Service for DefraggerService {
             }
         }
 
-        let mut partial_items: HashMap<&str, (Location, usize, &Item)> = HashMap::new();
+        let mut partial_items: HashMap<u64, (Location, usize, &Item)> = HashMap::new();
 
         for (loc, slot, item) in state.inventories.iter_slots() {
             if let Some(item) = item {
@@ -57,7 +58,7 @@ impl Service for DefraggerService {
                     }
 
                     if let Some((pair_loc, pair_slot, pair_item)) =
-                        partial_items.get(item.stackable_hash.as_str())
+                        partial_items.get(&item.stackable_hash)
                     {
                         let remaining_space = pair_item.stack_size - pair_item.count;
                         let items_to_move = min(item.count, remaining_space);
@@ -82,7 +83,7 @@ impl Service for DefraggerService {
 
                         return;
                     } else {
-                        partial_items.insert(item.stackable_hash.as_str(), (loc, slot, item));
+                        partial_items.insert(item.stackable_hash, (loc, slot, item));
                     }
                 }
             }

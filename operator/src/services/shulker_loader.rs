@@ -42,7 +42,7 @@ impl Service for ShulkerLoaderService {
         });
 
         for item in inv_listing.iter() {
-            if item.shulker_data().is_some() {
+            if item.shulker_data.is_some() {
                 continue;
             }
 
@@ -54,7 +54,7 @@ impl Service for ShulkerLoaderService {
 
             for (loc, slot, inv_item) in state.inventories.iter_slots() {
                 if full_stacks.len() == 27 {
-                    continue;
+                    break;
                 }
                 if let Some(inv_item) = inv_item {
                     if inv_item.stackable_hash != item.stackable_hash {
@@ -98,7 +98,7 @@ impl Service for ShulkerLoaderService {
 
                 let empty_shulker = state.inventories.iter_slots().find(|(loc, slot, item)| {
                     item.as_ref()
-                        .and_then(|item| item.shulker_data())
+                        .and_then(|item| item.shulker_data.as_ref())
                         .map_or(false, |shulker_data| {
                             shulker_data.empty && shulker_data.name.is_none()
                         })
