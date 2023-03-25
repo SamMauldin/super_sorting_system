@@ -301,6 +301,7 @@ pub enum HoldRequestFilter {
     SlotLocation {
         location: Location,
         slot: u32,
+        open_from: Vec3,
     },
 }
 
@@ -308,12 +309,16 @@ impl HoldRequestFilter {
     pub fn attempt_match(&self, state: &mut State) -> Result<Vec<Hold>, HoldMatchError> {
         match self {
             Self::EmptySlot => {
-                for (loc, slot, item) in state.inventories.iter_slots() {
+                for (loc, slot, item, open_from) in state.inventories.iter_slots() {
                     if item.is_some() || state.holds.existing_hold(loc, slot as u32).is_some() {
                         continue;
                     }
 
-                    let hold = state.holds.create(loc, slot as u32).unwrap().clone();
+                    let hold = state
+                        .holds
+                        .create(loc, slot as u32, open_from)
+                        .unwrap()
+                        .clone();
 
                     return Ok(vec![hold]);
                 }
@@ -330,7 +335,7 @@ impl HoldRequestFilter {
                 let mut matching_items = state
                     .inventories
                     .iter_slots()
-                    .filter(|(loc, slot, item)| {
+                    .filter(|(loc, slot, item, _open_from)| {
                         item.as_ref()
                             .map(|item| {
                                 match_criteria.matches_item(&item)
@@ -338,13 +343,20 @@ impl HoldRequestFilter {
                             })
                             .unwrap_or(false)
                     })
-                    .map(|(loc, slot, item)| (loc, slot, item.as_ref().unwrap().clone()))
+                    .map(|(loc, slot, item, open_from)| {
+                        (loc, slot, item.as_ref().unwrap().clone(), open_from)
+                    })
                     .collect::<Vec<_>>();
 
-                matching_items.sort_by(|(_, _, a), (_, _, b)| a.count.cmp(&b.count).reverse());
+                matching_items
+                    .sort_by(|(_, _, a, _), (_, _, b, _)| a.count.cmp(&b.count).reverse());
 
-                for (loc, slot, item) in matching_items.iter() {
-                    let hold = state.holds.create(*loc, *slot as u32).unwrap().clone();
+                for (loc, slot, item, open_from) in matching_items.iter() {
+                    let hold = state
+                        .holds
+                        .create(*loc, *slot as u32, *open_from)
+                        .unwrap()
+                        .clone();
                     holds.push(hold);
 
                     total_remaining -= item.count as i64;
@@ -359,12 +371,20 @@ impl HoldRequestFilter {
                     return Err(HoldMatchError::NoMatch);
                 }
             }
-            Self::SlotLocation { location, slot } => {
+            Self::SlotLocation {
+                location,
+                slot,
+                open_from,
+            } => {
                 if state.holds.existing_hold(*location, *slot).is_some() {
                     return Err(HoldMatchError::AlreadyHeld);
                 }
 
-                let hold = state.holds.create(*location, *slot).unwrap().clone();
+                let hold = state
+                    .holds
+                    .create(*location, *slot, *open_from)
+                    .unwrap()
+                    .clone();
 
                 return Ok(vec![hold]);
             }
@@ -376,4 +396,5 @@ impl HoldRequestFilter {
 pub struct Inventory {
     pub slots: Vec<Option<Item>>,
     pub scanned_at: DateTime<Utc>,
+    pub open_from: Vec3,
 }

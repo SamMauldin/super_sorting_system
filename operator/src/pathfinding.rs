@@ -3,7 +3,10 @@ use serde::Serialize;
 use thiserror::Error;
 
 use crate::{
-    state::{sign_config::CompiledSignConfig, State},
+    state::{
+        sign_config::{CompiledSignConfig, StorageComplex},
+        State,
+    },
     types::{Dimension, Location, Vec2, Vec3},
 };
 
@@ -17,19 +20,46 @@ pub enum PathfindingError {
 
 // Is the given point inside a complex? If so, which one?
 fn is_in_complex(loc: Location, sign_config: &CompiledSignConfig) -> Option<String> {
-    for (name, complex) in sign_config.complexes.iter() {
-        if loc.dim != complex.dimension {
-            continue;
-        }
+    for (_name, complex) in sign_config.complexes.iter() {
+        match complex {
+            StorageComplex::Tower {
+                dimension,
+                name,
+                origin,
+                height,
+            } => {
+                if loc.dim != *dimension {
+                    continue;
+                }
 
-        if loc.vec3.y != complex.y_level + 1 {
-            continue;
-        }
+                if loc.vec3.y < origin.y || loc.vec3.y > (origin.y + (*height as i32)) {
+                    continue;
+                }
 
-        let (b1, b2) = complex.bounds;
+                if Vec2::from(*origin) == Vec2::from(loc.vec3) {
+                    return Some(name.clone());
+                }
+            }
+            StorageComplex::FlatFloor {
+                dimension,
+                name,
+                y_level,
+                bounds,
+            } => {
+                if loc.dim != *dimension {
+                    continue;
+                }
 
-        if Vec2::from(loc.vec3).contained_by(b1, b2, 1) {
-            return Some(name.clone());
+                if loc.vec3.y != y_level + 1 {
+                    continue;
+                }
+
+                let (b1, b2) = bounds;
+
+                if Vec2::from(loc.vec3).contained_by(*b1, *b2, 1) {
+                    return Some(name.clone());
+                }
+            }
         }
     }
 

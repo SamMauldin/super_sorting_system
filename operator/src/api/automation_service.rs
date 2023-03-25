@@ -9,13 +9,14 @@ use crate::{
         operations::{Operation, OperationKind, OperationPriority},
         StateData,
     },
-    types::{HoldMatchError, HoldRequestFilter, Item, Location},
+    types::{HoldMatchError, HoldRequestFilter, Item, Location, Vec3},
 };
 
 #[derive(Serialize)]
 struct InventoryWithLoc {
     pub slots: Vec<Option<Item>>,
     pub loc: Location,
+    pub open_from: Vec3,
 }
 
 #[get("/inventory_contents")]
@@ -28,6 +29,7 @@ async fn inventory_contents(state: StateData) -> impl Responder {
         .map(|(loc, inv)| InventoryWithLoc {
             slots: inv.slots.clone(),
             loc: *loc,
+            open_from: inv.open_from,
         })
         .collect();
 

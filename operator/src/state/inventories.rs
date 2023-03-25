@@ -1,6 +1,6 @@
 use hashbrown::{hash_map::Iter, HashMap};
 
-use crate::types::{Inventory, Item, Location};
+use crate::types::{Inventory, Item, Location, Vec3};
 
 pub struct InventoryState {
     inventory_map: HashMap<Location, Inventory>,
@@ -27,12 +27,12 @@ impl InventoryState {
         self.inventory_map.iter()
     }
 
-    pub fn iter_slots(&self) -> impl Iterator<Item = (Location, usize, &Option<Item>)> {
+    pub fn iter_slots(&self) -> impl Iterator<Item = (Location, usize, &Option<Item>, Vec3)> {
         self.iter_inventories().flat_map(|(&loc, inv)| {
             inv.slots
                 .iter()
                 .enumerate()
-                .map(move |(slot, item)| (loc, slot, item))
+                .map(move |(slot, item)| (loc, slot, item, inv.open_from))
         })
     }
 
@@ -49,7 +49,7 @@ impl InventoryState {
             }
         };
 
-        for (_loc, _slot, item) in self.iter_slots() {
+        for (_loc, _slot, item, _open_from) in self.iter_slots() {
             if let Some(item) = item {
                 if let Some(shulker_data) = &item.shulker_data {
                     let is_empty = shulker_data.contained_items.len() == 0;

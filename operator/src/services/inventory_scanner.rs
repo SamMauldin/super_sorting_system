@@ -7,6 +7,7 @@ use crate::{
     config::Config,
     state::{
         operations::{OperationKind, OperationPriority, OperationStatus},
+        sign_config::StorageComplex,
         State,
     },
     types::{Location, Vec3},
@@ -16,6 +17,7 @@ use super::service::Service;
 
 struct TrackedInventory {
     location: Location,
+    open_from: Vec3,
     current_scan_operation_id: Option<Uuid>,
 }
 
@@ -34,33 +36,83 @@ impl Service for InventoryScannerService {
         let sign_config = state.sign_config.get_config();
 
         for (_name, complex) in sign_config.complexes.iter() {
-            let bounds = complex.bounds;
-            let y = complex.y_level;
+            match complex {
+                StorageComplex::FlatFloor {
+                    dimension,
+                    name: _name,
+                    y_level,
+                    bounds,
+                } => {
+                    let x1 = bounds.0.x;
+                    let x2 = bounds.1.x;
+                    let z1 = bounds.0.z;
+                    let z2 = bounds.1.z;
 
-            let x1 = bounds.0.x;
-            let x2 = bounds.1.x;
-            let z1 = bounds.0.z;
-            let z2 = bounds.1.z;
-
-            for x in min(x1, x2)..=max(x1, x2) {
-                for z in min(z1, z2)..=max(z1, z2) {
-                    if self.tracked_inventories.iter().any(|inv| {
-                        inv.location
-                            == Location {
-                                vec3: Vec3 { x, y, z },
-                                dim: complex.dimension,
+                    for x in min(x1, x2)..=max(x1, x2) {
+                        for z in min(z1, z2)..=max(z1, z2) {
+                            if self.tracked_inventories.iter().any(|inv| {
+                                inv.location
+                                    == Location {
+                                        vec3: Vec3 { x, y: *y_level, z },
+                                        dim: *dimension,
+                                    }
+                            }) {
+                                continue;
                             }
-                    }) {
-                        continue;
-                    }
 
-                    self.tracked_inventories.push(TrackedInventory {
-                        location: Location {
-                            vec3: crate::types::Vec3 { x, y, z },
-                            dim: complex.dimension,
-                        },
-                        current_scan_operation_id: None,
-                    })
+                            self.tracked_inventories.push(TrackedInventory {
+                                location: Location {
+                                    vec3: Vec3 { x, y: *y_level, z },
+                                    dim: *dimension,
+                                },
+                                open_from: Vec3 {
+                                    x,
+                                    y: (*y_level + 1),
+                                    z,
+                                },
+                                current_scan_operation_id: None,
+                            })
+                        }
+                    }
+                }
+                StorageComplex::Tower {
+                    dimension,
+                    name: _name,
+                    origin,
+                    height,
+                } => {
+                    for y in (origin.y)..=(origin.y + (*height as i32) - 1) {
+                        for x in (origin.x - 4)..=(origin.x + 4) {
+                            for z in (origin.z - 4)..=(origin.z + 4) {
+                                if x == origin.x && z == origin.z {
+                                    continue;
+                                }
+
+                                if self.tracked_inventories.iter().any(|inv| {
+                                    inv.location
+                                        == Location {
+                                            vec3: Vec3 { x, y, z },
+                                            dim: *dimension,
+                                        }
+                                }) {
+                                    continue;
+                                }
+
+                                self.tracked_inventories.push(TrackedInventory {
+                                    location: Location {
+                                        vec3: Vec3 { x, y, z },
+                                        dim: *dimension,
+                                    },
+                                    open_from: Vec3 {
+                                        x: origin.x,
+                                        y,
+                                        z: origin.z,
+                                    },
+                                    current_scan_operation_id: None,
+                                })
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -98,6 +150,7 @@ impl Service for InventoryScannerService {
 
             let kind = OperationKind::ScanInventory {
                 location: inventory.location,
+                open_from: inventory.open_from,
             };
 
             let op = state.operations.queue_operation(priority, kind);

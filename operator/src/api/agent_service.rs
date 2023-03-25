@@ -15,7 +15,7 @@ use crate::{
         sign_config::Sign,
         StateData,
     },
-    types::{Dimension, Inventory, Location, UnhashedItem, Vec2},
+    types::{Dimension, Inventory, Location, UnhashedItem, Vec2, Vec3},
 };
 
 #[derive(Serialize)]
@@ -124,12 +124,12 @@ async fn free_hold(_agent: Agent, state: StateData) -> impl Responder {
     let mut state_lock = state.lock().unwrap();
     let state = state_lock.deref_mut();
 
-    for (loc, slot, item) in state.inventories.iter_slots() {
+    for (loc, slot, item, open_from) in state.inventories.iter_slots() {
         if item.is_some() || state.holds.existing_hold(loc, slot as u32).is_some() {
             continue;
         }
 
-        let hold = state.holds.create(loc, slot as u32).unwrap();
+        let hold = state.holds.create(loc, slot as u32, open_from).unwrap();
 
         return HttpResponse::Ok().json(FreeHoldResponse::HoldAcquired { hold: hold.clone() });
     }
@@ -196,6 +196,7 @@ async fn operation_complete(
 pub struct InventoryScannedRequest {
     location: Location,
     slots: Vec<Option<UnhashedItem>>,
+    open_from: Vec3,
 }
 
 #[post("/inventory_scanned")]
@@ -205,6 +206,7 @@ async fn inventory_scanned(
     inventory_data: web::Json<InventoryScannedRequest>,
 ) -> impl Responder {
     let mut state = state.lock().unwrap();
+    let open_from = inventory_data.open_from;
 
     state.inventories.set_inventory_at(
         inventory_data.location,
@@ -219,6 +221,7 @@ async fn inventory_scanned(
                 })
                 .collect(),
             scanned_at: Utc::now(),
+            open_from,
         },
     );
 

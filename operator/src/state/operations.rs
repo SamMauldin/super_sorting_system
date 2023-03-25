@@ -32,6 +32,7 @@ pub struct Operation {
 pub enum OperationKind {
     ScanInventory {
         location: Location,
+        open_from: Vec3,
     },
     ScanSigns {
         location: Location,
@@ -40,7 +41,7 @@ pub enum OperationKind {
     MoveItems {
         source_hold: Uuid,
         destination_hold: Uuid,
-        count: u32,
+        count: i32,
     },
     DropItems {
         drop_from: Location,

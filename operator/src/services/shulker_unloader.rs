@@ -40,7 +40,7 @@ impl Service for ShulkerUnloaderService {
             shulker_unpacking: ShulkerUnpacking::None,
         });
 
-        'shulker: for (loc, slot, item) in state.inventories.iter_slots() {
+        'shulker: for (loc, slot, item, open_from) in state.inventories.iter_slots() {
             if let Some(item) = item {
                 if let Some(shulker_data) = &item.shulker_data {
                     if shulker_data.name.is_some() {
@@ -83,18 +83,19 @@ impl Service for ShulkerUnloaderService {
                         }
                     }
 
-                    let shulker_hold_id = state.holds.create(loc, slot as u32).unwrap().id;
+                    let shulker_hold_id =
+                        state.holds.create(loc, slot as u32, open_from).unwrap().id;
                     let mut destination_hold_ids = vec![];
 
                     for _ in 0..27 {
-                        for (loc, slot, item) in state.inventories.iter_slots() {
+                        for (loc, slot, item, open_from) in state.inventories.iter_slots() {
                             if item.is_some()
                                 || state.holds.existing_hold(loc, slot as u32).is_some()
                             {
                                 continue;
                             }
 
-                            let hold = state.holds.create(loc, slot as u32).unwrap();
+                            let hold = state.holds.create(loc, slot as u32, open_from).unwrap();
 
                             destination_hold_ids.push(hold.id);
 

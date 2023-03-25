@@ -47,7 +47,7 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
       z: parseInt(chunk.chunkZ) * 16
     };
 
-    const scanRegion = getSignsInChunk(bot, chunkPos);
+    const scanRegion = getSignsInChunk(bot, chunkPos, chunk);
     if (scanRegion) scannedRegions.push(scanRegion);
 
     await yieldTick();
@@ -56,39 +56,42 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
   return scannedRegions;
 };
 
-const getSignsInChunk = (bot: Bot, chunkPos: Vec3): ScanRegion | null => {
-  const data = require('minecraft-data')(bot._client.version);
+const parseLine = (line: any): string => {
+  const valParsed = JSON.parse(line['value']);
+  return valParsed['text'];
+};
 
-  const signBlockIds: number[] = Object.values(data.blocksByName)
-    .filter((b: any) => b.name.includes('_sign'))
-    .map((b: any) => b.id);
-
-  const chunk = bot.world.getColumnAt(chunkPos);
-
-  if (!chunk) return null;
-
+const getSignsInChunk = (
+  bot: Bot,
+  chunkPos: Vec3,
+  chunk: any
+): ScanRegion | null => {
   const signs: Sign[] = [];
 
-  for (let x = 0; x < 16; x++) {
-    for (let y = chunk.minY; y < chunk.worldHeight; y++) {
-      for (let z = 0; z < 16; z++) {
-        const type = chunk.getBlockType({ x, y, z });
-
-        if (signBlockIds.includes(type)) {
-          const signBlock = bot.blockAt(
-            vec3({ x: chunkPos.x + x, y, z: chunkPos.z + z })
-          );
-          if (!signBlock || !signBlock.signText) continue;
-
-          signs.push({
-            lines: signBlock.signText?.split('\n'),
-            location: {
-              vec3: { x: chunkPos.x + x, y, z: chunkPos.z + z },
-              dim: stringToDim(bot.game.dimension)
-            }
-          });
-        }
-      }
+  for (const [posStr, blockEntityData] of Object.entries<any>(
+    chunk.column.blockEntities
+  )) {
+    if (
+      blockEntityData &&
+      'value' in blockEntityData &&
+      'Text1' in blockEntityData['value']
+    ) {
+      const posElements = posStr.split(',').map((val: string) => parseInt(val));
+      const vec = {
+        x: posElements[0] + chunkPos.x,
+        y: posElements[1] + chunkPos.y,
+        z: posElements[2] + chunkPos.z
+      };
+      const lines = [
+        parseLine(blockEntityData['value']['Text1']),
+        parseLine(blockEntityData['value']['Text2']),
+        parseLine(blockEntityData['value']['Text3']),
+        parseLine(blockEntityData['value']['Text4'])
+      ];
+      signs.push({
+        location: { vec3: vec, dim: stringToDim(bot.game.dimension) },
+        lines
+      });
     }
   }
 

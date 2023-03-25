@@ -118,17 +118,28 @@ const main = async () => {
         const complex = Object.values(complexes)[0];
 
         if (complex) {
-          await navigateTo(
-            {
-              dim: complex.dimension,
-              vec3: {
-                ...complex.bounds[0],
-                y: complex.y_level + 1
-              }
-            },
-            bot,
-            agent
-          );
+          if ('Tower' in complex) {
+            await navigateTo(
+              {
+                dim: complex.Tower.dimension,
+                vec3: complex.Tower.origin
+              },
+              bot,
+              agent
+            );
+          } else if ('FlatFloor' in complex) {
+            await navigateTo(
+              {
+                dim: complex.FlatFloor.dimension,
+                vec3: {
+                  ...complex.FlatFloor.bounds[0],
+                  y: complex.FlatFloor.y_level + 1
+                }
+              },
+              bot,
+              agent
+            );
+          }
         }
 
         atHome = true;

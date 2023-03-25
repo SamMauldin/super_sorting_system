@@ -25,7 +25,7 @@ pub fn calculate_stats(state: &State) -> Stats {
     let free_slots = state
         .inventories
         .iter_slots()
-        .filter(|(_, _, slot)| slot.is_none())
+        .filter(|(_, _, slot, _)| slot.is_none())
         .count();
 
     let current_holds = state.holds.iter().count();

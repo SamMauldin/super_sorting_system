@@ -8,7 +8,7 @@ use crate::{
     config::Config,
     state::operations::{OperationKind, OperationPriority, OperationStatus},
     state::State,
-    types::{Item, Location},
+    types::{Item, Location, Vec3},
 };
 
 pub struct DefraggerService {
@@ -48,24 +48,27 @@ impl Service for DefraggerService {
             }
         }
 
-        let mut partial_items: HashMap<u64, (Location, usize, &Item)> = HashMap::new();
+        let mut partial_items: HashMap<u64, (Location, usize, &Item, Vec3)> = HashMap::new();
 
-        for (loc, slot, item) in state.inventories.iter_slots() {
+        for (loc, slot, item, open_from) in state.inventories.iter_slots() {
             if let Some(item) = item {
                 if item.count < item.stack_size {
                     if state.holds.existing_hold(loc, slot as u32).is_some() {
                         continue;
                     }
 
-                    if let Some((pair_loc, pair_slot, pair_item)) =
+                    if let Some((pair_loc, pair_slot, pair_item, pair_open_from)) =
                         partial_items.get(&item.stackable_hash)
                     {
                         let remaining_space = pair_item.stack_size - pair_item.count;
                         let items_to_move = min(item.count, remaining_space);
 
-                        let hold_id = state.holds.create(loc, slot as u32).unwrap().id;
-                        let pair_hold_id =
-                            state.holds.create(*pair_loc, *pair_slot as u32).unwrap().id;
+                        let hold_id = state.holds.create(loc, slot as u32, open_from).unwrap().id;
+                        let pair_hold_id = state
+                            .holds
+                            .create(*pair_loc, *pair_slot as u32, *pair_open_from)
+                            .unwrap()
+                            .id;
 
                         let queued_op_id = state
                             .operations
@@ -74,7 +77,7 @@ impl Service for DefraggerService {
                                 OperationKind::MoveItems {
                                     source_hold: hold_id,
                                     destination_hold: pair_hold_id,
-                                    count: items_to_move,
+                                    count: items_to_move as i32,
                                 },
                             )
                             .id;
@@ -83,7 +86,7 @@ impl Service for DefraggerService {
 
                         return;
                     } else {
-                        partial_items.insert(item.stackable_hash, (loc, slot, item));
+                        partial_items.insert(item.stackable_hash, (loc, slot, item, open_from));
                     }
                 }
             }

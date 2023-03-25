@@ -4,6 +4,7 @@ import {
   DeliveryItems,
 } from '../api/delivery';
 import { pickupItems as apiPickupItems } from '../api/pickup';
+import { complexTransfer as apiComplexTransfer } from '../api/complex_transfer';
 
 export type ActionStatus = 'in-progress' | 'complete' | 'failed';
 export type ActionDetails = {
@@ -19,13 +20,19 @@ export type PickupAction = ActionDetails & {
   type: 'pickup';
   node: string;
 };
+export type ComplexTransfer = ActionDetails & {
+  type: 'complex_transfer';
+  from_complex: string;
+  to_complex: string;
+};
 
-export type Action = DeliveryAction | PickupAction;
+export type Action = DeliveryAction | PickupAction | ComplexTransfer;
 
 export type ActionController = {
   currentActions: Action[];
   deliverItems: (node: string, items: DeliveryItems) => void;
   pickupItems: (node: string) => void;
+  complexTransfer: (from_complex: string, to_complex: string) => void;
 };
 
 export const useActionController = (): ActionController => {
@@ -90,5 +97,21 @@ export const useActionController = (): ActionController => {
       .catch(() => finishAction(actionId, 'failed'));
   };
 
-  return { currentActions, deliverItems, pickupItems };
+  const complexTransfer = (fromComplexName: string, toComplexName: string) => {
+    const actionId = getNextActionId();
+    setCurrentActions((actions) => [
+      ...actions,
+      {
+        id: actionId,
+        status: 'in-progress',
+        type: 'complex_transfer',
+        from_complex: fromComplexName,
+        to_complex: toComplexName,
+      },
+    ]);
+
+    apiComplexTransfer(fromComplexName, toComplexName);
+  };
+
+  return { currentActions, deliverItems, pickupItems, complexTransfer };
 };

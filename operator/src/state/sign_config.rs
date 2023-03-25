@@ -136,6 +136,17 @@ pub struct Sign {
 // Line 3: Offset similar to line 1 of complex end. This offset is specified from the effective location of the sign
 // Line 4: Name of complex
 
+/*
+ * Storage Tower Signs
+ * These signs indicate a 9x9 tower of chests with a hole in the middle
+ * It is assumed that any pathfinding connections have a clear path, either above or below the
+ * tower
+ */
+
+// Line 2: Sign type: "storage tower"
+// Line 3: Height
+// Name of tower
+
 #[derive(Debug)]
 pub enum ParsedSign {
     PathfindingNode {
@@ -168,6 +179,12 @@ pub enum ParsedSign {
         bounds: (Vec2, Vec2),
         name: String,
     },
+    StorageTower {
+        dimension: Dimension,
+        origin: Vec3,
+        height: u32,
+        name: String,
+    },
 }
 
 #[derive(Error, Debug, Serialize)]
@@ -181,6 +198,8 @@ pub enum SignParseError {
     UnknownSignType,
     #[error("Name must not be empty")]
     NameEmpty,
+    #[error("Unable to parse height")]
+    BadHeight,
 }
 
 #[derive(Error, Debug, Serialize)]
@@ -303,6 +322,12 @@ impl TryFrom<&Sign> for ParsedSign {
                     ),
                 })
             }
+            "storage tower" => Ok(ParsedSign::StorageTower {
+                dimension: effective_location.dim,
+                origin: effective_location.vec3,
+                height: s.lines[2].parse().map_err(|_| SignParseError::BadHeight)?,
+                name: s.lines[3].clone(),
+            }),
             _ => Err(SignParseError::UnknownSignType),
         }
     }
@@ -326,11 +351,19 @@ pub struct PathfindingNode {
 }
 
 #[derive(Serialize)]
-pub struct StorageComplex {
-    pub dimension: Dimension,
-    pub y_level: i32,
-    pub bounds: (Vec2, Vec2),
-    pub name: String,
+pub enum StorageComplex {
+    FlatFloor {
+        dimension: Dimension,
+        name: String,
+        y_level: i32,
+        bounds: (Vec2, Vec2),
+    },
+    Tower {
+        dimension: Dimension,
+        name: String,
+        origin: Vec3,
+        height: u32,
+    },
 }
 
 #[derive(Serialize)]
@@ -449,6 +482,37 @@ impl SignConfigState {
                         )
                     }
                 }
+                ParsedSign::StorageTower {
+                    origin,
+                    height: _height,
+                    dimension,
+                    name,
+                } => {
+                    let existing_node = nodes.insert(
+                        name.clone(),
+                        PathfindingNode {
+                            name: name.clone(),
+                            location: Location {
+                                vec3: *origin,
+                                dim: *dimension,
+                            },
+                            connections: Vec::new(),
+                            pickup: None,
+                            dropoff: None,
+                            portal: None,
+                            shulker_station: false,
+                        },
+                    );
+
+                    if existing_node.is_some() {
+                        validation_errors.push(
+                            SignConfigValidationError::DuplicatePathfindingNode {
+                                name: name.clone(),
+                            },
+                        )
+                    }
+                }
+
                 _ => {}
             };
         });
@@ -579,11 +643,29 @@ impl SignConfigState {
             {
                 complexes.insert(
                     name.clone(),
-                    StorageComplex {
+                    StorageComplex::FlatFloor {
                         name: name.clone(),
                         dimension: *dimension,
                         y_level: *y_level,
                         bounds: *bounds,
+                    },
+                );
+            }
+
+            if let ParsedSign::StorageTower {
+                dimension,
+                origin,
+                height,
+                name,
+            } = sign
+            {
+                complexes.insert(
+                    name.clone(),
+                    StorageComplex::Tower {
+                        name: name.clone(),
+                        dimension: *dimension,
+                        origin: *origin,
+                        height: *height,
                     },
                 );
             }

@@ -19,6 +19,15 @@ export const locEq = (a: Loc, b: Loc) =>
 
 export type Vec2 = Omit<Vec3, 'y'>;
 
+export const vec2ContainedBy = (bounds: [Vec2, Vec2], vec: Vec2) => {
+  const minX = Math.min(bounds[0].x, bounds[1].x);
+  const maxX = Math.max(bounds[0].x, bounds[1].x);
+  const minZ = Math.min(bounds[0].z, bounds[1].z);
+  const maxZ = Math.max(bounds[0].z, bounds[1].z);
+
+  return minX <= vec.x && maxX >= vec.x && minZ <= vec.z && maxZ >= vec.z;
+};
+
 export type Hold = {
   id: string;
   location: Loc;

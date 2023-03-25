@@ -3,6 +3,7 @@ import { Dimension, Item, Loc, Vec2, Vec3 } from './types';
 export type InventoryWithLoc = {
   slots: Array<Item | null>;
   loc: Loc;
+  open_from: Vec3;
 };
 
 export type InventoriesWithLoc = Array<InventoryWithLoc>;
@@ -16,10 +17,18 @@ export type PathfindingNode = {
 };
 
 export type StorageComplex = {
-  dimension: Dimension;
-  y_level: number;
-  bounds: [Vec2, Vec2];
-  name: string;
+  FlatFloor: {
+    dimension: Dimension;
+    y_level: number;
+    bounds: [Vec2, Vec2];
+    name: string;
+  };
+  Tower: {
+    dimension: Dimension;
+    origin: Vec3;
+    name: string;
+    height: number;
+  };
 };
 
 type SignParseError = {
@@ -72,6 +81,7 @@ export type HoldRequestFilter =
       SlotLocation: {
         location: Loc;
         slot: number;
+        open_from: Vec3;
       };
     };
 

@@ -9,6 +9,7 @@ import {
   ScreenMenu,
   useActionController,
 } from './common';
+import { Admin } from './screens/Admin';
 
 export const App = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('delivery');
@@ -33,6 +34,9 @@ export const App = () => {
           ev.preventDefault();
         } else if (ev.key === 'h') {
           setCurrentScreen('help');
+          ev.preventDefault();
+        } else if (ev.key === 'a') {
+          setCurrentScreen('admin');
           ev.preventDefault();
         }
       }
@@ -63,6 +67,9 @@ export const App = () => {
       {currentScreen === 'config' && <Config />}
       {currentScreen === 'stats' && <Stats />}
       {currentScreen === 'help' && <Help />}
+      {currentScreen === 'admin' && (
+        <Admin actionController={actionController} />
+      )}
     </Container>
   );
 };

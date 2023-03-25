@@ -12,16 +12,29 @@ export const moveItems = async (
 ) => {
   const {
     data: {
-      hold: { location: sourceLocation, slot: sourceSlot }
+      hold: {
+        location: sourceLocation,
+        slot: sourceSlot,
+        open_from: sourceOpenFrom
+      }
     }
   } = await getHold(operationKind.source_hold, agent);
   const {
     data: {
-      hold: { location: destinationLocation, slot: destinationSlot }
+      hold: {
+        location: destinationLocation,
+        slot: destinationSlot,
+        open_from: destOpenFrom
+      }
     }
   } = await getHold(operationKind.destination_hold, agent);
 
-  const sourceChest = await openChestAt(sourceLocation, bot, agent);
+  const sourceChest = await openChestAt(
+    sourceLocation,
+    sourceOpenFrom,
+    bot,
+    agent
+  );
 
   await transferItems(
     bot,
@@ -32,11 +45,16 @@ export const moveItems = async (
     'from_chest'
   );
 
-  await sendChestData(sourceChest, sourceLocation, agent);
+  await sendChestData(sourceChest, sourceLocation, sourceOpenFrom, agent);
 
   sourceChest.close();
 
-  const destChest = await openChestAt(destinationLocation, bot, agent);
+  const destChest = await openChestAt(
+    destinationLocation,
+    destOpenFrom,
+    bot,
+    agent
+  );
 
   await transferItems(
     bot,
@@ -47,7 +65,7 @@ export const moveItems = async (
     'to_chest'
   );
 
-  await sendChestData(destChest, destinationLocation, agent);
+  await sendChestData(destChest, destinationLocation, destOpenFrom, agent);
 
   destChest.close();
 };

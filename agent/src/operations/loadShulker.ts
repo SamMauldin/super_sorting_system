@@ -3,7 +3,13 @@ import { Window } from 'prismarine-windows';
 import { getHold } from '../controllerApi';
 import vec3 from 'vec3';
 
-import { Agent, locEq, Location, LoadShulkerOperationKind } from '../types';
+import {
+  Agent,
+  locEq,
+  Location,
+  LoadShulkerOperationKind,
+  Vec3
+} from '../types';
 import {
   navigateTo,
   openChestAt,
@@ -24,35 +30,63 @@ export const loadShulker = async (
 ) => {
   const {
     data: {
-      hold: { location: shulkerChestLocation, slot: shulkerChestSlot }
+      hold: {
+        location: shulkerChestLocation,
+        slot: shulkerChestSlot,
+        open_from: shulkerOpenFrom
+      }
     }
   } = await getHold(shulker_hold, agent);
 
   // Grab Shulker
-  let shulkerChest = await openChestAt(shulkerChestLocation, bot, agent);
+  let shulkerChest = await openChestAt(
+    shulkerChestLocation,
+    shulkerOpenFrom,
+    bot,
+    agent
+  );
   await transferItems(bot, shulkerChest, shulkerChestSlot, 27, 1, 'from_chest');
-  await sendChestData(shulkerChest, shulkerChestLocation, agent);
+  await sendChestData(
+    shulkerChest,
+    shulkerChestLocation,
+    shulkerOpenFrom,
+    agent
+  );
   shulkerChest.close();
 
   // Grab Items to load
-  let lastChest: { location: Location; chest: Chest & Window } | null = null;
+  let lastChest: {
+    location: Location;
+    chest: Chest & Window;
+    openFrom: Vec3;
+  } | null = null;
 
   for (const [inv_slot, hold_id] of source_holds.entries()) {
     if (!hold_id) continue;
     const {
       data: {
-        hold: { location: sourceLocation, slot: sourceSlot }
+        hold: {
+          location: sourceLocation,
+          slot: sourceSlot,
+          open_from: sourceOpenFrom
+        }
       }
     } = await getHold(hold_id, agent);
 
     if (lastChest && !locEq(sourceLocation, lastChest.location)) {
-      await sendChestData(lastChest.chest, lastChest.location, agent);
+      await sendChestData(
+        lastChest.chest,
+        lastChest.location,
+        lastChest.openFrom,
+        agent
+      );
       lastChest.chest.close();
       lastChest = null;
     }
 
     const chest: Chest & Window =
-      lastChest?.chest || (await openChestAt(sourceLocation, bot, agent));
+      lastChest?.chest ||
+      (await openChestAt(sourceLocation, sourceOpenFrom, bot, agent));
 
     await transferItems(
       bot,
@@ -63,11 +97,16 @@ export const loadShulker = async (
       'from_chest'
     );
 
-    lastChest = { chest, location: sourceLocation };
+    lastChest = { chest, location: sourceLocation, openFrom: sourceOpenFrom };
   }
 
   if (lastChest) {
-    await sendChestData(lastChest.chest, lastChest.location, agent);
+    await sendChestData(
+      lastChest.chest,
+      lastChest.location,
+      lastChest.openFrom,
+      agent
+    );
     lastChest.chest.close();
   }
 
@@ -112,8 +151,18 @@ export const loadShulker = async (
   }
 
   // Put Shulker back in Slot
-  shulkerChest = await openChestAt(shulkerChestLocation, bot, agent);
+  shulkerChest = await openChestAt(
+    shulkerChestLocation,
+    shulkerOpenFrom,
+    bot,
+    agent
+  );
   await transferItems(bot, shulkerChest, shulkerChestSlot, 27, 1, 'to_chest');
-  await sendChestData(shulkerChest, shulkerChestLocation, agent);
+  await sendChestData(
+    shulkerChest,
+    shulkerChestLocation,
+    shulkerOpenFrom,
+    agent
+  );
   shulkerChest.close();
 };

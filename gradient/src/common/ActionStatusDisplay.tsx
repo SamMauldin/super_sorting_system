@@ -35,6 +35,13 @@ export const ActionStatusDisplay = ({ actionController }: Props) => {
               Pickup from {action.node}: {friendlyStatusString(action.status)}
             </ActionStatusItem>
           );
+        } else if (action.type === 'complex_transfer') {
+          return (
+            <ActionStatusItem key={action.id}>
+              Complex transfer from {action.from_complex} to {action.to_complex}
+              : {friendlyStatusString(action.status)}
+            </ActionStatusItem>
+          );
         } else {
           return null;
         }

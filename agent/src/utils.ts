@@ -26,10 +26,10 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
       throw new Error('Could not acquire a free hold to clear inventory!');
 
     const {
-      hold: { location, slot, id }
+      hold: { location, slot, id, open_from }
     } = data;
 
-    const chest = await openChestAt(location, bot, agent);
+    const chest = await openChestAt(location, open_from, bot, agent);
 
     await transferItems(
       bot,
@@ -40,7 +40,7 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
       'to_chest'
     );
 
-    await sendChestData(chest, location, agent);
+    await sendChestData(chest, location, open_from, agent);
 
     chest.close();
 

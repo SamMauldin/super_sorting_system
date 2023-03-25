@@ -8,9 +8,19 @@ export const scanInventory = async (
   bot: Bot,
   agent: Agent
 ) => {
-  const chest = await openChestAt(operationKind.location, bot, agent);
+  const chest = await openChestAt(
+    operationKind.location,
+    operationKind.open_from,
+    bot,
+    agent
+  );
 
-  await sendChestData(chest, operationKind.location, agent);
+  await sendChestData(
+    chest,
+    operationKind.location,
+    operationKind.open_from,
+    agent
+  );
 
   chest.close();
 };

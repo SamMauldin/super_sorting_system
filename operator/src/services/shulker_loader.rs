@@ -52,7 +52,7 @@ impl Service for ShulkerLoaderService {
 
             let mut full_stacks = vec![];
 
-            for (loc, slot, inv_item) in state.inventories.iter_slots() {
+            for (loc, slot, inv_item, open_from) in state.inventories.iter_slots() {
                 if full_stacks.len() == 27 {
                     break;
                 }
@@ -69,15 +69,17 @@ impl Service for ShulkerLoaderService {
                         continue;
                     }
 
-                    full_stacks.push((loc, slot));
+                    full_stacks.push((loc, slot, open_from));
                 }
             }
 
             if full_stacks.len() == 27 {
                 let mut holds = vec![];
 
-                for (loc, slot) in full_stacks.into_iter() {
-                    holds.push(Some(state.holds.create(loc, slot as u32).unwrap().id));
+                for (loc, slot, open_from) in full_stacks.into_iter() {
+                    holds.push(Some(
+                        state.holds.create(loc, slot as u32, open_from).unwrap().id,
+                    ));
                 }
 
                 let sign_config = state.sign_config.get_config();
@@ -96,17 +98,21 @@ impl Service for ShulkerLoaderService {
                     return;
                 };
 
-                let empty_shulker = state.inventories.iter_slots().find(|(loc, slot, item)| {
-                    item.as_ref()
-                        .and_then(|item| item.shulker_data.as_ref())
-                        .map_or(false, |shulker_data| {
-                            shulker_data.empty && shulker_data.name.is_none()
-                        })
-                        && state.holds.existing_hold(*loc, *slot as u32).is_none()
-                });
+                let empty_shulker =
+                    state
+                        .inventories
+                        .iter_slots()
+                        .find(|(loc, slot, item, _open_from)| {
+                            item.as_ref()
+                                .and_then(|item| item.shulker_data.as_ref())
+                                .map_or(false, |shulker_data| {
+                                    shulker_data.empty && shulker_data.name.is_none()
+                                })
+                                && state.holds.existing_hold(*loc, *slot as u32).is_none()
+                        });
 
-                let empty_shulker_hold = if let Some((loc, slot, _)) = empty_shulker {
-                    state.holds.create(loc, slot as u32).unwrap().id
+                let empty_shulker_hold = if let Some((loc, slot, _, open_from)) = empty_shulker {
+                    state.holds.create(loc, slot as u32, open_from).unwrap().id
                 } else {
                     return;
                 };

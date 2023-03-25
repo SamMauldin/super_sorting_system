@@ -2,7 +2,13 @@ import { Bot, Chest } from 'mineflayer';
 import { Window } from 'prismarine-windows';
 import { getHold } from '../controllerApi';
 
-import { Agent, ImportInventoryOperationKind, locEq, Location } from '../types';
+import {
+  Agent,
+  ImportInventoryOperationKind,
+  locEq,
+  Location,
+  Vec3
+} from '../types';
 import {
   navigateTo,
   openChestAt,
@@ -23,6 +29,7 @@ export const importInventory = async (
 
   const sourceChest = await openChestAt(
     { dim: node_location.dim, vec3: chest_location },
+    node_location.vec3,
     bot,
     agent,
     true
@@ -54,23 +61,37 @@ export const importInventory = async (
 
   sourceChest.close();
 
-  let lastChest: { location: Location; chest: Chest & Window } | null = null;
+  let lastChest: {
+    location: Location;
+    chest: Chest & Window;
+    openFrom: Vec3;
+  } | null = null;
 
   for (let i = 0; i < takenItemsCount; i++) {
     const {
       data: {
-        hold: { location: destinationLocation, slot: destinationSlot }
+        hold: {
+          location: destinationLocation,
+          slot: destinationSlot,
+          open_from: destOpenFrom
+        }
       }
     } = await getHold(destination_holds[i], agent);
 
     if (lastChest && !locEq(destinationLocation, lastChest.location)) {
-      await sendChestData(lastChest.chest, lastChest.location, agent);
+      await sendChestData(
+        lastChest.chest,
+        lastChest.location,
+        lastChest.openFrom,
+        agent
+      );
       lastChest.chest.close();
       lastChest = null;
     }
 
     const destChest: Chest & Window =
-      lastChest?.chest || (await openChestAt(destinationLocation, bot, agent));
+      lastChest?.chest ||
+      (await openChestAt(destinationLocation, destOpenFrom, bot, agent));
 
     await transferItems(
       bot,
@@ -81,11 +102,20 @@ export const importInventory = async (
       'to_chest'
     );
 
-    lastChest = { chest: destChest, location: destinationLocation };
+    lastChest = {
+      chest: destChest,
+      location: destinationLocation,
+      openFrom: destOpenFrom
+    };
   }
 
   if (lastChest) {
-    await sendChestData(lastChest.chest, lastChest.location, agent);
+    await sendChestData(
+      lastChest.chest,
+      lastChest.location,
+      lastChest.openFrom,
+      agent
+    );
     lastChest.chest.close();
   }
 };

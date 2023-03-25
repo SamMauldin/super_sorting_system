@@ -1,6 +1,12 @@
 import styled from 'styled-components';
 
-export type Screen = 'delivery' | 'pickup' | 'config' | 'stats' | 'help';
+export type Screen =
+  | 'delivery'
+  | 'pickup'
+  | 'config'
+  | 'stats'
+  | 'help'
+  | 'admin';
 
 type Props = {
   screen: Screen;

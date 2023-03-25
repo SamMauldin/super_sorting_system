@@ -76,13 +76,15 @@ export const operationComplete = async (
 export const inventoryScanned = async (
   slots: Array<Item | null>,
   inventoryLocation: Location,
+  openFrom: Vec3,
   agent: Agent
 ): Promise<AxiosResponse<string>> =>
   axios.post(
     agentEndpoint('inventory_scanned'),
     {
       location: inventoryLocation,
-      slots
+      slots,
+      open_from: openFrom
     },
     { headers: agentHeader(agent) }
   );
@@ -169,10 +171,18 @@ export type PathfindingNode = {
 };
 
 export type StorageComplex = {
-  dimension: Dimension;
-  y_level: number;
-  bounds: [Vec2, Vec2];
-  name: string;
+  FlatFloor: {
+    dimension: Dimension;
+    y_level: number;
+    bounds: [Vec2, Vec2];
+    name: string;
+  };
+  Tower: {
+    dimension: Dimension;
+    origin: Vec3;
+    height: number;
+    name: string;
+  };
 };
 
 export type CompiledSignConfig = {

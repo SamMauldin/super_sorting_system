@@ -3,10 +3,11 @@ import { Window } from 'prismarine-windows';
 import vec3 from 'vec3';
 import { navigateTo } from '.';
 
-import { Agent, Location } from '../../types';
+import { Agent, Location, Vec3 } from '../../types';
 
 export const openChestAt = async (
   chestLoc: Location,
+  openFrom: Vec3,
   bot: Bot,
   agent: Agent,
   skipNavigation?: boolean
@@ -14,11 +15,8 @@ export const openChestAt = async (
   if (!skipNavigation)
     await navigateTo(
       {
-        ...chestLoc,
-        vec3: {
-          ...chestLoc.vec3,
-          y: chestLoc.vec3.y + 1
-        }
+        dim: chestLoc.dim,
+        vec3: openFrom
       },
       bot,
       agent

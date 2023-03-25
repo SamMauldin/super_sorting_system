@@ -62,6 +62,7 @@ export type Vec2 = Omit<Vec3, 'y'>;
 export type ScanInventoryOperationKind = {
   type: 'ScanInventory';
   location: Location;
+  open_from: Vec3;
 };
 
 export type ScanSignsOperationKind = {
@@ -128,6 +129,7 @@ export type Hold = {
   location: Location;
   slot: number;
   valid_until: string;
+  open_from: Vec3;
 };
 
 export type Item = {

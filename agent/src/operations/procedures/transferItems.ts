@@ -40,7 +40,7 @@ export const transferItems = async (
 
   assert(sourceItem);
 
-  if (count === Infinity) {
+  if (count === Infinity || count === -1) {
     count = sourceItem.count;
   }
   assert(sourceItem.count >= count);

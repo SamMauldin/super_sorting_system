@@ -3,7 +3,7 @@ import { Window } from 'prismarine-windows';
 import vec3 from 'vec3';
 
 import { getHold } from '../controllerApi';
-import { Agent, DropItemsOperationKind, Location, locEq } from '../types';
+import { Agent, DropItemsOperationKind, Location, locEq, Vec3 } from '../types';
 import {
   dropSlot,
   navigateTo,
@@ -17,23 +17,33 @@ export const dropItems = async (
   bot: Bot,
   agent: Agent
 ) => {
-  let lastChest: { location: Location; chest: Chest & Window } | null = null;
+  let lastChest: {
+    location: Location;
+    chest: Chest & Window;
+    openFrom: Vec3;
+  } | null = null;
 
   for (const [inv_slot, hold_id] of operationKind.source_holds.entries()) {
     const {
       data: {
-        hold: { location: sourceLocation, slot: sourceSlot }
+        hold: { location: sourceLocation, slot: sourceSlot, open_from }
       }
     } = await getHold(hold_id, agent);
 
     if (lastChest && !locEq(sourceLocation, lastChest.location)) {
-      await sendChestData(lastChest.chest, lastChest.location, agent);
+      await sendChestData(
+        lastChest.chest,
+        lastChest.location,
+        lastChest.openFrom,
+        agent
+      );
       lastChest.chest.close();
       lastChest = null;
     }
 
     const chest: Chest & Window =
-      lastChest?.chest || (await openChestAt(sourceLocation, bot, agent));
+      lastChest?.chest ||
+      (await openChestAt(sourceLocation, open_from, bot, agent));
 
     await transferItems(
       bot,
@@ -44,11 +54,16 @@ export const dropItems = async (
       'from_chest'
     );
 
-    lastChest = { chest, location: sourceLocation };
+    lastChest = { chest, location: sourceLocation, openFrom: open_from };
   }
 
   if (lastChest) {
-    await sendChestData(lastChest.chest, lastChest.location, agent);
+    await sendChestData(
+      lastChest.chest,
+      lastChest.location,
+      lastChest.openFrom,
+      agent
+    );
     lastChest.chest.close();
   }
 
