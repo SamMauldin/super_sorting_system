@@ -98,7 +98,7 @@ export const unloadShulker = async (
 
   // Wait for shulker to be collected
   while (true) {
-    await setTimeout(200);
+    await setTimeout(50);
     if (bot.inventory.slots[36]) break;
   }
 
