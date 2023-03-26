@@ -39,9 +39,9 @@ pub enum OperationKind {
         take_portal: Option<Vec3>,
     },
     MoveItems {
-        source_hold: Uuid,
-        destination_hold: Uuid,
-        count: i32,
+        source_holds: Vec<Uuid>,
+        destination_holds: Vec<Uuid>,
+        counts: Vec<i32>,
     },
     DropItems {
         drop_from: Location,
@@ -161,10 +161,12 @@ impl Operation {
         match &self.kind {
             OperationKind::ScanInventory { .. } | OperationKind::ScanSigns { .. } => vec![],
             OperationKind::MoveItems {
-                source_hold,
-                destination_hold,
+                source_holds,
+                destination_holds,
                 ..
-            } => vec![*source_hold, *destination_hold],
+            } => {
+                source_holds.iter().chain(destination_holds.iter()).map(|hold| *hold).collect()
+            }
             OperationKind::DropItems { source_holds, .. } => source_holds.clone(),
             OperationKind::ImportInventory {
                 destination_holds, ..

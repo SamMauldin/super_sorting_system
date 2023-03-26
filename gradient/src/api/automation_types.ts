@@ -115,9 +115,9 @@ export type ScanSignsOperationKind = {
 
 export type MoveItemsOperationKind = {
   type: 'MoveItems';
-  source_hold: string;
-  destination_hold: string;
-  count: number;
+  source_holds: string[];
+  destination_holds: string[];
+  counts: number[];
 };
 
 export type DropItemsOperationKind = {

@@ -29,17 +29,7 @@ impl Service for DefraggerService {
             if let Some(op) = op {
                 match op.status {
                     OperationStatus::Complete | OperationStatus::Aborted => {
-                        match op.kind {
-                            OperationKind::MoveItems {
-                                source_hold,
-                                destination_hold,
-                                count: _,
-                            } => {
-                                state.holds.remove(source_hold);
-                                state.holds.remove(destination_hold);
-                            }
-                            _ => panic!("Operation kind changed!"),
-                        }
+                        op.holds().iter().for_each(|hold| {state.holds.remove(*hold);} );
 
                         self.outstanding_operation = None
                     }
@@ -75,9 +65,9 @@ impl Service for DefraggerService {
                             .queue_operation(
                                 OperationPriority::Background,
                                 OperationKind::MoveItems {
-                                    source_hold: hold_id,
-                                    destination_hold: pair_hold_id,
-                                    count: items_to_move as i32,
+                                    source_holds: vec![hold_id],
+                                    destination_holds: vec![pair_hold_id],
+                                    counts: vec![items_to_move as i32],
                                 },
                             )
                             .id;

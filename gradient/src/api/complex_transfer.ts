@@ -96,14 +96,14 @@ export const complexTransfer = async (
   for (
     let i = 0;
     i < Math.min(destinationHolds.length, sourceHolds.length);
-    i++
+    i += 27
   ) {
     await createOperation(
       {
         type: 'MoveItems',
-        source_hold: sourceHolds[i],
-        destination_hold: destinationHolds[i],
-        count: -1,
+        source_holds: sourceHolds.slice(i, i + 27),
+        destination_holds: destinationHolds.slice(i, i + 27),
+        counts: Array(27).fill(-1),
       },
       'UserInteractive',
     );
