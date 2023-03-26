@@ -15,6 +15,7 @@ const formatShort = (num: number): string => {
 };
 
 export const CountSelectorModal = ({ startingCount, item, close }: Props) => {
+  const [debug, setDebug] = useState(false);
   const [rawCount, setRawCount] = useState(startingCount ? startingCount : 1);
   const [denomination, setDenomination] = useState<Denomination>(
     startingCount ? 'item' : 'stack',
@@ -47,6 +48,9 @@ export const CountSelectorModal = ({ startingCount, item, close }: Props) => {
     } else if (ev.key === 'ArrowDown' || ev.key === 'Down') {
       ev.preventDefault();
       setRawCount(rawCount - 1);
+    } else if (ev.key === '?') {
+      setDebug(!debug);
+      ev.preventDefault();
     } else if (ev.key === 'Tab') {
       ev.preventDefault();
       setDenomination((denom) => {
@@ -101,9 +105,19 @@ export const CountSelectorModal = ({ startingCount, item, close }: Props) => {
       <button type="submit" onClick={onClose}>
         Select
       </button>
+
+      {debug ? (
+        <pre>
+          <Json>{JSON.stringify(item, undefined, 2)}</Json>
+        </pre>
+      ) : null}
     </Container>
   );
 };
+
+const Json = styled.code`
+  overflow-wrap: anywhere;
+`;
 
 const Container = styled.div`
   padding: 10px;

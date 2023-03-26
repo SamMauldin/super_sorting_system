@@ -36,6 +36,10 @@ const GlobalStyle = createGlobalStyle`
 
     box-sizing: border-box;
   }
+
+  code {
+    font-family: 'Hack', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  }
 `;
 
 const queryClient = new QueryClient();
