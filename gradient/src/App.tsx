@@ -35,7 +35,7 @@ export const App = () => {
         } else if (ev.key === 'h') {
           setCurrentScreen('help');
           ev.preventDefault();
-        } else if (ev.key === 'a') {
+        } else if (ev.key === 'm') {
           setCurrentScreen('admin');
           ev.preventDefault();
         }

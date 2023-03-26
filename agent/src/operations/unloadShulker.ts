@@ -59,14 +59,14 @@ export const unloadShulker = async (
   bot.setQuickBarSlot(0);
   bot.updateHeldItem();
   const piston = bot.blockAt(
-    vec3(shulker_station_location.vec3).add(vec3([0, 4, 0]))
+    vec3(shulker_station_location.vec3).add(vec3([0, 3, 0]))
   );
   assert(piston);
   await bot.placeBlock(piston, vec3([0, -1, 0]));
 
   // Open Shulker
   const shulkerBlock = bot.blockAt(
-    vec3(shulker_station_location.vec3).add(vec3([0, 3, 0]))
+    vec3(shulker_station_location.vec3).add(vec3([0, 2, 0]))
   );
   assert(shulkerBlock);
 
@@ -91,7 +91,7 @@ export const unloadShulker = async (
 
   // Break Shulker
   const button = bot.blockAt(
-    vec3(shulker_station_location.vec3).add(vec3([0, 5, 0]))
+    vec3(shulker_station_location.vec3).add(vec3([0, 4, 0]))
   );
   assert(button);
   await bot.activateBlock(button);
