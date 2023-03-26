@@ -110,7 +110,9 @@ export const useActionController = (): ActionController => {
       },
     ]);
 
-    apiComplexTransfer(fromComplexName, toComplexName);
+    apiComplexTransfer(fromComplexName, toComplexName)
+      .then(() => finishAction(actionId, 'complete'))
+      .catch(() => finishAction(actionId, 'failed'));
   };
 
   return { currentActions, deliverItems, pickupItems, complexTransfer };

@@ -1,8 +1,10 @@
 import assert from 'assert';
+import { delay, releaseHolds } from '../helpers';
 import {
   createHold,
   createOperation,
   getInventoryContents,
+  getOperation,
   getSignConfig,
 } from './automation';
 import { HoldRequestFilter, StorageComplex } from './automation_types';
@@ -93,12 +95,16 @@ export const complexTransfer = async (
     destinationHolds.push(...holdRes.Holds.holds.map(({ id }) => id));
   }
 
+  const operationIds = [];
+
   for (
     let i = 0;
     i < Math.min(destinationHolds.length, sourceHolds.length);
     i += 27
   ) {
-    await createOperation(
+    const {
+      data: { operation },
+    } = await createOperation(
       {
         type: 'MoveItems',
         source_holds: sourceHolds.slice(i, i + 27),
@@ -107,5 +113,34 @@ export const complexTransfer = async (
       },
       'UserInteractive',
     );
+
+    operationIds.push(operation.id);
+  }
+
+  let failed = false;
+
+  while (operationIds.length > 0) {
+    const {
+      data: {
+        operation: { status },
+      },
+    } = await getOperation(operationIds[operationIds.length - 1]);
+
+    if (status === 'Complete') {
+      operationIds.pop();
+      continue;
+    } else if (status === 'Aborted') {
+      operationIds.pop();
+      failed = true;
+      continue;
+    }
+
+    await delay(5000);
+  }
+
+  await releaseHolds([...destinationHolds, ...sourceHolds]);
+
+  if (failed) {
+    throw new Error('One or more operations failed');
   }
 };
