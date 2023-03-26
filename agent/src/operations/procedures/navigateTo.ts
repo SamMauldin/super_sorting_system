@@ -29,8 +29,6 @@ function vecMagnitude(vec: depVec3) {
 async function flyTo(bot: Bot, destination: depVec3) {
   const segmentLength = 5;
 
-  bot.creative.startFlying();
-
   let vector = destination.minus(bot.entity.position);
   let magnitude = vecMagnitude(vector);
   const normalizedVector = vector.scaled(1 / magnitude);
