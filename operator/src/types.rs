@@ -178,7 +178,16 @@ impl UnhashedItem {
                         let count = nbt_item.pointer("/Count/value").unwrap().as_u64().unwrap();
                         let nbt = nbt_item
                             .pointer("/tag")
-                            .map(|tag| tag.clone())
+                            .map(|tag| match tag {
+                                Value::Object(tag_map) => {
+                                    let mut tag_map = tag_map.clone();
+
+                                    tag_map.insert(String::from("name"), Value::String(String::from("")));
+
+                                    Value::Object(tag_map)
+                                }
+                                _ => tag.clone()
+                            })
                             .unwrap_or(serde_json::Value::Null);
 
                         Some(
