@@ -3,3 +3,6 @@ members = [
     "operator",
     "test"
 ]
+
+[profile.release]
+debug = true

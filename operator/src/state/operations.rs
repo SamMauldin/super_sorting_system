@@ -1,5 +1,6 @@
 use crate::types::{Location, Vec3};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use thiserror::Error;
 use uuid::Uuid;
 
@@ -72,13 +73,15 @@ pub enum OperationKind {
 }
 
 pub struct OperationState {
-    operations: Vec<Operation>,
+    operations: HashMap<Uuid, Operation>,
+    pending_operation_ids: Vec<(Uuid, OperationPriority)>,
 }
 
 impl Default for OperationState {
     fn default() -> Self {
         OperationState {
             operations: Default::default(),
+            pending_operation_ids: Default::default(),
         }
     }
 }
@@ -95,14 +98,18 @@ impl OperationState {
         priority: OperationPriority,
         kind: OperationKind,
     ) -> &Operation {
-        self.operations.push(Operation {
-            id: Uuid::new_v4(),
-            priority,
-            status: OperationStatus::Pending,
-            kind,
-        });
+        let id = Uuid::new_v4();
+        self.operations.insert(
+            id,
+            Operation {
+                id,
+                priority,
+                status: OperationStatus::Pending,
+                kind,
+            },
+        );
 
-        self.operations.last().unwrap()
+        self.operations.get(&id).unwrap()
     }
 
     pub fn take_next_operation(&mut self) -> Option<&Operation> {
@@ -112,23 +119,30 @@ impl OperationState {
             .flatten()
             .collect::<Vec<Location>>();
 
-        self.operations.sort_by(|a, b| a.priority.cmp(&b.priority));
+        self.pending_operation_ids.sort_by(|a, b| a.0.cmp(&b.0));
 
-        self.operations
-            .iter_mut()
-            .filter(|op| matches!(op.status, OperationStatus::Pending))
-            .filter(|op| {
-                op.shulker_station_location()
-                    .as_ref()
-                    .map(|station| !shulker_stations_in_use.contains(station))
-                    .unwrap_or(true)
-            })
-            .nth(0)
-            .map(|op| {
-                op.status = OperationStatus::InProgress;
+        let next_op =
+            self.pending_operation_ids
+                .iter()
+                .enumerate()
+                .find(|(_idx, (op_id, _priority))| {
+                    let op = self.operations.get(&op_id).unwrap();
 
-                &*op
-            })
+                    op.shulker_station_location()
+                        .as_ref()
+                        .map(|station| !shulker_stations_in_use.contains(station))
+                        .unwrap_or(true)
+                });
+
+        if let Some((idx, (op_id, _priority))) = next_op {
+            let op_id = *op_id;
+            self.operations.get_mut(&op_id).unwrap().status = OperationStatus::InProgress;
+            self.pending_operation_ids.remove(idx);
+
+            return self.operations.get(&op_id);
+        } else {
+            return None;
+        }
     }
 
     pub fn set_operation_status(
@@ -137,8 +151,7 @@ impl OperationState {
         status: OperationStatus,
     ) -> Result<&Operation, OperationError> {
         self.operations
-            .iter_mut()
-            .find(|op| op.id == operation_id)
+            .get_mut(&operation_id)
             .ok_or_else(|| OperationError::NotFound)
             .map(|op| {
                 op.status = status;
@@ -148,11 +161,14 @@ impl OperationState {
     }
 
     pub fn iter(&self, status: OperationStatus) -> impl Iterator<Item = &Operation> {
-        self.operations.iter().filter(move |op| op.status == status)
+        self.operations
+            .iter()
+            .filter(move |(_id, op)| op.status == status)
+            .map(|(_id, op)| op)
     }
 
     pub fn get(&self, id: Uuid) -> Option<&Operation> {
-        self.operations.iter().find(|op| op.id == id)
+        self.operations.get(&id)
     }
 }
 
@@ -164,9 +180,11 @@ impl Operation {
                 source_holds,
                 destination_holds,
                 ..
-            } => {
-                source_holds.iter().chain(destination_holds.iter()).map(|hold| *hold).collect()
-            }
+            } => source_holds
+                .iter()
+                .chain(destination_holds.iter())
+                .map(|hold| *hold)
+                .collect(),
             OperationKind::DropItems { source_holds, .. } => source_holds.clone(),
             OperationKind::ImportInventory {
                 destination_holds, ..

@@ -1,4 +1,5 @@
 use std::cmp::{max, min};
+use std::collections::HashMap;
 
 use chrono::{Duration, Utc};
 use uuid::Uuid;
@@ -16,13 +17,12 @@ use crate::{
 use super::service::Service;
 
 struct TrackedInventory {
-    location: Location,
     open_from: Vec3,
     current_scan_operation_id: Option<Uuid>,
 }
 
 pub struct InventoryScannerService {
-    tracked_inventories: Vec<TrackedInventory>,
+    tracked_inventories: HashMap<Location, TrackedInventory>,
 }
 
 impl Service for InventoryScannerService {
@@ -50,28 +50,25 @@ impl Service for InventoryScannerService {
 
                     for x in min(x1, x2)..=max(x1, x2) {
                         for z in min(z1, z2)..=max(z1, z2) {
-                            if self.tracked_inventories.iter().any(|inv| {
-                                inv.location
-                                    == Location {
-                                        vec3: Vec3 { x, y: *y_level, z },
-                                        dim: *dimension,
-                                    }
-                            }) {
+                            let location = Location {
+                                vec3: Vec3 { x, y: *y_level, z },
+                                dim: *dimension,
+                            };
+                            if self.tracked_inventories.contains_key(&location) {
                                 continue;
                             }
 
-                            self.tracked_inventories.push(TrackedInventory {
-                                location: Location {
-                                    vec3: Vec3 { x, y: *y_level, z },
-                                    dim: *dimension,
+                            self.tracked_inventories.insert(
+                                location,
+                                TrackedInventory {
+                                    open_from: Vec3 {
+                                        x,
+                                        y: (*y_level + 1),
+                                        z,
+                                    },
+                                    current_scan_operation_id: None,
                                 },
-                                open_from: Vec3 {
-                                    x,
-                                    y: (*y_level + 1),
-                                    z,
-                                },
-                                current_scan_operation_id: None,
-                            })
+                            );
                         }
                     }
                 }
@@ -88,28 +85,26 @@ impl Service for InventoryScannerService {
                                     continue;
                                 }
 
-                                if self.tracked_inventories.iter().any(|inv| {
-                                    inv.location
-                                        == Location {
-                                            vec3: Vec3 { x, y, z },
-                                            dim: *dimension,
-                                        }
-                                }) {
+                                let location = Location {
+                                    vec3: Vec3 { x, y, z },
+                                    dim: *dimension,
+                                };
+
+                                if self.tracked_inventories.contains_key(&location) {
                                     continue;
                                 }
 
-                                self.tracked_inventories.push(TrackedInventory {
-                                    location: Location {
-                                        vec3: Vec3 { x, y, z },
-                                        dim: *dimension,
+                                self.tracked_inventories.insert(
+                                    location,
+                                    TrackedInventory {
+                                        open_from: Vec3 {
+                                            x: origin.x,
+                                            y,
+                                            z: origin.z,
+                                        },
+                                        current_scan_operation_id: None,
                                     },
-                                    open_from: Vec3 {
-                                        x: origin.x,
-                                        y,
-                                        z: origin.z,
-                                    },
-                                    current_scan_operation_id: None,
-                                })
+                                );
                             }
                         }
                     }
@@ -117,7 +112,7 @@ impl Service for InventoryScannerService {
             }
         }
 
-        for inventory in self.tracked_inventories.iter_mut() {
+        for (loc, inventory) in self.tracked_inventories.iter_mut() {
             if let Some(op_id) = inventory.current_scan_operation_id {
                 let op = state.operations.get(op_id);
 
@@ -132,7 +127,7 @@ impl Service for InventoryScannerService {
                 }
             }
 
-            let existing_inventory = state.inventories.inventory_contents_at(&inventory.location);
+            let existing_inventory = state.inventories.inventory_contents_at(loc);
 
             let needs_rescan = match existing_inventory {
                 Some(inventory) => inventory.scanned_at + Duration::hours(2) < Utc::now(),
@@ -149,7 +144,7 @@ impl Service for InventoryScannerService {
             };
 
             let kind = OperationKind::ScanInventory {
-                location: inventory.location,
+                location: *loc,
                 open_from: inventory.open_from,
             };
 

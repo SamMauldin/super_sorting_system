@@ -29,7 +29,9 @@ impl Service for DefraggerService {
             if let Some(op) = op {
                 match op.status {
                     OperationStatus::Complete | OperationStatus::Aborted => {
-                        op.holds().iter().for_each(|hold| {state.holds.remove(*hold);} );
+                        op.holds().iter().for_each(|hold| {
+                            state.holds.remove(*hold);
+                        });
 
                         self.outstanding_operation = None
                     }

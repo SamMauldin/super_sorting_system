@@ -182,11 +182,14 @@ impl UnhashedItem {
                                 Value::Object(tag_map) => {
                                     let mut tag_map = tag_map.clone();
 
-                                    tag_map.insert(String::from("name"), Value::String(String::from("")));
+                                    tag_map.insert(
+                                        String::from("name"),
+                                        Value::String(String::from("")),
+                                    );
 
                                     Value::Object(tag_map)
                                 }
-                                _ => tag.clone()
+                                _ => tag.clone(),
                             })
                             .unwrap_or(serde_json::Value::Null);
 
