@@ -119,7 +119,7 @@ impl OperationState {
             .flatten()
             .collect::<Vec<Location>>();
 
-        self.pending_operation_ids.sort_by(|a, b| a.0.cmp(&b.0));
+        self.pending_operation_ids.sort_by(|a, b| a.1.cmp(&b.1));
 
         let next_op =
             self.pending_operation_ids
