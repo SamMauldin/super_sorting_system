@@ -1,5 +1,6 @@
 use crate::types::{Location, Vec3};
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use thiserror::Error;
 use uuid::Uuid;
@@ -109,33 +110,55 @@ impl OperationState {
             },
         );
 
+        self.pending_operation_ids.push((id, priority));
+
         self.operations.get(&id).unwrap()
     }
 
-    pub fn take_next_operation(&mut self) -> Option<&Operation> {
+    pub fn take_next_operation(&mut self, starting_loc: Location) -> Option<&Operation> {
         let shulker_stations_in_use = self
             .iter(OperationStatus::InProgress)
             .map(|op| op.shulker_station_location())
             .flatten()
             .collect::<Vec<Location>>();
 
-        self.pending_operation_ids.sort_by(|a, b| a.1.cmp(&b.1));
+        let mut leading_operation: Option<(usize, Uuid, &Operation, i32)> = None;
 
-        let next_op =
-            self.pending_operation_ids
-                .iter()
-                .enumerate()
-                .find(|(_idx, (op_id, _priority))| {
-                    let op = self.operations.get(&op_id).unwrap();
+        for (idx, (op_id, _priority)) in self.pending_operation_ids.iter().enumerate() {
+            let op = self.operations.get(&op_id).unwrap();
 
-                    op.shulker_station_location()
-                        .as_ref()
-                        .map(|station| !shulker_stations_in_use.contains(station))
-                        .unwrap_or(true)
-                });
+            let shulker_station_available = op
+                .shulker_station_location()
+                .as_ref()
+                .map(|station| !shulker_stations_in_use.contains(station))
+                .unwrap_or(true);
 
-        if let Some((idx, (op_id, _priority))) = next_op {
-            let op_id = *op_id;
+            if !shulker_station_available {
+                continue;
+            }
+
+            let est_dist_cost = op
+                .starting_location()
+                .map(|loc| loc.distance_heuristic(&starting_loc))
+                .unwrap_or(0);
+
+            if let Some((_other_idx, _other_op_id, other_op, other_est_dist_cost)) =
+                leading_operation
+            {
+                if op
+                    .priority
+                    .cmp(&other_op.priority)
+                    .then(est_dist_cost.cmp(&other_est_dist_cost))
+                    == Ordering::Less
+                {
+                    leading_operation = Some((idx, *op_id, op, est_dist_cost));
+                }
+            } else {
+                leading_operation = Some((idx, *op_id, op, est_dist_cost));
+            }
+        }
+
+        if let Some((idx, op_id, _op, _priority)) = leading_operation {
             self.operations.get_mut(&op_id).unwrap().status = OperationStatus::InProgress;
             self.pending_operation_ids.remove(idx);
 
@@ -219,6 +242,19 @@ impl Operation {
                 holds.push(*shulker_hold);
                 holds
             }
+        }
+    }
+
+    pub fn starting_location(&self) -> Option<Location> {
+        match &self.kind {
+            OperationKind::ScanInventory {
+                location,
+                open_from,
+            } => Some(Location {
+                dim: location.dim,
+                vec3: *open_from,
+            }),
+            _ => None,
         }
     }
 

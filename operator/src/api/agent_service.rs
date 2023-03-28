@@ -66,6 +66,11 @@ async fn alert(
     HttpResponse::Ok().json(AgentAlertResponse { alert })
 }
 
+#[derive(Deserialize)]
+pub struct PollOperationRequest {
+    location: Location,
+}
+
 #[derive(Serialize)]
 #[serde(tag = "type")]
 enum PollOperationResponse {
@@ -74,14 +79,21 @@ enum PollOperationResponse {
 }
 
 #[post("/poll_operation")]
-async fn poll_operation(agent: Agent, state: StateData) -> impl Responder {
+async fn poll_operation(
+    agent: Agent,
+    state: StateData,
+    poll_req: web::Json<PollOperationRequest>,
+) -> impl Responder {
     let mut state = state.lock().unwrap();
 
     if agent.current_operation.is_some() {
         return HttpResponse::Conflict().body("Agent already is executing an operation");
     }
 
-    let next_operation = state.operations.take_next_operation().map(|op| op.clone());
+    let next_operation = state
+        .operations
+        .take_next_operation(poll_req.location)
+        .map(|op| op.clone());
 
     HttpResponse::Ok().json(match next_operation {
         Some(op) => {

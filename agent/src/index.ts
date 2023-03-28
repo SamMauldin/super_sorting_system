@@ -23,6 +23,7 @@ import {
 } from './operations';
 import { navigateTo, sendVisibleSignData } from './operations/procedures';
 import { clearInventory, sleep } from './utils';
+import { stringToDim } from './types';
 
 const main = async () => {
   const {
@@ -77,7 +78,14 @@ const main = async () => {
   while (true) {
     await clearInventory(bot, agent);
 
-    const { data: operationResponse } = await pollOperation(agent);
+    const { data: operationResponse } = await pollOperation(agent, {
+      vec3: {
+        x: Math.floor(bot.entity.position.x),
+        y: Math.floor(bot.entity.position.y),
+        z: Math.floor(bot.entity.position.z)
+      },
+      dim: stringToDim(bot.game.dimension)
+    });
 
     if (operationResponse.type === 'OperationAvailable') {
       atHome = false;

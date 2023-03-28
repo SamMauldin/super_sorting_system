@@ -31,6 +31,16 @@ pub struct Location {
     pub dim: Dimension,
 }
 
+impl Location {
+    pub fn distance_heuristic(&self, other: &Location) -> i32 {
+        if other.dim != self.dim {
+            return 1000;
+        }
+
+        self.vec3.dist(other.vec3) as i32
+    }
+}
+
 impl Vec3 {
     pub fn dist(&self, other: Vec3) -> f64 {
         let x_diff = (other.x - self.x) as i64;

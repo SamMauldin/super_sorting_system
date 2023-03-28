@@ -56,11 +56,16 @@ type PollOperationResponse =
     };
 
 export const pollOperation = async (
-  agent: Agent
+  agent: Agent,
+  location: Location
 ): Promise<AxiosResponse<PollOperationResponse>> =>
-  axios.post(agentEndpoint('poll_operation'), undefined, {
-    headers: agentHeader(agent)
-  });
+  axios.post(
+    agentEndpoint('poll_operation'),
+    { location },
+    {
+      headers: agentHeader(agent)
+    }
+  );
 
 export const operationComplete = async (
   agent: Agent,

@@ -33,9 +33,10 @@ async function flyTo(bot: Bot, destination: depVec3) {
   let magnitude = vecMagnitude(vector);
   const normalizedVector = vector.scaled(1 / magnitude);
 
-  const allowedTravelTimeMs = 5000 + magnitude * 200;
+  const allowedTravelTimeMs = 5000 + magnitude * 10;
   let travelTimeExceeded = false;
   let travelTimeTimeout = timers.setTimeout(() => {
+    console.log('Travel time exceeded! Attempting break');
     travelTimeExceeded = true;
   }, allowedTravelTimeMs);
 
@@ -58,6 +59,7 @@ async function flyTo(bot: Bot, destination: depVec3) {
     }
 
     bot.entity.position = nextSegment;
+    bot.entity.onGround = true;
 
     if (nextSegment.equals(destination)) {
       await once(bot, 'move');
