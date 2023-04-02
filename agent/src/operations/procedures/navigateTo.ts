@@ -26,8 +26,9 @@ function vecMagnitude(vec: depVec3) {
   return Math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
-async function flyTo(bot: Bot, destination: depVec3) {
+async function flyTo(bot: Bot, destination: depVec3, portalExpected?: boolean) {
   const segmentLength = 5;
+  const startingDim = bot.game.dimension;
 
   let vector = destination.minus(bot.entity.position);
   let magnitude = vecMagnitude(vector);
@@ -62,6 +63,15 @@ async function flyTo(bot: Bot, destination: depVec3) {
     bot.entity.position = nextSegment;
     bot.entity.onGround = true;
 
+    if (bot.game.dimension !== startingDim) {
+      if (portalExpected) {
+        console.log('NAV: Expected portal taken during flying. Exiting early.');
+        return;
+      } else {
+        throw new Error('Unexpected dimension change during flying');
+      }
+    }
+
     if (nextSegment.equals(destination)) {
       await once(bot, 'move');
       timers.clearTimeout(travelTimeTimeout);
@@ -93,7 +103,7 @@ export const takePortal = async (vec: Vec3, bot: Bot) => {
   const startingDim = bot.game.dimension;
 
   await setTimeout(700);
-  await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
+  await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })), true);
 
   console.log(
     `NAV: At portal location: ${displayLoc(
