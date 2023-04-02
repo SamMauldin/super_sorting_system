@@ -1,3 +1,16 @@
+diff --git a/node_modules/mineflayer/lib/plugins/game.js b/node_modules/mineflayer/lib/plugins/game.js
+index 12f54a4..a0fd1e0 100644
+--- a/node_modules/mineflayer/lib/plugins/game.js
++++ b/node_modules/mineflayer/lib/plugins/game.js
+@@ -94,7 +94,7 @@ function inject (bot, options) {
+   })
+ 
+   bot._client.on('game_state_change', (packet) => {
+-    if (packet?.reason === 4 && packet?.gameMode === 1) {
++    if (packet?.reason === 4) {
+       bot._client.write('client_command', { action: 0 })
+     }
+     if (packet.reason === 3) {
 diff --git a/node_modules/mineflayer/lib/plugins/generic_place.js b/node_modules/mineflayer/lib/plugins/generic_place.js
 index 8fddeba..5d7932b 100644
 --- a/node_modules/mineflayer/lib/plugins/generic_place.js
