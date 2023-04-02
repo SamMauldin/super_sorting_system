@@ -1,5 +1,6 @@
 import { Bot, Chest } from 'mineflayer';
 import { Window } from 'prismarine-windows';
+import { setTimeout } from 'timers/promises';
 import vec3 from 'vec3';
 import { navigateTo } from '.';
 
@@ -21,6 +22,10 @@ export const openChestAt = async (
       bot,
       agent
     );
+
+  while (!bot.world.getColumnAt(vec3(chestLoc.vec3))) {
+    await setTimeout(100);
+  }
 
   const chestBlock = bot.blockAt(vec3(chestLoc.vec3));
   if (!chestBlock) throw new Error('No block at chest destination!');
