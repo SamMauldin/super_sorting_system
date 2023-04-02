@@ -11,7 +11,11 @@ mod state;
 mod stats;
 mod types;
 
-use std::{sync::Mutex, thread, time::Duration};
+use std::{
+    sync::Mutex,
+    thread,
+    time::{Duration, Instant},
+};
 
 use actix_cors::Cors;
 use actix_web::{guard, middleware, web, App, HttpServer};
@@ -22,7 +26,8 @@ use crate::{
     services::{
         agent_expiration::AgentExpirationService, defragger::DefraggerService,
         hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
-        node_scanner::NodeScannerService, service::Service, shulker_loader::ShulkerLoaderService,
+        node_scanner::NodeScannerService, operation_expiration::OperationExpirationService,
+        service::Service, shulker_loader::ShulkerLoaderService,
         shulker_unloader::ShulkerUnloaderService,
     },
     state::StateData,
@@ -59,11 +64,13 @@ async fn main() -> Result<(), StartupError> {
         let mut node_scanner_service = NodeScannerService::new(&config);
         let mut shulker_unloader_service = ShulkerUnloaderService::new(&config);
         let mut shulker_loader_service = ShulkerLoaderService::new(&config);
+        let mut operation_expiration_service = OperationExpirationService::new(&config);
 
         loop {
             thread::sleep(Duration::from_millis(1000));
             let mut state = state.lock().unwrap();
 
+            let start_time = Instant::now();
             inventory_scanner_service.tick(&mut state);
             agent_expiration_service.tick(&mut state);
             defragger_service.tick(&mut state);
@@ -71,6 +78,9 @@ async fn main() -> Result<(), StartupError> {
             node_scanner_service.tick(&mut state);
             shulker_unloader_service.tick(&mut state);
             shulker_loader_service.tick(&mut state);
+            operation_expiration_service.tick(&mut state);
+
+            state.metrics.services_tick_time = Some(start_time.elapsed());
         }
     });
 

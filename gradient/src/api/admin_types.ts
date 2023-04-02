@@ -11,4 +11,6 @@ export type Stats = {
   operations_aborted: number;
 
   agents_connected: number;
+
+  services_tick_time_micros: number;
 };

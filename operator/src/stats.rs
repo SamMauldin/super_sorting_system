@@ -16,6 +16,8 @@ pub struct Stats {
     pub operations_aborted: usize,
 
     pub agents_connected: usize,
+
+    pub services_tick_time_micros: usize,
 }
 
 pub fn calculate_stats(state: &State) -> Stats {
@@ -37,6 +39,11 @@ pub fn calculate_stats(state: &State) -> Stats {
 
     let agents_connected = state.agents.iter().count();
 
+    let services_tick_time_micros = state
+        .metrics
+        .services_tick_time
+        .map_or(0, |dur| dur.as_micros()) as usize;
+
     Stats {
         inventories_in_mem,
         total_slots,
@@ -50,5 +57,7 @@ pub fn calculate_stats(state: &State) -> Stats {
         operations_aborted,
 
         agents_connected,
+
+        services_tick_time_micros,
     }
 }

@@ -34,6 +34,10 @@ export const Stats = () => {
       <Row>
         <StatCard title="Agents Connected" value={stats.agents_connected} />
         <StatCard title="Slot Holds" value={stats.current_holds} />
+        <StatCard
+          title="Services Tick Time (ms)"
+          value={Math.round(stats.services_tick_time_micros / 100) / 10}
+        />
       </Row>
     </Container>
   );
