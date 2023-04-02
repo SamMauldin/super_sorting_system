@@ -1,4 +1,5 @@
 use crate::types::{Location, Vec3};
+use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -27,6 +28,7 @@ pub struct Operation {
     pub priority: OperationPriority,
     pub status: OperationStatus,
     pub kind: OperationKind,
+    pub finalized_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
@@ -107,6 +109,7 @@ impl OperationState {
                 priority,
                 status: OperationStatus::Pending,
                 kind,
+                finalized_at: None,
             },
         );
 
@@ -179,6 +182,13 @@ impl OperationState {
             .map(|op| {
                 op.status = status;
 
+                match status {
+                    OperationStatus::Aborted | OperationStatus::Complete => {
+                        op.finalized_at = Some(Utc::now());
+                    }
+                    _ => {}
+                }
+
                 &*op
             })
     }
@@ -192,6 +202,19 @@ impl OperationState {
 
     pub fn get(&self, id: Uuid) -> Option<&Operation> {
         self.operations.get(&id)
+    }
+
+    pub fn purge_old_operations(&mut self) {
+        self.operations.retain(|_, op| match op.status {
+            OperationStatus::Pending | OperationStatus::InProgress => true,
+            OperationStatus::Complete | OperationStatus::Aborted => {
+                if let Some(finalized_at) = op.finalized_at {
+                    finalized_at > (Utc::now() - Duration::minutes(15))
+                } else {
+                    false
+                }
+            }
+        });
     }
 }
 
