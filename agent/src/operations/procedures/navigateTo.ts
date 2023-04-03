@@ -110,8 +110,14 @@ export const takePortal = async (vec: Vec3, bot: Bot) => {
       currentPosLoc(bot)
     )}. Waiting for traversal.`
   );
+  let tries = 0;
   while (bot.game.dimension === startingDim) {
     await setTimeout(100);
+
+    tries++;
+    if (tries > 50) {
+      throw new Error('Timeout exceeded while waiting for portal traversal');
+    }
   }
   console.log(
     `NAV: Portal traversed. New location: ${displayLoc(

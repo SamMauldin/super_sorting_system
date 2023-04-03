@@ -23,8 +23,16 @@ export const openChestAt = async (
       agent
     );
 
+  let tries = 0;
   while (!bot.world.getColumnAt(vec3(chestLoc.vec3))) {
     await setTimeout(100);
+
+    tries++;
+    if (tries > 20) {
+      throw new Error(
+        'Timeout exceeded while waiting for chunk containing chest.'
+      );
+    }
   }
 
   const chestBlock = bot.blockAt(vec3(chestLoc.vec3));
