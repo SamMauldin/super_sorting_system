@@ -19,7 +19,7 @@ const getLastUsedNodes = (): string[] => {
 
 const markNodeUsed = (node: string) => {
   let nodes = getLastUsedNodes();
-  nodes = nodes.filter((other_node) => other_node === node);
+  nodes = nodes.filter((other_node) => other_node !== node);
   nodes.unshift(node);
 
   while (nodes.length > 50) {
@@ -51,7 +51,7 @@ export const NodeSelector = ({ submit: rawSubmit, purpose }: Props) => {
   const [hoverIdx, setHoverIdx] = useState(0);
   const [search, setSearch] = useState('');
   const mainInputRef = useRef<HTMLInputElement>(null);
-  const priorityList = useMemo(() => getLastUsedNodes(), []);
+  const priorityList = getLastUsedNodes();
   const nodeSort = nodeSortFactory(priorityList);
 
   const submit = (node: string) => {
@@ -70,14 +70,9 @@ export const NodeSelector = ({ submit: rawSubmit, purpose }: Props) => {
     })
     .map((node) => node.name);
 
-  const fzf = useMemo(
-    () =>
-      new Fzf(validNodes, {
-        tiebreakers: [(a, b) => nodeSort(a.item, b.item)],
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(validNodes)],
-  );
+  const fzf = new Fzf(validNodes, {
+    tiebreakers: [(a, b) => nodeSort(a.item, b.item)],
+  });
 
   const nodes =
     search.length > 0
