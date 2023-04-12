@@ -74,6 +74,11 @@ async function flyTo(bot: Bot, destination: depVec3, portalExpected?: boolean) {
 
     if (nextSegment.equals(destination)) {
       await once(bot, 'move');
+
+      if (vecMagnitude(destination.minus(bot.entity.position)) > 1) {
+        continue;
+      }
+
       timers.clearTimeout(travelTimeTimeout);
 
       return;
