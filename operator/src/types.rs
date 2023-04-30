@@ -5,7 +5,7 @@ use std::cmp::{max, min};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::ops::Add;
-use std::{fmt::Display, hash::Hasher};
+use std::{fmt::Display, hash::Hasher, sync::Arc};
 use thiserror::Error;
 
 use crate::data::McData;
@@ -110,7 +110,7 @@ pub struct UnhashedItem {
     pub item_id: u32,
     pub count: u32,
     pub metadata: u32,
-    pub nbt: Value,
+    pub nbt: Arc<Value>,
     pub stack_size: u32,
 }
 
@@ -207,7 +207,7 @@ impl UnhashedItem {
                             UnhashedItem {
                                 item_id: mc_data_item.id,
                                 stack_size: mc_data_item.stack_size,
-                                nbt,
+                                nbt: Arc::new(nbt),
 
                                 count: count as u32,
                                 metadata: 0,
@@ -273,7 +273,7 @@ pub struct Item {
     pub item_id: u32,
     pub count: u32,
     pub metadata: u32,
-    pub nbt: Value,
+    pub nbt: Arc<Value>,
     pub stack_size: u32,
 
     #[serde(with = "string")]
