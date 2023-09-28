@@ -164,7 +164,7 @@ export const ItemSelector = ({
                 }
                 onClick={() => setModalItem(item)}
               >
-                {item.prettyPrinted} x{item.count}
+                {item.prettyPrinted} x{item.count.toLocaleString()}
                 {selectedCount > 0 && (
                   <SelectedText hovered={hoverIdx === idx}>
                     ({selectedCount} selected)
