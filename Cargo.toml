@@ -3,6 +3,7 @@ members = [
     "operator",
     "test"
 ]
+resolver = "2"
 
 [profile.release]
 debug = true
