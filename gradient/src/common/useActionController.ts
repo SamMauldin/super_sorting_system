@@ -31,7 +31,7 @@ export type Action = DeliveryAction | PickupAction | ComplexTransfer;
 export type ActionController = {
   currentActions: Action[];
   deliverItems: (node: string, items: DeliveryItems) => void;
-  pickupItems: (node: string) => void;
+  pickupItems: (node: string, repeatUntilEmpty?: boolean) => void;
   complexTransfer: (from_complex: string, to_complex: string) => void;
 };
 
@@ -80,7 +80,7 @@ export const useActionController = (): ActionController => {
       .catch(() => finishAction(actionId, 'failed'));
   };
 
-  const pickupItems = (node: string) => {
+  const pickupItems = (node: string, repeatUntilEmpty?: boolean) => {
     const actionId = getNextActionId();
     setCurrentActions((actions) => [
       ...actions,
@@ -92,7 +92,7 @@ export const useActionController = (): ActionController => {
       },
     ]);
 
-    apiPickupItems(node)
+    apiPickupItems(node, repeatUntilEmpty)
       .then(() => finishAction(actionId, 'complete'))
       .catch(() => finishAction(actionId, 'failed'));
   };
