@@ -57,7 +57,7 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
 };
 
 const parseLine = (line: any): string => {
-  const valParsed = JSON.parse(line['value']);
+  const valParsed = JSON.parse(line);
   return valParsed['text'];
 };
 
@@ -71,11 +71,11 @@ const getSignsInChunk = (
   for (const [posStr, blockEntityData] of Object.entries<any>(
     chunk.column.blockEntities
   )) {
-    if (
-      blockEntityData &&
-      'value' in blockEntityData &&
-      'Text1' in blockEntityData['value']
-    ) {
+    const frontTextMessages =
+      blockEntityData?.['value']?.['front_text']?.['value']?.['messages']?.[
+        'value'
+      ]?.['value'];
+    if (frontTextMessages) {
       const posElements = posStr.split(',').map((val: string) => parseInt(val));
       const vec = {
         x: posElements[0] + chunkPos.x,
@@ -83,10 +83,10 @@ const getSignsInChunk = (
         z: posElements[2] + chunkPos.z
       };
       const lines = [
-        parseLine(blockEntityData['value']['Text1']),
-        parseLine(blockEntityData['value']['Text2']),
-        parseLine(blockEntityData['value']['Text3']),
-        parseLine(blockEntityData['value']['Text4'])
+        parseLine(frontTextMessages[0]),
+        parseLine(frontTextMessages[1]),
+        parseLine(frontTextMessages[2]),
+        parseLine(frontTextMessages[3])
       ];
       signs.push({
         location: { vec3: vec, dim: stringToDim(bot.game.dimension) },

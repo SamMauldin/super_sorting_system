@@ -57,11 +57,12 @@ type PollOperationResponse =
 
 export const pollOperation = async (
   agent: Agent,
-  location: Location
+  location: Location,
+  hasClearInventory: boolean
 ): Promise<AxiosResponse<PollOperationResponse>> =>
   axios.post(
     agentEndpoint('poll_operation'),
-    { location },
+    { location, has_clear_inventory: hasClearInventory },
     {
       headers: agentHeader(agent)
     }

@@ -76,16 +76,20 @@ const main = async () => {
   let atHome = false;
 
   while (true) {
-    await clearInventory(bot, agent);
+    const hasClearInventory = await clearInventory(bot, agent);
 
-    const { data: operationResponse } = await pollOperation(agent, {
-      vec3: {
-        x: Math.floor(bot.entity.position.x),
-        y: Math.floor(bot.entity.position.y),
-        z: Math.floor(bot.entity.position.z)
+    const { data: operationResponse } = await pollOperation(
+      agent,
+      {
+        vec3: {
+          x: Math.floor(bot.entity.position.x),
+          y: Math.floor(bot.entity.position.y),
+          z: Math.floor(bot.entity.position.z)
+        },
+        dim: stringToDim(bot.game.dimension)
       },
-      dim: stringToDim(bot.game.dimension)
-    });
+      hasClearInventory
+    );
 
     if (operationResponse.type === 'OperationAvailable') {
       atHome = false;

@@ -118,7 +118,7 @@ impl OperationState {
         self.operations.get(&id).unwrap()
     }
 
-    pub fn take_next_operation(&mut self, starting_loc: Location) -> Option<&Operation> {
+    pub fn take_next_operation(&mut self, starting_loc: Location, has_clear_inventory: bool) -> Option<&Operation> {
         let shulker_stations_in_use = self
             .iter(OperationStatus::InProgress)
             .map(|op| op.shulker_station_location())
@@ -129,6 +129,10 @@ impl OperationState {
 
         for (idx, (op_id, _priority)) in self.pending_operation_ids.iter().enumerate() {
             let op = self.operations.get(&op_id).unwrap();
+
+            if !has_clear_inventory && op.requires_clear_inventory() {
+                continue;
+            }
 
             let shulker_station_available = op
                 .shulker_station_location()
@@ -292,6 +296,14 @@ impl Operation {
                 ..
             } => Some(*shulker_station_location),
             _ => None,
+        }
+    }
+
+    pub fn requires_clear_inventory(&self) -> bool {
+        match &self.kind {
+            OperationKind::ScanSigns { .. } => false,
+            OperationKind::ScanInventory { .. } => false,
+            _ => true,
         }
     }
 }

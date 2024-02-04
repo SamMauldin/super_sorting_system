@@ -69,6 +69,7 @@ async fn alert(
 #[derive(Deserialize)]
 pub struct PollOperationRequest {
     location: Location,
+    has_clear_inventory: bool,
 }
 
 #[derive(Serialize)]
@@ -92,7 +93,7 @@ async fn poll_operation(
 
     let next_operation = state
         .operations
-        .take_next_operation(poll_req.location)
+        .take_next_operation(poll_req.location, poll_req.has_clear_inventory)
         .map(|op| op.clone());
 
     HttpResponse::Ok().json(match next_operation {
@@ -146,7 +147,7 @@ async fn free_hold(_agent: Agent, state: StateData) -> impl Responder {
         return HttpResponse::Ok().json(FreeHoldResponse::HoldAcquired { hold: hold.clone() });
     }
 
-    HttpResponse::NotFound().json(FreeHoldResponse::HoldUnavailable)
+    HttpResponse::Ok().json(FreeHoldResponse::HoldUnavailable)
 }
 
 #[derive(Deserialize)]

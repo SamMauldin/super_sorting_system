@@ -10,7 +10,10 @@ import { Agent } from './types';
 export const sleep = (delay: number) =>
   new Promise((resolve) => setTimeout(resolve, delay));
 
-export const clearInventory = async (bot: Bot, agent: Agent) => {
+export const clearInventory = async (
+  bot: Bot,
+  agent: Agent
+): Promise<boolean> => {
   // Verify inventory empty
   for (const [invSlot, contents] of bot.inventory.slots.entries()) {
     if (!contents) continue;
@@ -22,8 +25,10 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
 
     const { data } = await getFreeHold(agent);
 
-    if (data.type !== 'HoldAcquired')
-      throw new Error('Could not acquire a free hold to clear inventory!');
+    if (data.type !== 'HoldAcquired') {
+      console.error('Could not acquire a free hold to clear inventory!');
+      return false;
+    }
 
     const {
       hold: { location, slot, id, open_from }
@@ -46,4 +51,6 @@ export const clearInventory = async (bot: Bot, agent: Agent) => {
 
     await releaseHold(id);
   }
+
+  return true;
 };
