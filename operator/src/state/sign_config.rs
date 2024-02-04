@@ -391,9 +391,9 @@ impl Default for SignConfigState {
 
 impl SignConfigState {
     pub fn clear_area(&mut self, dimension: Dimension, start: Vec2, end: Vec2) {
-        let _ = self.signs.extract_if(|sign| {
-            sign.location.dim == dimension
-                && Vec2::from(sign.location.vec3).contained_by(start, end, 0)
+        self.signs.retain(|sign| {
+            !(sign.location.dim == dimension
+                && Vec2::from(sign.location.vec3).contained_by(start, end, 0))
         });
 
         self.set_dirty();
