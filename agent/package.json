@@ -19,12 +19,12 @@
     "typescript": "^4.4.2"
   },
   "volta": {
-    "node": "16.8.0"
+    "node": "18.19.0"
   },
   "dependencies": {
     "axios": "^0.24.0",
     "dotenv": "^10.0.0",
-    "mineflayer": "git@github.com:PrismarineJS/mineflayer.git#273c29c57ca838641407af6c0e3b37744554b0ef",
+    "mineflayer": "4.18.0",
     "patch-package": "^6.4.7"
   }
 }
