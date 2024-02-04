@@ -58,6 +58,8 @@ export const unloadShulker = async (
   await navigateTo(shulker_station_location, bot, agent);
   bot.setQuickBarSlot(0);
   bot.updateHeldItem();
+  assert(bot.inventory.slots[36]);
+  assert(bot.inventory.slots[36].name.endsWith('shulker_box'));
   const piston = bot.blockAt(
     vec3(shulker_station_location.vec3).add(vec3([0, 3, 0]))
   );
