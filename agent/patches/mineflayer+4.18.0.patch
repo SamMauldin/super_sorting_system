@@ -38,10 +38,10 @@ index 89380cf..0e87139 100644
      if (bot.supportFeature('blockPlaceHasHeldItem')) {
        bot._client.write('block_place', {
 diff --git a/node_modules/mineflayer/lib/plugins/physics.js b/node_modules/mineflayer/lib/plugins/physics.js
-index 79fe868..eb4990f 100644
+index 79fe868..e769681 100644
 --- a/node_modules/mineflayer/lib/plugins/physics.js
 +++ b/node_modules/mineflayer/lib/plugins/physics.js
-@@ -300,11 +300,7 @@ function inject (bot, { physicsEnabled, maxCatchupTicks }) {
+@@ -300,11 +300,8 @@ function inject (bot, { physicsEnabled, maxCatchupTicks }) {
      }
      lookingTask = createTask()
  
@@ -51,6 +51,7 @@ index 79fe868..eb4990f 100644
 -    const yawChange = Math.round((yaw - bot.entity.yaw) / sensitivity) * sensitivity
 -    const pitchChange = Math.round((pitch - bot.entity.pitch) / sensitivity) * sensitivity
 +    const pitchChange = pitch - bot.entity.pitch
++    const yawChange = yaw - bot.entity.yaw
  
      if (yawChange === 0 && pitchChange === 0) {
        return
