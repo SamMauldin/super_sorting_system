@@ -65,6 +65,12 @@ async function flyTo(bot: Bot, destination: depVec3, portalExpected?: boolean) {
     bot.entity.velocity.x = 0;
     bot.entity.velocity.y = 0;
     bot.entity.velocity.z = 0;
+    bot._client.write('position', {
+      x: nextSegment.x,
+      y: nextSegment.y,
+      z: nextSegment.z,
+      onGround: true
+    });
 
     if (bot.game.dimension !== startingDim) {
       if (portalExpected) {
