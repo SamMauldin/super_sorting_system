@@ -1,9 +1,7 @@
 import { Bot } from 'mineflayer';
 import vec3, { Vec3 as depVec3 } from 'vec3';
 import { findPath } from '../../controllerApi';
-import { once } from 'events';
 import { setTimeout } from 'timers/promises';
-import timers from 'timers';
 
 import { Agent, Vec3, vecEq, Location, stringToDim } from '../../types';
 
@@ -13,90 +11,24 @@ const floorVec3 = (input: Vec3) => ({
   z: Math.floor(input.z)
 });
 
-class FlyTimeoutError extends Error {
-  constructor() {
-    super('Timed out while flying');
-    this.name = 'FlyTimeoutError';
+async function flyTo(bot: Bot, destination: depVec3) {
+  bot.entity.position = destination;
+  bot.entity.onGround = true;
+  bot.entity.velocity.x = 0;
+  bot.entity.velocity.y = 0;
+  bot.entity.velocity.z = 0;
+  bot._client.write('position', {
+    x: destination.x,
+    y: destination.y,
+    z: destination.z,
+    onGround: true
+  });
+
+  console.log(`NAV: Teleport complete. Awaiting chunk load.`);
+  while (!bot.world.getColumnAt(bot.entity.position)) {
+    await setTimeout(100);
   }
-}
-
-// Largely adapted from mineflayer
-
-function vecMagnitude(vec: depVec3) {
-  return Math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-}
-
-async function flyTo(bot: Bot, destination: depVec3, portalExpected?: boolean) {
-  const segmentLength = 5;
-  const startingDim = bot.game.dimension;
-
-  let vector = destination.minus(bot.entity.position);
-  let magnitude = vecMagnitude(vector);
-
-  const allowedTravelTimeMs = 5000 + magnitude * 20;
-  let travelTimeExceeded = false;
-  let travelTimeTimeout = timers.setTimeout(() => {
-    console.warn('NAV: Travel time exceeded! Attempting break');
-    travelTimeExceeded = true;
-  }, allowedTravelTimeMs);
-
-  while (true) {
-    let nextSegment = bot.entity.position;
-    while (true) {
-      const vecToDest = destination.minus(nextSegment);
-      const distToEnd = vecMagnitude(vecToDest);
-      const normalizedVector = vecToDest.scaled(1 / magnitude);
-
-      const candidateSegment =
-        distToEnd < segmentLength
-          ? destination
-          : nextSegment.add(normalizedVector.scaled(segmentLength));
-
-      if (bot.world.getColumnAt(candidateSegment)) {
-        nextSegment = candidateSegment;
-        if (nextSegment.equals(destination)) break;
-      } else {
-        break;
-      }
-    }
-
-    bot.entity.position = nextSegment;
-    bot.entity.onGround = true;
-    bot.entity.velocity.x = 0;
-    bot.entity.velocity.y = 0;
-    bot.entity.velocity.z = 0;
-    bot._client.write('position', {
-      x: nextSegment.x,
-      y: nextSegment.y,
-      z: nextSegment.z,
-      onGround: true
-    });
-
-    if (bot.game.dimension !== startingDim) {
-      if (portalExpected) {
-        console.log('NAV: Expected portal taken during flying. Exiting early.');
-        return;
-      } else {
-        throw new Error('Unexpected dimension change during flying');
-      }
-    }
-
-    if (nextSegment.equals(destination)) {
-      await once(bot, 'move');
-
-      if (vecMagnitude(destination.minus(bot.entity.position)) > 1) {
-        continue;
-      }
-
-      timers.clearTimeout(travelTimeTimeout);
-
-      return;
-    }
-
-    await setTimeout(50);
-
-    if (travelTimeExceeded) throw new FlyTimeoutError();
-  }
+  console.log(`NAV: Chunk loaded.`);
 }
 
 const displayLoc = (loc: Location): string => {
@@ -117,7 +49,7 @@ export const takePortal = async (vec: Vec3, bot: Bot) => {
   const startingDim = bot.game.dimension;
 
   await setTimeout(700);
-  await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })), true);
+  await flyTo(bot, vec3(vec).add(vec3({ x: 0.5, y: 0, z: 0.5 })));
 
   console.log(
     `NAV: At portal location: ${displayLoc(
