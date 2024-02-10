@@ -23,14 +23,13 @@ pub struct Sign {
 // Location offset is an absolute change in X, Y, and Z, not dependent on sign orientation
 
 // Line 2: Sign Type
-// Examples: path node, path connection
+// Examples: path node
 
 // Lines 3 and 4 are sign type specific
 
 /*
  * Pathfinding Node Signs
  * These signs indicate a node that agents can travel to and from
- * Pathfinding connections are neccesary for these
  */
 
 // Line 2: Sign type "path node"
@@ -78,21 +77,6 @@ pub struct Sign {
 // (4th line empty)
 
 /*
- * Pathfinding Connection Signs
- * These signs indiciate that two pathfinding nodes have a clear path in between one another
- */
-
-// Line 2: Sign type "path connection"
-// Line 3: First node to connect
-// Line 4: Second node to connect
-
-// Example:
-// SSS
-// path connection
-// Hallway A
-// Hallway B
-
-/*
  * Portal Signs
  * These signs indicate that a pathfinding node has a portal that connects to another pathfinding
  * node. This point will be inside of the portal. Note that this only establishes
@@ -128,8 +112,6 @@ pub struct Sign {
  * Storage Complex Signs
  * These signs indicate an area of storage containers to be used by the network
  * This will also act as a pathfinding node of the given name
- * It is assumed that any pathfinding connections have a clear path to and from
- * anywhere one y-level above the containers
  */
 
 // Line 2: Sign type "storage complex"
@@ -139,8 +121,6 @@ pub struct Sign {
 /*
  * Storage Tower Signs
  * These signs indicate a 9x9 tower of chests with a hole in the middle
- * It is assumed that any pathfinding connections have a clear path, either above or below the
- * tower
  */
 
 // Line 2: Sign type: "storage tower"
@@ -152,10 +132,6 @@ pub enum ParsedSign {
     PathfindingNode {
         effective_location: Location,
         name: String,
-    },
-    PathfindingConnection {
-        node_a_name: String,
-        node_b_name: String,
     },
     PickupChest {
         effective_location: Vec3,
@@ -209,8 +185,6 @@ pub enum SignConfigValidationError {
     DuplicatePathfindingNode { name: String },
     #[error("Referenced node {name} is unknown")]
     UnknownNode { name: String },
-    #[error("Connection between node {name_a} and {name_b} is invalid because they are in different dimensions. Use a portal sign to link these.")]
-    InterdimentionalConnection { name_a: String, name_b: String },
 }
 
 fn parse_offset(offset: &str) -> Result<Vec3, SignParseError> {
@@ -262,19 +236,6 @@ impl TryFrom<&Sign> for ParsedSign {
                 Ok(ParsedSign::PathfindingNode {
                     effective_location,
                     name,
-                })
-            }
-            "path connection" => {
-                let name_a = s.lines[2].clone();
-                let name_b = s.lines[3].clone();
-
-                if name_a.len() == 0 || name_b.len() == 0 {
-                    return Err(SignParseError::NameEmpty);
-                }
-
-                Ok(ParsedSign::PathfindingConnection {
-                    node_a_name: name_a,
-                    node_b_name: name_b,
                 })
             }
             "pickup" => {
@@ -343,7 +304,6 @@ pub struct Portal {
 pub struct PathfindingNode {
     pub location: Location,
     pub name: String,
-    pub connections: Vec<String>,
     pub pickup: Option<Vec3>,
     pub dropoff: Option<Vec3>,
     pub portal: Option<Portal>,
@@ -432,7 +392,6 @@ impl SignConfigState {
                         PathfindingNode {
                             name: name.clone(),
                             location: *effective_location,
-                            connections: Vec::new(),
                             pickup: None,
                             dropoff: None,
                             portal: None,
@@ -466,7 +425,6 @@ impl SignConfigState {
                                 },
                                 dim: *dimension,
                             },
-                            connections: Vec::new(),
                             pickup: None,
                             dropoff: None,
                             portal: None,
@@ -496,7 +454,6 @@ impl SignConfigState {
                                 vec3: *origin,
                                 dim: *dimension,
                             },
-                            connections: Vec::new(),
                             pickup: None,
                             dropoff: None,
                             portal: None,
@@ -517,46 +474,8 @@ impl SignConfigState {
             };
         });
 
-        // Add all connections, pickups, and drop-offs
+        // Add all pickups and drop-offs
         parsed_signs.iter().for_each(|sign| match sign {
-            ParsedSign::PathfindingConnection {
-                node_a_name,
-                node_b_name,
-            } => {
-                let node_a = nodes.get(node_a_name);
-                let node_b = nodes.get(node_b_name);
-
-                if node_a.is_none() {
-                    validation_errors.push(SignConfigValidationError::UnknownNode {
-                        name: node_a_name.clone(),
-                    });
-                    return;
-                }
-
-                if node_b.is_none() {
-                    validation_errors.push(SignConfigValidationError::UnknownNode {
-                        name: node_b_name.clone(),
-                    });
-                    return;
-                }
-
-                let node_a = node_a.unwrap();
-                let node_b = node_b.unwrap();
-
-                if node_a.location.dim != node_b.location.dim {
-                    validation_errors.push(SignConfigValidationError::InterdimentionalConnection {
-                        name_a: node_a_name.clone(),
-                        name_b: node_b_name.clone(),
-                    });
-                    return;
-                }
-
-                let node_a = nodes.get_mut(node_a_name).unwrap();
-                node_a.connections.push(node_b_name.clone());
-
-                let node_b = nodes.get_mut(node_b_name).unwrap();
-                node_b.connections.push(node_a_name.clone());
-            }
             ParsedSign::DropOffLocation {
                 node_name,
                 effective_location,

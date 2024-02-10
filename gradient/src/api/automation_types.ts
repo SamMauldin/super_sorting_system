@@ -11,7 +11,6 @@ export type InventoriesWithLoc = Array<InventoryWithLoc>;
 export type PathfindingNode = {
   location: Loc;
   name: string;
-  connections: string[];
   pickup?: Vec3;
   dropoff?: Vec3;
 };
@@ -43,11 +42,6 @@ type SignValidationError =
   | {
       type: 'UnknownNode';
       name: string;
-    }
-  | {
-      type: 'InterdimentionalConnection';
-      name_a: string;
-      name_b: string;
     };
 
 export type CompiledSignConfig = {

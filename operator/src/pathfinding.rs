@@ -66,14 +66,6 @@ fn is_in_complex(loc: Location, sign_config: &CompiledSignConfig) -> Option<Stri
     None
 }
 
-fn is_roughly_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
-    let target_dist = b.dist(c);
-
-    let actual_dist = a.dist(b) + a.dist(c);
-
-    actual_dist - 3_f64 <= target_dist
-}
-
 fn is_exactly_in_between(a: Vec3, b: Vec3, c: Vec3) -> bool {
     let mut equality_count = 0;
     if a.x == b.x && b.x == c.x {
@@ -120,37 +112,6 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
 
     if let Some((name, _node)) = nearby_portal {
         return Some(name.to_owned());
-    }
-
-    // In between two nodes, select closest
-    let in_between_node_res = sign_config
-        .nodes
-        .iter()
-        .find_map(|(node_name, node)| {
-            node.connections.iter().find_map(|other_name| {
-                let other_node = sign_config.nodes.get(other_name).unwrap();
-
-                if is_roughly_in_between(
-                    start_loc.vec3,
-                    node.location.vec3,
-                    other_node.location.vec3,
-                ) {
-                    if start_loc.vec3.dist(node.location.vec3)
-                        < start_loc.vec3.dist(other_node.location.vec3)
-                    {
-                        Some(node_name)
-                    } else {
-                        Some(other_name)
-                    }
-                } else {
-                    None
-                }
-            })
-        })
-        .map(|node| node.to_owned());
-
-    if let Some(node) = in_between_node_res {
-        return Some(node)
     }
 
     // Fallback to nearest node in same dimension
@@ -208,13 +169,19 @@ pub fn find_path(
         |node| match &node {
             PfNode::Normal { node } => {
                 let config_node = sign_config.nodes.get(node).unwrap();
-                let mut connected_nodes: Vec<PfNode> = config_node
-                    .connections
-                    .iter()
-                    .map(|name| PfNode::Normal {
-                        node: name.to_owned(),
-                    })
-                    .collect();
+                let mut connected_nodes: Vec<PfNode> = sign_config.nodes.iter().filter(|(name, sign_node)| {
+                    if node == *name {
+                        return false
+                    }
+
+                    if sign_node.location.dim != config_node.location.dim {
+                        return false
+                    }
+                    
+                    return true
+                }).map(|(name, _sign_node)| PfNode::Normal {
+                    node: name.to_owned(),
+                }).collect();
 
                 if config_node.portal.is_some() {
                     connected_nodes.push(PfNode::Portal {

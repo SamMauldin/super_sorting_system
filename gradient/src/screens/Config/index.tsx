@@ -68,7 +68,6 @@ export const Config = () => {
                     ) : (
                       <button onClick={rescan}>Re-scan Location</button>
                     )}
-                    <p>Connections: {node.connections.join(', ')}</p>
                     <p>
                       Location: <LocText location={node.location} />
                     </p>
@@ -107,13 +106,6 @@ export const Config = () => {
             return (
               <li key={idx}>
                 Node {err.name} was referenced, but it is unknown.
-              </li>
-            );
-          } else if (err.type === 'InterdimentionalConnection') {
-            return (
-              <li key={idx}>
-                Cannot connect nodes {err.name_a} and {err.name_b} because they
-                are in different dimensions. Use a portal sign to link these.
               </li>
             );
           } else {
