@@ -149,7 +149,24 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
         })
         .map(|node| node.to_owned());
 
-    in_between_node_res
+    if let Some(node) = in_between_node_res {
+        return Some(node)
+    }
+
+    // Fallback to nearest node in same dimension
+    let mut nodes_in_dim = sign_config
+        .nodes
+        .iter()
+        .filter(|(_name, node)| node.location.dim == start_loc.dim)
+        .collect::<Vec<_>>();
+
+    nodes_in_dim.sort_by(|a, b| {
+        let a_dist = start_loc.vec3.dist(a.1.location.vec3);
+        let b_dist = start_loc.vec3.dist(b.1.location.vec3);
+        a_dist.total_cmp(&b_dist)
+    });
+
+    nodes_in_dim.first().map(|(name, _node)|name.to_owned()).cloned()
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
