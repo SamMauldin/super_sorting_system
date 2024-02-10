@@ -98,6 +98,9 @@ export const unloadShulker = async (
   assert(button);
   await bot.activateBlock(button);
 
+  // Wait for piston to fully retract
+  await setTimeout(50 * 5);
+
   // Wait for shulker to be collected
   while (true) {
     await setTimeout(50);
