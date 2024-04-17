@@ -58,6 +58,10 @@ const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
 
 const parseLine = (line: any): string => {
   const valParsed = JSON.parse(line);
+  // Sometimes it is just a string...
+  if (typeof valParsed === 'string') {
+    return valParsed;
+  }
   return valParsed['text'];
 };
 
