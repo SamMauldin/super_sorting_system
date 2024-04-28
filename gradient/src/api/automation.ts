@@ -11,8 +11,8 @@ import {
 } from './automation_types';
 import { Item } from './types';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL!;
-const API_KEY = process.env.REACT_APP_API_KEY!;
+const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL!;
+const API_KEY = import.meta.env.REACT_APP_API_KEY!;
 
 const endpoint = (name: string) => `${BASE_URL}/automation/${name}`;
 const headers = { 'X-Api-Key': API_KEY };
