@@ -4,7 +4,8 @@ export const potionDecorator: Decorator = (item): string | null => {
   const nbtPotionValue: string | undefined = item.nbt?.value?.Potion?.value;
   if (!nbtPotionValue) return null;
 
-  const value = nbtPotionValue.split(':')[1];
+  const valueArr = nbtPotionValue.split(':');
+  const value = valueArr[valueArr.length - 1];
 
   return value
     .split('_')

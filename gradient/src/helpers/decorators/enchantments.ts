@@ -9,7 +9,8 @@ export const enchantmentsDecorator: Decorator = (
   if (!nbtEnchantments) return null;
 
   const enchantments = nbtEnchantments.value.value.map((enchant: any) => {
-    const name = enchant.id.value.split(':')[1];
+    const nameArr = enchant.id.value.split(':');
+    const name = nameArr[nameArr.length - 1];
     const level = enchant.lvl.value;
 
     const enchantmentType = mcData.enchantments.get(name);
@@ -21,5 +22,5 @@ export const enchantmentsDecorator: Decorator = (
 
   if (enchantments.length === 0) return null;
 
-  return enchantments.join(", ");
+  return enchantments.join(', ');
 };
