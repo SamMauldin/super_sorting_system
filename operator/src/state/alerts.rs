@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -38,5 +38,9 @@ impl AlertState {
         warn!("{:?}", self.alerts.last().unwrap());
 
         self.alerts.last().unwrap()
+    }
+
+    pub fn purge_old_alerts(&mut self) {
+        self.alerts.retain(|alert| alert.timestamp > (Utc::now() - Duration::minutes(30)));
     }
 }

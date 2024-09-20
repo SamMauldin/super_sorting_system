@@ -7,3 +7,4 @@ pub mod operation_expiration;
 pub mod service;
 pub mod shulker_loader;
 pub mod shulker_unloader;
+pub mod alert_expiration;
