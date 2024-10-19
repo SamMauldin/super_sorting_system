@@ -12,5 +12,5 @@ export type Stats = {
 
   agents_connected: number;
 
-  services_tick_time_micros: number;
+  services_tick_times_micros: { [service: string]: number };
 };

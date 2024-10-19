@@ -14,6 +14,9 @@ export const Stats = () => {
 
   const { data: stats } = data;
 
+  const tickTimeEntries = Object.entries(stats.services_tick_times_micros);
+  tickTimeEntries.sort((a, b) => b[1] - a[1]);
+
   return (
     <Container>
       <RowTitle>Operations</RowTitle>
@@ -34,10 +37,17 @@ export const Stats = () => {
       <Row>
         <StatCard title="Agents Connected" value={stats.agents_connected} />
         <StatCard title="Slot Holds" value={stats.current_holds} />
-        <StatCard
-          title="Services Tick Time (ms)"
-          value={Math.round(stats.services_tick_time_micros / 100) / 10}
-        />
+      </Row>
+      <Row>
+        <code>
+          {tickTimeEntries.map(([serviceName, tickTimeMicros]) => {
+            return (
+              <p>
+                {serviceName}: {Math.round(tickTimeMicros / 100) / 10}ms
+              </p>
+            );
+          })}
+        </code>
       </Row>
     </Container>
   );
