@@ -145,7 +145,7 @@ impl UnhashedItem {
         s.finish()
     }
 
-    pub fn shulker_data(&self) -> Option<ShulkerData> {
+    pub fn shulker_data(&self) -> Option<Box<ShulkerData>> {
         let mc_data_item = MC_DATA.items_by_id.get(&self.item_id)?;
         if !mc_data_item.name.ends_with("shulker_box") {
             return None;
@@ -244,12 +244,12 @@ impl UnhashedItem {
             })
             .unwrap_or_else(|| vec![]);
 
-        Some(ShulkerData {
+        Some(Box::new(ShulkerData {
             name,
             color,
             contained_items,
             empty,
-        })
+        }))
     }
 }
 
@@ -304,7 +304,7 @@ pub struct Item {
     pub stackable_hash: u64,
 
     #[serde(skip)]
-    pub shulker_data: Option<ShulkerData>,
+    pub shulker_data: Option<Box<ShulkerData>>,
 }
 
 impl Display for Item {
