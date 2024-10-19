@@ -160,8 +160,7 @@ impl UnhashedItem {
             .nbt
             .pointer("/value/display/value/Name/value")
             .and_then(|nbt_val| nbt_val.as_str())
-            .and_then(|nbt_str| serde_json::from_str::<NbtNameStr>(nbt_str).ok())
-            .map(|name| name.text);
+            .and_then(|nbt_str| serde_json::from_str::<String>(nbt_str).ok());
 
         let contained_items_nbt = self
             .nbt
@@ -284,11 +283,6 @@ pub struct ShulkerData {
     pub color: Option<String>,
     pub contained_items: Vec<Item>,
     pub empty: bool,
-}
-
-#[derive(Deserialize)]
-struct NbtNameStr {
-    text: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone)]
