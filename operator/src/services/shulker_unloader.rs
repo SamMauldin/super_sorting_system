@@ -68,17 +68,17 @@ impl Service for ShulkerUnloaderService {
 
                     let first_item_hash =
                         &shulker_data.contained_items.first().unwrap().stackable_hash;
-                    let mut full_of_one_type = true;
+                    let mut one_type_full_stacks = true;
 
                     for item in shulker_data.contained_items.iter() {
                         if &item.stackable_hash != first_item_hash || item.count != item.stack_size
                         {
-                            full_of_one_type = false;
+                            one_type_full_stacks = false;
                             break;
                         }
                     }
 
-                    if full_of_one_type {
+                    if one_type_full_stacks && shulker_data.contained_items.len() == 27 {
                         let unpacked_count = counts_by_stackable_hash.get(&item.stackable_hash);
                         if let Some(unpacked_count) = unpacked_count {
                             if *unpacked_count >= item.stack_size * 27 {
