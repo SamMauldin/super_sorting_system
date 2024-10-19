@@ -14,6 +14,7 @@ use std::{
     sync::Mutex,
     thread,
     time::{Duration, Instant},
+    collections::HashMap,
 };
 
 use actix_cors::Cors;
@@ -23,12 +24,11 @@ use uuid::Uuid;
 
 use crate::{
     services::{
-        agent_expiration::AgentExpirationService, defragger::DefraggerService,
-        hold_expiration::HoldExpirationService, inventory_scanner::InventoryScannerService,
-        node_scanner::NodeScannerService, operation_expiration::OperationExpirationService,
-        alert_expiration::AlertExpirationService,
-        service::Service, shulker_loader::ShulkerLoaderService,
-        shulker_unloader::ShulkerUnloaderService,
+        agent_expiration::AgentExpirationService, alert_expiration::AlertExpirationService,
+        defragger::DefraggerService, hold_expiration::HoldExpirationService,
+        inventory_scanner::InventoryScannerService, node_scanner::NodeScannerService,
+        operation_expiration::OperationExpirationService, service::Service,
+        shulker_loader::ShulkerLoaderService, shulker_unloader::ShulkerUnloaderService,
     },
     state::StateData,
 };
@@ -57,32 +57,31 @@ async fn main() -> Result<(), StartupError> {
         let state = bg_state.clone();
         let config = bg_config.clone();
 
-        let mut inventory_scanner_service = InventoryScannerService::new(&config);
-        let mut agent_expiration_service = AgentExpirationService::new(&config);
-        let mut defragger_service = DefraggerService::new(&config);
-        let mut hold_expiration_service = HoldExpirationService::new(&config);
-        let mut node_scanner_service = NodeScannerService::new(&config);
-        let mut shulker_unloader_service = ShulkerUnloaderService::new(&config);
-        let mut shulker_loader_service = ShulkerLoaderService::new(&config);
-        let mut operation_expiration_service = OperationExpirationService::new(&config);
-        let mut alert_expiration_service = AlertExpirationService::new(&config);
+        let mut services_list: Vec<Box<dyn Service>> = vec![
+            Box::new(InventoryScannerService::new(&config)),
+            Box::new(AgentExpirationService::new(&config)),
+            Box::new(DefraggerService::new(&config)),
+            Box::new(HoldExpirationService::new(&config)),
+            Box::new(NodeScannerService::new(&config)),
+            Box::new(ShulkerUnloaderService::new(&config)),
+            Box::new(ShulkerLoaderService::new(&config)),
+            Box::new(OperationExpirationService::new(&config)),
+            Box::new(AlertExpirationService::new(&config)),
+        ];
 
         loop {
             thread::sleep(Duration::from_millis(1000));
             let mut state = state.lock().unwrap();
 
-            let start_time = Instant::now();
-            inventory_scanner_service.tick(&mut state);
-            agent_expiration_service.tick(&mut state);
-            defragger_service.tick(&mut state);
-            hold_expiration_service.tick(&mut state);
-            node_scanner_service.tick(&mut state);
-            shulker_unloader_service.tick(&mut state);
-            shulker_loader_service.tick(&mut state);
-            operation_expiration_service.tick(&mut state);
-            alert_expiration_service.tick(&mut state);
+            let mut services_tick_time = HashMap::new();
 
-            state.metrics.services_tick_time = Some(start_time.elapsed());
+            for service in services_list.iter_mut() {
+                let start_time = Instant::now();
+                service.tick(&mut state);
+                services_tick_time.insert(service.get_name(), start_time.elapsed());
+            }
+
+            state.metrics.services_tick_time = Some(services_tick_time);
         }
     });
 

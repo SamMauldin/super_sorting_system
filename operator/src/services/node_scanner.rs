@@ -27,6 +27,10 @@ pub struct NodeScannerService {
 }
 
 impl Service for NodeScannerService {
+    fn get_name(&self) -> &'static str {
+        "node_scanner"
+    }
+
     fn new(_config: &Config) -> Self {
         NodeScannerService {
             tracked_nodes: Default::default(),

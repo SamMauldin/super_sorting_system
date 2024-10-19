@@ -5,6 +5,10 @@ use super::service::Service;
 pub struct AlertExpirationService {}
 
 impl Service for AlertExpirationService {
+    fn get_name(&self) -> &'static str {
+        "alert_expiration"
+    }
+
     fn new(_config: &Config) -> Self {
         Self {}
     }

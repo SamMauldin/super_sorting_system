@@ -1,4 +1,5 @@
 use serde::Serialize;
+use std::collections::HashMap;
 
 use crate::{state::operations::OperationStatus, state::State};
 
@@ -17,7 +18,7 @@ pub struct Stats {
 
     pub agents_connected: usize,
 
-    pub services_tick_time_micros: usize,
+    pub services_tick_times_micros: HashMap<&'static str, u64>,
 }
 
 pub fn calculate_stats(state: &State) -> Stats {
@@ -39,10 +40,19 @@ pub fn calculate_stats(state: &State) -> Stats {
 
     let agents_connected = state.agents.iter().count();
 
-    let services_tick_time_micros = state
+    let services_tick_times_micros = state
         .metrics
         .services_tick_time
-        .map_or(0, |dur| dur.as_micros()) as usize;
+        .as_ref()
+        .map_or_else(|| HashMap::new(), |dur_map| {
+            let mut mapped_map = HashMap::new();
+
+            for (name, dur) in dur_map.iter() {
+                mapped_map.insert(*name, dur.as_micros() as u64);
+            }
+
+            mapped_map
+        });
 
     Stats {
         inventories_in_mem,
@@ -58,6 +68,6 @@ pub fn calculate_stats(state: &State) -> Stats {
 
         agents_connected,
 
-        services_tick_time_micros,
+        services_tick_times_micros,
     }
 }

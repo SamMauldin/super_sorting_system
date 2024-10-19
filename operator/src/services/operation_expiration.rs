@@ -5,6 +5,10 @@ use super::service::Service;
 pub struct OperationExpirationService {}
 
 impl Service for OperationExpirationService {
+    fn get_name(&self) -> &'static str {
+        "operation_expiration"
+    }
+
     fn new(_config: &Config) -> Self {
         Self {}
     }

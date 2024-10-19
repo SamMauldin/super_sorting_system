@@ -26,6 +26,10 @@ pub struct InventoryScannerService {
 }
 
 impl Service for InventoryScannerService {
+    fn get_name(&self) -> &'static str {
+        "inventory_scanner"
+    }
+
     fn new(_config: &Config) -> Self {
         InventoryScannerService {
             tracked_inventories: Default::default(),

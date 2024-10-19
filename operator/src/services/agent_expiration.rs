@@ -11,6 +11,10 @@ use super::service::Service;
 pub struct AgentExpirationService {}
 
 impl Service for AgentExpirationService {
+    fn get_name(&self) -> &'static str {
+        "agent_expiration"
+    }
+
     fn new(_config: &Config) -> Self {
         AgentExpirationService {}
     }

@@ -10,6 +10,10 @@ use super::service::Service;
 pub struct HoldExpirationService {}
 
 impl Service for HoldExpirationService {
+    fn get_name(&self) -> &'static str {
+        "hold_expiration"
+    }
+
     fn new(_config: &Config) -> Self {
         HoldExpirationService {}
     }

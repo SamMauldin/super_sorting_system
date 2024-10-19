@@ -16,6 +16,10 @@ pub struct DefraggerService {
 }
 
 impl Service for DefraggerService {
+    fn get_name(&self) -> &'static str {
+        "defragger"
+    }
+
     fn new(_config: &Config) -> Self {
         DefraggerService {
             outstanding_operation: None,

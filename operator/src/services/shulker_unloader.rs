@@ -12,6 +12,10 @@ pub struct ShulkerUnloaderService {
 }
 
 impl Service for ShulkerUnloaderService {
+    fn get_name(&self) -> &'static str {
+        "shulker_unloader"
+    }
+
     fn new(_config: &Config) -> Self {
         ShulkerUnloaderService {
             outstanding_operation: None,
