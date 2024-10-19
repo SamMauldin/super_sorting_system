@@ -59,6 +59,7 @@ async fn main() -> Result<(), StartupError> {
         let config = bg_config.clone();
 
         let mut services_list: Vec<Box<dyn Service>> = vec![
+            Box::new(AbortedOperationRecoveryService::new(&config)),
             Box::new(InventoryScannerService::new(&config)),
             Box::new(AgentExpirationService::new(&config)),
             Box::new(DefraggerService::new(&config)),
@@ -68,7 +69,6 @@ async fn main() -> Result<(), StartupError> {
             Box::new(ShulkerLoaderService::new(&config)),
             Box::new(OperationExpirationService::new(&config)),
             Box::new(AlertExpirationService::new(&config)),
-            Box::new(AbortedOperationRecoveryService::new(&config)),
         ];
 
         loop {
