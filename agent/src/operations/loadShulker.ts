@@ -115,7 +115,10 @@ export const loadShulker = async (
   bot.setQuickBarSlot(0);
   bot.updateHeldItem();
   assert(bot.inventory.slots[36]);
-  assert(bot.inventory.slots[36].name.endsWith('shulker_box'));
+  assert(
+    bot.inventory.slots[36].name.endsWith('shulker_box'),
+    `${bot.inventory.slots[36].name} present in slot 36, not shulker box`
+  );
   const piston = bot.blockAt(
     vec3(shulker_station_location.vec3).add(vec3([0, 3, 0]))
   );
