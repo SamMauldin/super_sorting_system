@@ -176,7 +176,7 @@ impl UnhashedItem {
             .map(|items_list| {
                 items_list
                     .iter()
-                    .map(|nbt_item| {
+                    .flat_map(|nbt_item| {
                         let item_mc_name = nbt_item
                             .pointer("/id/value")
                             .unwrap()
@@ -239,7 +239,6 @@ impl UnhashedItem {
                             .into_item(),
                         )
                     })
-                    .flatten()
                     .collect::<Vec<Item>>()
             })
             .unwrap_or_else(|| vec![]);

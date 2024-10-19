@@ -125,8 +125,7 @@ impl OperationState {
     ) -> Option<&Operation> {
         let shulker_stations_in_use = self
             .iter(OperationStatus::InProgress)
-            .map(|op| op.shulker_station_location())
-            .flatten()
+            .flat_map(|op| op.shulker_station_location())
             .collect::<Vec<Location>>();
 
         let mut leading_operation: Option<(usize, Uuid, &Operation, i32)> = None;
