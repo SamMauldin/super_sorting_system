@@ -213,11 +213,12 @@ impl OperationState {
     }
 
     pub fn purge_old_operations(&mut self) {
+        let retain_time = Utc::now() - Duration::minutes(15);
         self.operations.retain(|_, op| match op.status {
             OperationStatus::Pending | OperationStatus::InProgress => true,
             OperationStatus::Complete | OperationStatus::Aborted => {
                 if let Some(finalized_at) = op.finalized_at {
-                    finalized_at > (Utc::now() - Duration::minutes(15))
+                    finalized_at > retain_time
                 } else {
                     false
                 }

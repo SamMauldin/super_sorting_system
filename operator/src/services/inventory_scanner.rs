@@ -116,6 +116,8 @@ impl Service for InventoryScannerService {
             }
         }
 
+        let rescan_time = Utc::now() - Duration::hours(2);
+
         for (loc, inventory) in self.tracked_inventories.iter_mut() {
             if let Some(op_id) = inventory.current_scan_operation_id {
                 let op = state.operations.get(op_id);
@@ -134,7 +136,7 @@ impl Service for InventoryScannerService {
             let existing_inventory = state.inventories.inventory_contents_at(loc);
 
             let needs_rescan = match existing_inventory {
-                Some(inventory) => inventory.scanned_at + Duration::hours(2) < Utc::now(),
+                Some(inventory) => inventory.scanned_at < rescan_time,
                 None => true,
             };
 
