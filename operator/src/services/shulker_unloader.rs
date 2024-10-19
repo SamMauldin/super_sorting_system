@@ -5,7 +5,6 @@ use crate::{
     state::operations::{OperationKind, OperationPriority, OperationStatus},
     state::State,
 };
-use std::collections::HashMap;
 use uuid::Uuid;
 
 pub struct ShulkerUnloaderService {
@@ -45,12 +44,6 @@ impl Service for ShulkerUnloaderService {
             shulker_unpacking: ShulkerUnpacking::None,
         });
 
-        let mut counts_by_stackable_hash = HashMap::new();
-
-        for item in inv_listing.iter() {
-            counts_by_stackable_hash.insert(item.stackable_hash, item.count);
-        }
-
         'shulker: for (loc, slot, item, open_from) in state.inventories.iter_slots() {
             if let Some(item) = item {
                 if let Some(shulker_data) = &item.shulker_data {
@@ -68,21 +61,28 @@ impl Service for ShulkerUnloaderService {
 
                     let first_item_hash =
                         &shulker_data.contained_items.first().unwrap().stackable_hash;
-                    let mut full_of_one_type = true;
+                    let mut contains_one_type = true;
 
                     for item in shulker_data.contained_items.iter() {
-                        if &item.stackable_hash != first_item_hash || item.count != item.stack_size
-                        {
-                            full_of_one_type = false;
-                            break;
+                        if &item.stackable_hash != first_item_hash {
+                            contains_one_type = false;
+                            continue;
                         }
                     }
 
-                    if full_of_one_type {
-                        let unpacked_count = counts_by_stackable_hash.get(&item.stackable_hash);
-                        if let Some(unpacked_count) = unpacked_count {
-                            if *unpacked_count >= item.stack_size * 27 {
-                                continue 'shulker;
+                    let is_full = shulker_data.contained_items.len() == 27
+                        && shulker_data
+                            .contained_items
+                            .iter()
+                            .find(|i| i.stack_size != i.count)
+                            .is_none();
+
+                    if contains_one_type && is_full {
+                        for item in inv_listing.iter() {
+                            if &item.stackable_hash == first_item_hash {
+                                if item.count >= item.stack_size * 27 {
+                                    continue 'shulker;
+                                }
                             }
                         }
                     }
