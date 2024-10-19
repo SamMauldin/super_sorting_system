@@ -127,7 +127,10 @@ fn find_aligned_node(start_loc: Location, sign_config: &CompiledSignConfig) -> O
         a_dist.total_cmp(&b_dist)
     });
 
-    nodes_in_dim.first().map(|(name, _node)|name.to_owned()).cloned()
+    nodes_in_dim
+        .first()
+        .map(|(name, _node)| name.to_owned())
+        .cloned()
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -169,19 +172,24 @@ pub fn find_path(
         |node| match &node {
             PfNode::Normal { node } => {
                 let config_node = sign_config.nodes.get(node).unwrap();
-                let mut connected_nodes: Vec<PfNode> = sign_config.nodes.iter().filter(|(name, sign_node)| {
-                    if node == *name {
-                        return false
-                    }
+                let mut connected_nodes: Vec<PfNode> = sign_config
+                    .nodes
+                    .iter()
+                    .filter(|(name, sign_node)| {
+                        if node == *name {
+                            return false;
+                        }
 
-                    if sign_node.location.dim != config_node.location.dim {
-                        return false
-                    }
-                    
-                    return true
-                }).map(|(name, _sign_node)| PfNode::Normal {
-                    node: name.to_owned(),
-                }).collect();
+                        if sign_node.location.dim != config_node.location.dim {
+                            return false;
+                        }
+
+                        return true;
+                    })
+                    .map(|(name, _sign_node)| PfNode::Normal {
+                        node: name.to_owned(),
+                    })
+                    .collect();
 
                 if config_node.portal.is_some() {
                     connected_nodes.push(PfNode::Portal {

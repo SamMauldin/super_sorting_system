@@ -118,7 +118,11 @@ impl OperationState {
         self.operations.get(&id).unwrap()
     }
 
-    pub fn take_next_operation(&mut self, starting_loc: Location, has_clear_inventory: bool) -> Option<&Operation> {
+    pub fn take_next_operation(
+        &mut self,
+        starting_loc: Location,
+        has_clear_inventory: bool,
+    ) -> Option<&Operation> {
         let shulker_stations_in_use = self
             .iter(OperationStatus::InProgress)
             .map(|op| op.shulker_station_location())

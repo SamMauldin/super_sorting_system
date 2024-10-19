@@ -41,6 +41,7 @@ impl AlertState {
     }
 
     pub fn purge_old_alerts(&mut self) {
-        self.alerts.retain(|alert| alert.timestamp > (Utc::now() - Duration::minutes(30)));
+        self.alerts
+            .retain(|alert| alert.timestamp > (Utc::now() - Duration::minutes(30)));
     }
 }
