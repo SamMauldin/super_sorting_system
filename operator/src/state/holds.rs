@@ -45,6 +45,16 @@ impl HoldState {
         self.holds.remove(&id)
     }
 
+    pub fn takeover(&mut self, id: Uuid) -> Option<&Hold> {
+        let previous_hold = self.holds.remove(&id)?;
+
+        let new_id = Uuid::new_v4();
+        self.holds.insert(new_id, previous_hold);
+        self.renew(new_id);
+
+        Some(self.holds.get(&new_id).unwrap())
+    }
+
     pub fn existing_hold(&self, location: Location, slot: u32) -> Option<&Hold> {
         self.holds
             .iter()

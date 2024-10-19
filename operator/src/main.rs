@@ -11,10 +11,10 @@ mod stats;
 mod types;
 
 use std::{
+    collections::HashMap,
     sync::Mutex,
     thread,
     time::{Duration, Instant},
-    collections::HashMap,
 };
 
 use actix_cors::Cors;
@@ -24,6 +24,7 @@ use uuid::Uuid;
 
 use crate::{
     services::{
+        aborted_operation_recovery::AbortedOperationRecoveryService,
         agent_expiration::AgentExpirationService, alert_expiration::AlertExpirationService,
         defragger::DefraggerService, hold_expiration::HoldExpirationService,
         inventory_scanner::InventoryScannerService, node_scanner::NodeScannerService,
@@ -67,6 +68,7 @@ async fn main() -> Result<(), StartupError> {
             Box::new(ShulkerLoaderService::new(&config)),
             Box::new(OperationExpirationService::new(&config)),
             Box::new(AlertExpirationService::new(&config)),
+            Box::new(AbortedOperationRecoveryService::new(&config)),
         ];
 
         loop {

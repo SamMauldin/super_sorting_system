@@ -40,11 +40,9 @@ pub fn calculate_stats(state: &State) -> Stats {
 
     let agents_connected = state.agents.iter().count();
 
-    let services_tick_times_micros = state
-        .metrics
-        .services_tick_time
-        .as_ref()
-        .map_or_else(|| HashMap::new(), |dur_map| {
+    let services_tick_times_micros = state.metrics.services_tick_time.as_ref().map_or_else(
+        || HashMap::new(),
+        |dur_map| {
             let mut mapped_map = HashMap::new();
 
             for (name, dur) in dur_map.iter() {
@@ -52,7 +50,8 @@ pub fn calculate_stats(state: &State) -> Stats {
             }
 
             mapped_map
-        });
+        },
+    );
 
     Stats {
         inventories_in_mem,

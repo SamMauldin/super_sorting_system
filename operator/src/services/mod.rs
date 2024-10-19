@@ -1,3 +1,4 @@
+pub mod aborted_operation_recovery;
 pub mod agent_expiration;
 pub mod alert_expiration;
 pub mod defragger;
