@@ -39,6 +39,7 @@ impl Service for AbortedOperationRecoveryService {
 
         for op_id in new_processed_operations.iter() {
             if !self.processed_operations.contains(op_id) {
+                info!("Attempting hold recovery from operation {}", op_id);
                 let op = state.operations.get(*op_id).unwrap();
 
                 let hold_ids = op
