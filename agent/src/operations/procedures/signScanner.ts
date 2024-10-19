@@ -37,7 +37,6 @@ const yieldTick = () => new Promise((resolve) => setImmediate(resolve));
 
 const scanVisibleRegion = async (bot: Bot): Promise<ScanRegion[]> => {
   const loadedChunks = bot.world.getColumns();
-
   const scannedRegions: ScanRegion[] = [];
 
   for (const chunk of loadedChunks) {
@@ -79,6 +78,11 @@ const getSignsInChunk = (
       blockEntityData?.['value']?.['front_text']?.['value']?.['messages']?.[
         'value'
       ]?.['value'];
+    const backTextMessages =
+      blockEntityData?.['value']?.['back_text']?.['value']?.['messages']?.[
+        'value'
+      ]?.['value'];
+
     if (frontTextMessages) {
       const posElements = posStr.split(',').map((val: string) => parseInt(val));
       const vec = {
@@ -97,6 +101,29 @@ const getSignsInChunk = (
         lines
       });
     }
+
+    if (backTextMessages) {
+      const posElements = posStr.split(',').map((val: string) => parseInt(val));
+      const vec = {
+        x: posElements[0] + chunkPos.x,
+        y: posElements[1] + chunkPos.y,
+        z: posElements[2] + chunkPos.z
+      };
+      const lines = [
+        parseLine(backTextMessages[0]),
+        parseLine(backTextMessages[1]),
+        parseLine(backTextMessages[2]),
+        parseLine(backTextMessages[3])
+      ];
+      signs.push({
+        location: { vec3: vec, dim: stringToDim(bot.game.dimension) },
+        lines
+      });
+    }
+  }
+
+  if (signs.length > 0) {
+    console.log(signs);
   }
 
   return {
