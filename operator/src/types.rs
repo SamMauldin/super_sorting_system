@@ -186,8 +186,32 @@ impl UnhashedItem {
                             .unwrap();
                         let mc_data_item = MC_DATA.items_by_name.get(item_mc_name)?;
                         let count = nbt_item.pointer("/Count/value").unwrap().as_u64().unwrap();
-                        let nbt = nbt_item
-                            .pointer("/tag")
+
+                        const USE_VIA_VERSION_FIX: bool = true;
+
+                        let mut nbt = nbt_item.pointer("/tag");
+
+                        if USE_VIA_VERSION_FIX {
+                            // ViaVersion appears to add this NBT tag to everything, regardless of
+                            // actual presence
+                            match nbt {
+                                Some(Value::Object(tag_map)) => {
+                                    if tag_map.len() == 2
+                                        && tag_map
+                                            .get("type")
+                                            .map_or(false, |val| val.as_str() == Some("compound"))
+                                        && tag_map.get("value").map_or(false, |val| {
+                                            val.as_object().unwrap().len() == 0
+                                        })
+                                    {
+                                        nbt = None
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+
+                        let nbt = nbt
                             .map(|tag| match tag {
                                 Value::Object(tag_map) => {
                                     let mut tag_map = tag_map.clone();
